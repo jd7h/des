@@ -23,72 +23,60 @@ RT_TASK handlertask;
 #define PARA_PORT_IRQ 7
 
 #define BASEPERIOD 0
-#define MEASUREMENTS 5
+#define PERIOD 8e5 //kleine periode. //helft van wat we eerst hadden. //3.7e6 //1/18 * 1/15 sec in nanoseconds old: //1e7 //1/18 * 1/5 second in nanoseconds
 
 void handler()
 {
 	rt_printf("Begin interrupt handler of lightsensor\n");
 	int nr_waiting_interrupts = 0;
-	int lr = 0;
-  int counter = 0;
-  RTIME time1,time2;
-  RTIME results[MEASUREMENTS];
-  char byte;
+	int counter = 0;
+  int rightleft = 0;
 	while(1)
 	{
 		nr_waiting_interrupts = rt_intr_wait(&lightsens_intr,TM_INFINITE);
-		if (nr_waiting_interrupts > 0)
+		if (nr_waiting_interrupts > 0 && rightleft==0)
 		{
-      if(lr == 0)
-      {
-        if(counter < MEASUREMENTS)
-        {
-          //do stuff
-          time1 = rt_timer_read();
-          if (counter > 0)
-          {
-            results[counter] = time1-time2;
-            counter++;
-          }
-        }
-        lr = 1;
-        if (counter >= MEASUREMENTS)
-        {
-          int cycletime = (results[0] + results[1])/2;
-          if(results[0] > results[1])
-          {
-            rt_task_sleep(cycletime); //blijf wachten
-            //begin met tekenen
-            byte = 0x7F;
-            outb(byte,0x378);
-          }
-        }
-        //if (result[0] > result[1])  //en als lr = 0, dan gaat de wijzer van links naar rechts
-        //dan: wacht op de volgende interrupt en wacht DAN result[0] en DAN: iets tekenen
-      }
-      else //lr == 1
-      {
-        if(counter < MEASUREMENTS)
-        {
-          //doe andere shit
-          time2 = rt_timer_read();
-          results[counter] = time2-time1;
-          counter++;
-        }
-        lr = 0;
-        if (counter >= MEASUREMENTS)
-        {
-          byte = 0x00;
-          outb(byte,0x378);
-        }
-      }
+      //rt_printf("voor: nr_waiting_interrupts:\t%d\n",nr_waiting_interrupts);
+      int buffer = 0;
+      rt_task_wait_period(NULL);
+      rt_task_wait_period(NULL);
+			//stap 1
+			char byte;
+			byte = byte | 0x63; //0110011
+      //byte = 0x01;
+			outb(byte, 0x378); //set D to first phase of X
+			rt_task_wait_period(NULL);
+			//stap 2
+			byte = 0x14;
+      //byte = 0x02;
+			outb(byte, 0x378);
+			rt_task_wait_period(NULL);
+			//stap 3
+			byte = 0x08;
+      //byte = 0x04;
+			outb(byte,0x378);
+			rt_task_wait_period(NULL);
+			//stap 4
+			byte = 0x14;
+      //byte = 0x08;
+			outb(byte,0x378);
+			rt_task_wait_period(NULL);
+			//stap 5
+			byte = 0x63;
+      //byte = 0x10;
+			outb(byte,0x378);
+			rt_task_wait_period(NULL);
+			//leegmaken
+			byte = 0x00;
+			outb(byte,0x378);
+      //rt_printf("na: nr_waiting_interrupts:\t%d\n",nr_waiting_interrupts);
+      rightleft = 1;
 		}	
+    else
+    {
+      rightleft = 0;
+    }
 	}
-  int j;
-  for (j = 0;j<MEASUREMENTS;j++)
-  {
-    rt_printf("%d\n",results[j]);
-  }
 }
 
 //startup code
@@ -101,6 +89,7 @@ void startup()
 	// define interrupt handler
 	rt_printf("Creating handler task...\n");
 	rt_task_create(&handlertask,NULL,0,99,0);
+	rt_task_set_periodic(&handlertask,TM_NOW,PERIOD);
 
 	rt_printf("Starting task...\n");
 	rt_task_start(&handlertask,&handler,NULL);

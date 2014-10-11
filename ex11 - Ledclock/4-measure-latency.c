@@ -23,7 +23,7 @@ RT_TASK handlertask;
 #define PARA_PORT_IRQ 7
 
 #define BASEPERIOD 0
-#define MEASUREMENTS 5
+#define MEASUREMENTS 180
 
 void handler()
 {
@@ -33,54 +33,30 @@ void handler()
   int counter = 0;
   RTIME time1,time2;
   RTIME results[MEASUREMENTS];
-  char byte;
-	while(1)
+	while(counter < MEASUREMENTS)
 	{
 		nr_waiting_interrupts = rt_intr_wait(&lightsens_intr,TM_INFINITE);
 		if (nr_waiting_interrupts > 0)
 		{
       if(lr == 0)
       {
-        if(counter < MEASUREMENTS)
-        {
-          //do stuff
-          time1 = rt_timer_read();
-          if (counter > 0)
-          {
-            results[counter] = time1-time2;
-            counter++;
-          }
-        }
+        //do stuff
+        time1 = rt_timer_read();
         lr = 1;
-        if (counter >= MEASUREMENTS)
+        if (counter > 0)
         {
-          int cycletime = (results[0] + results[1])/2;
-          if(results[0] > results[1])
-          {
-            rt_task_sleep(cycletime); //blijf wachten
-            //begin met tekenen
-            byte = 0x7F;
-            outb(byte,0x378);
-          }
-        }
-        //if (result[0] > result[1])  //en als lr = 0, dan gaat de wijzer van links naar rechts
-        //dan: wacht op de volgende interrupt en wacht DAN result[0] en DAN: iets tekenen
-      }
-      else //lr == 1
-      {
-        if(counter < MEASUREMENTS)
-        {
-          //doe andere shit
-          time2 = rt_timer_read();
-          results[counter] = time2-time1;
+          results[counter] = time1-time2;
           counter++;
         }
+
+      }
+      else
+      {
+        //doe andere shit
+        time2 = rt_timer_read();
         lr = 0;
-        if (counter >= MEASUREMENTS)
-        {
-          byte = 0x00;
-          outb(byte,0x378);
-        }
+        results[counter] = time2-time1;
+        counter++;
       }
 		}	
 	}
