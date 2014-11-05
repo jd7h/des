@@ -20,93 +20,46 @@ public class Main {
 	
 	static RegulatedMotor left = Motor.B;
 	static RegulatedMotor right = Motor.A;
+	static boolean isMaster = true;
+	static string slavename;
+	
 
 	public static void main(String[] args){
-		
+
+		if(isMaster)
+		{
+			Btfunc.masterSetUp(slavename);
+		}
+		else
+		{
+			//wait for bluetooth connection
+			Btfunc.slaveSetUp();
+		}
+
+		//do the stuff, this is for both slave and master.
 		left.setSpeed(400);
 	    right.setSpeed(400);
 	    
 		Behavior drive = new DriveForward();
-		//Behavior evade = new DetectObstacle(SensorPort.S3,SensorPort.S2);
-		//Behavior staywithinborder = new DetectBlackLine(SensorPort.S1);
-		//Behavior test = new ColorTester(SensorPort.S1);
-	    Behavior hunt = new ColorHunter(SensorPort.S1);
-		//Behavior[] behaviorList = {drive,evade,staywithinborder};
-	    Behavior[] behaviorList = {drive,hunt};
+		Behavior evade = new DetectObstacle(SensorPort.S3,SensorPort.S2);
+		Behavior staywithinborder = new DetectBlackLine(SensorPort.S1);
+		//neem mee of robot master of slave is
+	    Behavior hunt = new ColorHunter(SensorPort.S1,isMaster);
+		Behavior[] behaviorList = {drive,hunt,evade,staywithinborder);
 		Arbitrator arbitrator = new Arbitrator(behaviorList);
 		LCD.drawString("Robot van Judith\n en Mirjam",0,1);
 		Button.waitForAnyPress();
 		arbitrator.start();
-				
-		/*
-		//bluetooth connection, master side
-		String name = "NLT2"; //SLAVE NAME
-		
-		LCD.drawString("Connecting...", 0, 0);
-		LCD.refresh();
-		
-		RemoteDevice btrd = Bluetooth.getKnownDevice(name);
 
-		if (btrd == null) {
-			LCD.clear();
-			LCD.drawString("No such device", 0, 0);
-			LCD.refresh();
-			Thread.sleep(2000);
-			System.exit(1);
+		//start closing the connection
+		if(isMaster)
+		{
+			Btfunc.masterClose();
 		}
-		
-		BTConnection btc = Bluetooth.connect(btrd);
-		
-		if (btc == null) {
-			LCD.clear();
-			LCD.drawString("Connect fail", 0, 0);
-			LCD.refresh();
-			Thread.sleep(2000);
-			System.exit(1);
+		else
+		{
+			Btfunc.slaveClose();
 		}
-		
-		LCD.clear();
-		LCD.drawString("Connected", 0, 0);
-		LCD.refresh();
-		
-		DataInputStream dis = btc.openDataInputStream();
-		DataOutputStream dos = btc.openDataOutputStream();
-				
-		for(int i=0;i<100;i++) {
-			try {
-				LCD.drawInt(i*30000, 8, 0, 2);
-				LCD.refresh();
-				dos.writeInt(i*30000);
-				dos.flush();			
-			} catch (IOException ioe) {
-				LCD.drawString("Write Exception", 0, 0);
-				LCD.refresh();
-			}
-			
-			try {
-				LCD.drawInt(dis.readInt(),8, 0,3);
-				LCD.refresh();
-			} catch (IOException ioe) {
-				LCD.drawString("Read Exception ", 0, 0);
-				LCD.refresh();
-			}
-		}
-		
-		try {
-			LCD.drawString("Closing...    ", 0, 0);
-			LCD.refresh();
-			dis.close();
-			dos.close();
-			btc.close();
-		} catch (IOException ioe) {
-			LCD.drawString("Close Exception", 0, 0);
-			LCD.refresh();
-		}
-		
-		LCD.clear();
-		LCD.drawString("Finished",3, 4);
-		LCD.refresh();
-		Thread.sleep(2000);
-		*/
+
 	}
 }

@@ -10,6 +10,7 @@ import lejos.robotics.subsumption.Behavior;
 public class ColorHunter implements Behavior {
 	
 	private boolean suppressed = false;
+	private boolean isMaster;
 	private ColorSensor cs;
 	private int amount = 3;
 	private boolean prey[] = {false,false,false};
@@ -18,19 +19,28 @@ public class ColorHunter implements Behavior {
         "Megenta", "Orange", "White", "Black", "Pink",
         "Grey", "Light Grey", "Dark Grey", "Cyan"}; 
 	
-	public ColorHunter(SensorPort port)
+	public ColorHunter(SensorPort port, boolean isMaster)
 	{
 		cs = new ColorSensor(port);
+		this.isMaster = isMaster;
 	}
 	
 	public boolean allDone()
 	{
-		for(int i = 0;i<amount;i++)
+		//if this is the masterbot, return normal value
+		if(isMaster)
 		{
-			if(!prey[i])
-				return false;
+			for(int i = 0;i<amount;i++)
+			{
+				if(!prey[i])
+					return false;
+			}
+			return true;
 		}
-		return true;
+		//if this is the slavebot, ask the master
+		//nog aanpassen met bluetooth
+		else
+			return false;
 	}
 
 	@Override
@@ -38,8 +48,8 @@ public class ColorHunter implements Behavior {
 		Color color = cs.getColor();
 		cnr = color.getColor()+1;
 		LCD.drawString(colorlist[cnr], 0, 0);
-		if(allDone())
-			Sound.beepSequenceUp();
+		//if(allDone())
+		//	Sound.beepSequenceUp();
 		return !allDone() && (cnr == 1 || cnr == 3 || cnr == 4);
 	}
 
@@ -47,14 +57,22 @@ public class ColorHunter implements Behavior {
 	public void action() {
 		suppressed = false;
 		Sound.beep();
-		//register the color
-		switch(cnr){
-		case 1:		prey[0] = true; break;
-		case 3:		prey[1] = true; break;
-		case 4:		prey[2] = true; break;
-		default:	LCD.drawString("Wrong color. So sad.",0,4); break; //do nothing
-			}
-		//message the master or keep track
+		//if robot is master, register, do sound & notify slave for sound
+		if(isMaster)
+		{
+			//register the color
+			switch(cnr){
+			case 1:		prey[0] = true; break;
+			case 3:		prey[1] = true; break;
+			case 4:		prey[2] = true; break;
+			default:	LCD.drawString("Wrong color. So sad.",0,4); break; //do nothing
+				}
+		}
+		//if robot is slave
+		else
+		{
+			//notify master & do sound
+		}
 	}
 
 	@Override
