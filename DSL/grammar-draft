@@ -1,0 +1,66 @@
+Automata: 
+	statelist += State+		//we need at least one state
+	arrowlist += Arrow*		//zero or more arrows
+	startstate = [State]	//s zit in de lijst van states
+;
+
+State: 
+	'State' name=ID 'is' 
+	actionlist += Action+	//more than one action
+;
+
+Arrow:
+	'Arrow' from=[State] '->' to=[State] 'if' condition = Condition
+;
+
+Action:
+	'driveForward' ('duration' dl = INT unit = TimeUnit)?	|
+	'driveBackward' ('duration' dl = INT unit = TimeUnit)?	|
+	'turn' direction = Direction
+;
+
+Condition: //sensorcondition
+	LightCondition | SonarCondition | BumperCondition
+;
+
+LightCondition:
+	'lightsensor reads' LightValue
+;
+
+SonarCondition:
+	'sonar detects' SonarValue
+;
+
+BumperCondition:
+	'bumper is' BumperValue
+;
+
+enum BumperValue:
+	PRESSED = 'pressed' | 
+	NOTPRESSED = 'not pressed'
+;
+
+
+enum LightValue:
+	BLACK = 'black' |
+	WHITE = 'white'
+;
+
+enum SonarValue:
+	NOTHING = 'nothing' |
+	SOMETHING = 'something'
+;	
+
+enum TimeUnit:
+	MS = 'ms' |
+	SEC = 'sec'
+;
+
+enum Direction:
+	LEFT = 'left' |
+	RIGHT = 'right'
+;
+	
+	
+	
+
