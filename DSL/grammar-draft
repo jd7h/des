@@ -1,4 +1,5 @@
 Automata: 
+	'Automaton:'
 	statelist += State+		//we need at least one state
 	arrowlist += Arrow*		//zero or more arrows
 	startstate = [State]	//s zit in de lijst van states
@@ -14,9 +15,10 @@ Arrow:
 ;
 
 Action:
-	'driveForward' ('duration' dl = INT unit = TimeUnit)?	|
+	'Action:'
+	('driveForward' ('duration' dl = INT unit = TimeUnit)?	|
 	'driveBackward' ('duration' dl = INT unit = TimeUnit)?	|
-	'turn' direction = Direction
+	'turn' direction = Direction)
 ;
 
 Condition: //sensorcondition
@@ -24,15 +26,15 @@ Condition: //sensorcondition
 ;
 
 LightCondition:
-	'lightsensor reads' LightValue
+	'lightsensor reads' value = LightValue
 ;
 
 SonarCondition:
-	'sonar detects' SonarValue
+	'sonar detects' value =  SonarValue
 ;
 
 BumperCondition:
-	'bumper is' BumperValue
+	'bumper is' value = BumperValue
 ;
 
 enum BumperValue:
@@ -61,6 +63,3 @@ enum Direction:
 	RIGHT = 'right'
 ;
 	
-	
-	
-
