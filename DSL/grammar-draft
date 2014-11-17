@@ -15,10 +15,10 @@ Arrow:
 ;
 
 Action:
-	'Action:'
-	('driveForward' ('duration' dl = INT unit = TimeUnit)?	|
+	'driveForward' ('duration' dl = INT unit = TimeUnit)?	|
 	'driveBackward' ('duration' dl = INT unit = TimeUnit)?	|
-	'turn' direction = Direction)
+	'turn' direction = Direction |
+	'stop'
 ;
 
 Condition: //sensorcondition
@@ -30,7 +30,7 @@ LightCondition:
 ;
 
 SonarCondition:
-	'sonar detects' value =  SonarValue
+	'sonar detects' value = SonarValue 'at' distance = INT
 ;
 
 BumperCondition:
