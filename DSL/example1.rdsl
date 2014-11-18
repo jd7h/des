@@ -1,0 +1,11 @@
+Automaton: 
+States: 
+	State s1 is driveForward duration 10 sec 
+	State s2 is driveBackward duration 2 sec stop both turn left 
+
+Arrows: 
+	Arrow s1 -> s2 if bumper is pressed 
+	Arrow s2 -> s1 if bumper is not pressed 
+
+Start state: s1
+
