@@ -78,7 +78,7 @@ beantwoorden:
 Dit kan wel voor simpele robots. Bij de eerste opdracht was het ook maar één class. Maar omdat we de subsumption architectuur gebruiken, kunnen we net zo goed een class voor elke state doen.
 
 - hoe bepalen we wanneer we van een state naar een andere state gaan en hoe zetten we dit in de code?
-We maken gebruik van de currentState variabele in de main.
+We maken gebruik van de currentState variabele in de robot
 
 
 - gaan we wel of niet de subsumption architectuur gebruiken>?
