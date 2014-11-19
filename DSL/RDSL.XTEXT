@@ -1,0 +1,76 @@
+grammar robots.tasks.RDSL with org.eclipse.xtext.common.Terminals
+
+generate rDSL "http://www.tasks.robots/RDSL"
+
+
+Automata: 
+	'Automaton:'
+	'States:' statelist += State+		//we need at least one state
+	'Arrows:' arrowlist += Arrow*		//zero or more arrows
+	'Start state:' startstate = [State]	//s zit in de lijst van states
+;
+
+State: 
+	'State' name=ID 'is' 
+	actionlist += Action+	//more than one action
+;
+
+Arrow:
+	'Arrow' from=[State] '->' to=[State] 'if' condition = Condition
+;
+
+Action:
+	('driveForward' 'duration' dl = INT unit = TimeUnit	|
+	'driveBackward' 'duration' dl = INT unit = TimeUnit	|
+	'turn' direction = Direction|
+	'stop' motor = Motor)
+;
+
+Condition: //sensorcondition
+	LightCondition | SonarCondition | BumperCondition
+;
+
+LightCondition:
+	'lightsensor reads' value = LightValue
+;
+
+SonarCondition:
+	'sonar detects' value =  SonarValue 'at' distance = INT
+;
+
+BumperCondition:
+	'bumper is' value = BumperValue
+;
+
+enum BumperValue:
+	PRESSED = 'pressed' | 
+	NOTPRESSED = 'not pressed'
+;
+
+
+enum LightValue:
+	BLACK = 'black' |
+	WHITE = 'white'
+;
+
+enum SonarValue:
+	NOTHING = 'nothing' |
+	SOMETHING = 'something'
+;	
+
+enum TimeUnit:
+	MS = 'ms' |
+	SEC = 'sec'
+;
+
+enum Direction:
+	LEFT = 'left' |
+	RIGHT = 'right'
+;
+
+enum Motor:
+	LEFT = 'left' |
+	RIGHT = 'right'|
+	BOTH = 'both'
+;
+
