@@ -1,0 +1,86 @@
+maken bij code generation:
+Allereerst: een main file:
+
+- headers van de java files (includes/imports)
+
+package AUTOMAATNAAM;
+
+/*
+ *
+ * Controls the robot to stops at a black line and rotate.
+ * Also stops the robot using sonar and a push button to avoid objects.
+ *
+ * Authors: Judith van Stegeren and Mirjam van Nahmen
+*/
+
+import lejos.nxt.Button;
+import lejos.nxt.LightSensor;
+import lejos.nxt.Motor;
+import lejos.nxt.NXTRegulatedMotor;
+import lejos.nxt.LCD;
+import lejos.nxt.SensorPort;
+import lejos.nxt.UltrasonicSensor;
+import lejos.nxt.TouchSensor;
+import lejos.nxt.Sound;
+
+
+- naam van de class
+
+public class Main {
+
+automaton heeft een current state:
+enum states = haal states op van automaat.
+State current = naam van start state.
+
+- main function:
+
+
+- definieer standaard equipment (motoren, sensoren):
+
+NXTRegulatedMotor right = Motor.A;
+		NXTRegulatedMotor left = Motor.B;
+		LightSensor light = new LightSensor(SensorPort.S1);
+		UltrasonicSensor sonar = new UltrasonicSensor(SensorPort.S2);
+		TouchSensor touch = new TouchSensor(SensorPort.S3);
+- begin met instantieren van de behaviors
+- begin met aanmaken behaviorlist (afhankelijk van prioriteit)
+- begin met aanmaken arbitrator
+
+================================================================================
+
+voor elke state, maak een behavior class aan:
+
+package AUTOMATONNAAM
+
+import lejos.robotics.subsumption.*;
+
+public class NAAM VAN STATE implements Behavior{
+	private boolean suppressed = false;
+
+	public boolean takeControl(){
+	VOOR ALLE INCOMING PIJLEN
+	if (current state = state1 and CONDITION state1 -> this)
+		return true;
+	else if (current state = state2 and CONDITION state2 -> this)
+		return true;
+	return false;
+	}
+
+	public void suppress(){handmatig aanvullen?} //later over na denken
+
+	public void action(){
+		Main.currentState = naam van class;
+		LIST ALL ACTIONS IN THE STATE
+	}
+
+beantwoorden:
+- hoe noemen we de class? is alles één class? juist niet?
+Dit kan wel voor simpele robots. Bij de eerste opdracht was het ook maar één class. Maar omdat we de subsumption architectuur gebruiken, kunnen we net zo goed een class voor elke state doen.
+
+- hoe bepalen we wanneer we van een state naar een andere state gaan en hoe zetten we dit in de code?
+We maken gebruik van de currentState variabele in de main.
+
+
+- gaan we wel of niet de subsumption architectuur gebruiken>?
+	jawel, want zo krijg je het gewenste gedrag
+
