@@ -25,7 +25,9 @@ class Auxiliary {
  	def static List<Arrow> getArrows(Resource resource) {
 		return getAutomata(resource).arrowlist 
  	}
- 	
+	
+	//je kan toch gewoon de empty list teruggeven als er geen incoming arrows zijn?
+	//waarom null? 	
  	def static List<Arrow> getInArrows (Resource resource, State s){
  		var List<Arrow> arrowlist = new ArrayList<Arrow>() 
  		for (Arrow a : getArrows(resource)){ 
