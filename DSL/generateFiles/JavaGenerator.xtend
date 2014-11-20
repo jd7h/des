@@ -4,10 +4,12 @@ import org.eclipse.emf.ecore.resource.Resource
 import robots.tasks.rDSL.DriveAction
 
 class JavaGenerator {
+
 	def static generateMain(Resource resource)'''
 	package <<Auxilary.getAutomataName(resource)>>; //is this well-typed?
 
-	/* Automatically generated code
+	/* 
+	 * Automatically generated code
 	 * Judith van Stegeren and Mirjam van Nahmen
 	 * 
 	 */
@@ -38,7 +40,7 @@ class JavaGenerator {
 			Robot robot = new Robot(start,right,left,light,sonar,touch);
 
 			//maak een instantie aan van alle states/behaviors
-			Behavior s1 = new s1(robot); //nog aanpassen
+			Behavior s1 = new s1(robot); //nog aanpassen, afhankelijk van hoe de behaviorclasses worden gegenereerd 
 
 			//maak een lijst van de behaviors op basis van prioriteit
 
@@ -61,24 +63,34 @@ class JavaGenerator {
 			private boolean suppressed = false;
 			private Robot robot;
 
-			public <<Auxilary.getStateName(s)>>(Robot robot){
+			//note that statenames must begin with a capital!
+			public <<Auxilary.getStateName(s)>>(Robot robot){ 
 				this.robot = robot;
 			}
 
 			public boolean takeControl(){
+				<<FOR a : Auxilary.getInArrows(s)>>
+				if(<<condition2code(a.condition)>> && robot.getCurrentState == <<Auxilary.getStateNumber(a.from)>>)
+					return true;
+				<<ENDFOR>>
+				return false;
 			}
 
 			public void suppress(){
-			//standaard gewoon de motoren stoppen?
-			robot.right.stop(true);
-			robot.left.stop();
+				suppressed = true;
+				//standaard gewoon de motoren stoppen?
+				robot.right.stop(true);
+				robot.left.stop();
+				Sound.beep() //robot beeps on suppress
 			}
 
 			public void action(){
-			robot.setCurrentState(name);
-			suppressed = false;
-			//convert all actions of this state to javacode
-			<<FOR a : Auxilary.getActionList(s)>><<Auxilary.action2Java(a)>><<ENDFOR>>
+				robot.setCurrentState(Auxilary.getStateNumber(s));
+				suppressed = false;
+				//convert all actions of this state to javacode
+				<<FOR a : Auxilary.getActionList(s)>>
+					<<Auxilary.action2Java(a)>>
+				<<ENDFOR>>
 			}'''
 
 	def static generateRobot(Resource resource)'''

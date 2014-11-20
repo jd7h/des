@@ -21,6 +21,14 @@ class Auxiliary {
 	def static List<State> getStates(Resource resource) {
 		return getAutomata(resource).statelist 
  	}
+
+	//stub
+	//returns capitalized name of s
+	def static String getStateName(State s){}
+
+	//stub
+	//returns a unique int-id for state s
+	def static int getStateNumber(State s){}
  
  	def static List<Arrow> getArrows(Resource resource) {
 		return getAutomata(resource).arrowlist 
@@ -42,7 +50,7 @@ class Auxiliary {
  		}
  	}
  	
- 	def static List<Action> getAction(State s) {
+ 	def static List<Action> getActionList(State s) {
  				return s.actionlist; 
  	}
  }
