@@ -36,13 +36,16 @@ class JavaGenerator {
 			TouchSensor touch = new TouchSensor(SensorPort.S3);
 
 			//maak een robot
-			??? start = <<Auxilary.getStartState(resource)>>; //aanpassen, heeft nog geen type
-			Robot robot = new Robot(start,right,left,light,sonar,touch);
+			int startstate = <<Auxilary.getStateNumber(Auxilary.getStartState(resource))>>;
+			Robot robot = new Robot(startstate,right,left,light,sonar,touch);
 
 			//maak een instantie aan van alle states/behaviors
-			Behavior s1 = new s1(robot); //nog aanpassen, afhankelijk van hoe de behaviorclasses worden gegenereerd 
+			<<FOR s : Auxilary.getStates(resource)>>
+			Behavior b_<<Auxilary.getStateName(s)>> = new <<Auxilary.getBehaviorName(s)>>(robot);
+			<<ENDFOR>>
 
 			//maak een lijst van de behaviors op basis van prioriteit
+			Behavior[] behaviorlist = {<<FOR s : Auxilary.getSortedStates(resource) SEPARATOR ', '>>b_<<Auxilary.getStateName(s))>><<ENDFOR>>};	//separator is ','
 
 			//maak een arbitrator aan en start	
 			Arbitrator arbitrator = new Arbitrator(behaviorlist);
@@ -59,12 +62,11 @@ class JavaGenerator {
 
 		import lejos.robotics.subsumption.*;
 
-		public class <<Auxilary.getStateName(s)>> implements Behavior{
+		public class <<Auxilary.getBehaviorName(s)>> implements Behavior{
 			private boolean suppressed = false;
 			private Robot robot;
 
-			//note that statenames must begin with a capital!
-			public <<Auxilary.getStateName(s)>>(Robot robot){ 
+			public <<Auxilary.getBehaviorName(s)>>(Robot robot){ 
 				this.robot = robot;
 			}
 

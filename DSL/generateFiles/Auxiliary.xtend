@@ -23,12 +23,25 @@ class Auxiliary {
  	}
 
 	//stub
-	//returns capitalized name of s
+	//returns name of s
 	def static String getStateName(State s){}
+
+	//return capitalized name of s (used for class names)
+	def static String getBehaviorName(State s){}
 
 	//stub
 	//returns a unique int-id for state s
 	def static int getStateNumber(State s){}
+	
+	//stub
+	//returns the start state
+	def static State getStartState(Resource resource) {}
+
+	//stub
+	//return a list of states, sorted on their priority
+	//we need to change something in the grammar for this
+	def static List<State> getSortedStates(Resource resource){}
+	
  
  	def static List<Arrow> getArrows(Resource resource) {
 		return getAutomata(resource).arrowlist 
