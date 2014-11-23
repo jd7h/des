@@ -2,6 +2,9 @@ package robots.tasks.generator
 
 import org.eclipse.emf.ecore.resource.Resource
 import robots.tasks.rDSL.DriveAction
+import robots.tasks.rDSL.State
+import robots.tasks.rDSL.TurnAction
+import robots.tasks.rDSL.StopAction
 
 class JavaGenerator {
 
@@ -143,5 +146,24 @@ class JavaGenerator {
 		}else{
 			right.backward();
 			left.backward();
+		}'''
+		
+	def static dispatch action2Text(TurnAction action)'''
+		if( <<action.direction>> == <<Direction::LEFT>> ){
+			right.forward();
+			left.backward();
+		}else{
+			right.backward();
+			left.forward();
 		}'''	
+		
+	def static dispatch action2Text(StopAction action)'''
+		if( <<action.motor>> == <<Motor::LEFT>> ){
+			left.stop();
+		}else if( <<action.motor>> == <<Motor::RIGHT>> ){
+			right.stop();
+		}else {
+			right.stop();
+			left.stop();
+		}'''
 }
