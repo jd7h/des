@@ -5,6 +5,12 @@ import robots.tasks.rDSL.DriveAction
 import robots.tasks.rDSL.State
 import robots.tasks.rDSL.TurnAction
 import robots.tasks.rDSL.StopAction
+import robots.tasks.rDSL.LightCondition
+import robots.tasks.rDSL.SonarCondition
+import robots.tasks.rDSL.BumperCondition
+import robots.tasks.rDSL.LightValue
+import robots.tasks.rDSL.SonarValue
+import robots.tasks.rDSL.BumperValue
 
 class JavaGenerator {
 
@@ -138,6 +144,7 @@ class JavaGenerator {
 		}'''
 	
 	
+	//actions
 	//TODO Duration nog inzetten
 	def static dispatch action2Text(DriveAction action)'''
 		if( <<action.driveDir>> == <<DriveDirection::FORWARDS>> ){
@@ -159,11 +166,39 @@ class JavaGenerator {
 		
 	def static dispatch action2Text(StopAction action)'''
 		if( <<action.motor>> == <<Motor::LEFT>> ){
-			left.stop();
+			left.stop(true);
 		}else if( <<action.motor>> == <<Motor::RIGHT>> ){
-			right.stop();
+			right.stop(true);
 		}else {
-			right.stop();
-			left.stop();
+			right.stop(true);
+			left.stop(true);
 		}'''
+	
+	//Conditions	
+	def static dispatch condition2code(LightCondition condition){
+		
+		switch(condition.value)
+		{
+			case LightValue::WHITE: return ''' (20 == robot.light.readValue()) '''
+			case LightValue::BLACK: return ''' (80 == robot.light.readValue()) '''
+		}
+	}
+	
+	def static dispatch condition2code(SonarCondition condition){
+		
+		switch(condition.value)
+		{
+			case SonarValue::NOTHING: return ''' (robot.sonar.getDistance() > 20) '''
+			case SonarValue::SOMETHING: return ''' (robot.sonar.getDistance() < 20) '''
+		}
+	}
+	
+		def static dispatch condition2code(BumperCondition condition){
+		
+		switch(condition.value)
+		{
+			case BumperValue::PRESSED: return ''' (robotbumper.isPressed()) '''
+			case BumperValue::NOTPRESSED: return ''' (!robot.bumper.isPressed()) '''
+		}
+	}
 }

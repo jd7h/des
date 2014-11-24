@@ -4,26 +4,29 @@ generate rDSL "http://www.tasks.robots/RDSL"
 
 
 Automata: 
-	'Automaton:'
+	'Automaton:' name=ID
 	'States:' statelist += State+		//we need at least one state
 	'Arrows:' arrowlist += Arrow*		//zero or more arrows
 	'Start state:' startstate = [State]	//s zit in de lijst van states
 ;
 
 State: 
-	'State' name=ID 'is' 
-	actionlist += Action+	//more than one action
+	'State' name=ID 'with'
+	'Priority' priority = Priority 'is' 
+	actionlist += Action+	//more than one action	
 ;
 
 Arrow:
 	'Arrow' from=[State] '->' to=[State] 'if' condition = Condition
 ;
 
-Action:
-	('driveForward' 'duration' dl = INT unit = TimeUnit	|
-	'driveBackward' 'duration' dl = INT unit = TimeUnit	|
-	'turn' direction = Direction|
-	'stop' motor = Motor)
+Action: DriveAction | TurnAction | StopAction
+;
+DriveAction: 'drive' driveDir = DriveDirection 'duration' dl = INT unit = TimeUnit
+;
+TurnAction: 'turn' direction = Direction
+;
+StopAction: 'stop' motor = Motor
 ;
 
 Condition: //sensorcondition
@@ -35,7 +38,7 @@ LightCondition:
 ;
 
 SonarCondition:
-	'sonar detects' value =  SonarValue 'at' distance = INT
+	'sonar detects' value = SonarValue 'at' distance = INT
 ;
 
 BumperCondition:
@@ -68,9 +71,20 @@ enum Direction:
 	RIGHT = 'right'
 ;
 
+enum DriveDirection:
+	BACKWARDS = 'backwards' |
+	FORWARDS = 'forwards'
+;
+
 enum Motor:
 	LEFT = 'left' |
 	RIGHT = 'right'|
 	BOTH = 'both'
+;
+
+enum Priority:
+	HIGH = 'high' |
+	MIDDLE = 'middle'|
+	LOW = 'low'
 ;
 
