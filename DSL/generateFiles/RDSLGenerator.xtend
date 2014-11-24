@@ -15,7 +15,12 @@ import org.eclipse.xtext.generator.IFileSystemAccess
 class RDSLGenerator implements IGenerator {
 	
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		fsa.generateFile("Main.java", JavaGenerator.generateMain(resource)) 
+		fsa.generateFile("Main.java", JavaGenerator.generateMain(resource)); 
+		fsa.generateFile("Robot.java", JavaGenerator.generateRobot(resource));
+		for(s : Auxilary.getStates(resource))
+		{
+			fsa.generateFile(Auxilary.getBehaviorName(s)+".java", JavaGenerator.generateBehavior(resource,s));
+		}
 //			resource.allContents
 //				.filter(typeof(Greeting))
 //				.map[name]
