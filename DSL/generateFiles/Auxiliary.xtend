@@ -34,9 +34,9 @@ class Auxiliary {
 	}
 
 	//returns a unique int-id for state s
-	def static int getStateNumber(State s){
-		statelist = getStates(resource)
-		nrstates = statelist.size()
+	def static int getStateNumber(State s, Resource resource){
+		var List<State> statelist = getStates(resource)
+		var int nrstates = statelist.size()
 		for(int i : 0 ..< nrstates)
 		{
 			if(statelist.get(i) == s)

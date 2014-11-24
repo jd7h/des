@@ -1,21 +1,24 @@
 package robots.tasks.generator
 
 import org.eclipse.emf.ecore.resource.Resource
-import robots.tasks.rDSL.DriveAction
-import robots.tasks.rDSL.State
-import robots.tasks.rDSL.TurnAction
-import robots.tasks.rDSL.StopAction
-import robots.tasks.rDSL.LightCondition
-import robots.tasks.rDSL.SonarCondition
 import robots.tasks.rDSL.BumperCondition
-import robots.tasks.rDSL.LightValue
-import robots.tasks.rDSL.SonarValue
 import robots.tasks.rDSL.BumperValue
+import robots.tasks.rDSL.Direction
+import robots.tasks.rDSL.DriveAction
+import robots.tasks.rDSL.DriveDirection
+import robots.tasks.rDSL.LightCondition
+import robots.tasks.rDSL.LightValue
+import robots.tasks.rDSL.Motor
+import robots.tasks.rDSL.SonarCondition
+import robots.tasks.rDSL.SonarValue
+import robots.tasks.rDSL.State
+import robots.tasks.rDSL.StopAction
+import robots.tasks.rDSL.TurnAction
 
 class JavaGenerator {
 
 	def static generateMain(Resource resource)'''
-	package <<Auxilary.getAutomataName(resource)>>; //is this well-typed?
+	package «Auxiliary.getAutomata(resource).name»; //is this well-typed?
 
 	/* 
 	 * Automatically generated code
@@ -44,16 +47,16 @@ class JavaGenerator {
 			TouchSensor touch = new TouchSensor(SensorPort.S3);
 
 			//maak een robot
-			int startstate = <<Auxilary.getStateNumber(Auxilary.getStartState(resource))>>;
+			int startstate = «Auxiliary.getStateNumber(Auxiliary.getStartState(resource), resource)»;
 			Robot robot = new Robot(startstate,right,left,light,sonar,touch);
 
 			//maak een instantie aan van alle states/behaviors
-			<<FOR s : Auxilary.getStates(resource)>>
-			Behavior b_<<Auxilary.getStateName(s)>> = new <<Auxilary.getBehaviorName(s)>>(robot);
-			<<ENDFOR>>
+			«FOR s : Auxiliary.getStates(resource)»
+			Behavior b_«Auxiliary.getStateName(s)» = new «Auxiliary.getBehaviorName(s)»(robot);
+			«ENDFOR»
 
 			//maak een lijst van de behaviors op basis van prioriteit
-			Behavior[] behaviorlist = {<<FOR s : Auxilary.getSortedStates(resource) SEPARATOR ', '>>b_<<Auxilary.getStateName(s))>><<ENDFOR>>};	//separator is ','
+			Behavior[] behaviorlist = {«FOR s : Auxiliary.getSortedStates(resource) SEPARATOR ', '»b_«Auxiliary.getStateName(s)»«ENDFOR»};	//separator is ','
 
 			//maak een arbitrator aan en start	
 			Arbitrator arbitrator = new Arbitrator(behaviorlist);
@@ -66,23 +69,23 @@ class JavaGenerator {
 		}'''
 
 	def static generateBehavior(Resource resource,State s)'''
-		package <<Auxilary.getAutomataName(resource)>>;
+		package «Auxiliary.getAutomata(resource).name»;
 
 		import lejos.robotics.subsumption.*;
 
-		public class <<Auxilary.getBehaviorName(s)>> implements Behavior{
+		public class «Auxiliary.getBehaviorName(s)» implements Behavior{
 			private boolean suppressed = false;
 			private Robot robot;
 
-			public <<Auxilary.getBehaviorName(s)>>(Robot robot){ 
+			public «Auxiliary.getBehaviorName(s)»(Robot robot){ 
 				this.robot = robot;
 			}
 
 			public boolean takeControl(){
-				<<FOR a : Auxilary.getInArrows(s)>>
-				if(<<condition2code(a.condition)>> && robot.getCurrentState == <<Auxilary.getStateNumber(a.from)>>)
+				«FOR a : Auxiliary.getInArrows(resource,s)»
+				if(«condition2code(a.condition)» && robot.getCurrentState == «Auxiliary.getStateNumber(a.from, resource)»)
 					return true;
-				<<ENDFOR>>
+				«ENDFOR»
 				return false;
 			}
 
@@ -95,16 +98,16 @@ class JavaGenerator {
 			}
 
 			public void action(){
-				robot.setCurrentState(Auxilary.getStateNumber(s));
+				robot.setCurrentState(«Auxiliary.getStateNumber(s, resource)»);
 				suppressed = false;
 				//convert all actions of this state to javacode
-				<<FOR a : Auxilary.getActionList(s)>>
-					<<Auxilary.action2Java(a)>>
-				<<ENDFOR>>
+				«FOR a : Auxiliary.getActionList(s)»
+					«action2Text(a)»
+				«ENDFOR»
 			}'''
 
 	def static generateRobot(Resource resource)'''
-		package <<Auxilary.getAutomataName(resource)>>;
+		package «Auxiliary.getAutomata(resource).name»;
 
 		//imports
 		import lejos.nxt.Button;
@@ -146,7 +149,7 @@ class JavaGenerator {
 	//actions
 	//TODO Duration nog inzetten
 	def static dispatch action2Text(DriveAction action)'''
-		if( <<action.driveDir>> == <<DriveDirection::FORWARDS>> ){
+		if( «action.driveDir» == «DriveDirection::FORWARDS» ){
 			right.forward();
 			left.forward();
 		}else{
@@ -155,7 +158,7 @@ class JavaGenerator {
 		}'''
 		
 	def static dispatch action2Text(TurnAction action)'''
-		if( <<action.direction>> == <<Direction::LEFT>> ){
+		if( «action.direction» == «Direction::LEFT» ){
 			right.forward();
 			left.backward();
 		}else{
@@ -164,9 +167,9 @@ class JavaGenerator {
 		}'''	
 		
 	def static dispatch action2Text(StopAction action)'''
-		if( <<action.motor>> == <<Motor::LEFT>> ){
+		if( «action.motor» == «Motor::LEFT» ){
 			left.stop(true);
-		}else if( <<action.motor>> == <<Motor::RIGHT>> ){
+		}else if( «action.motor» == «Motor::RIGHT» ){
 			right.stop(true);
 		}else {
 			right.stop(true);
