@@ -28,7 +28,6 @@ class JavaGenerator {
 	import lejos.nxt.Sound;
 
 	public class Main{
-			//maak een enum van alle states, kan ook als Int?
 			//to do ^
 
 			//definieer standaard equipment op Robot
@@ -163,7 +162,7 @@ class JavaGenerator {
 		}else if( <<action.motor>> == <<Motor::RIGHT>> ){
 			right.stop();
 		}else {
-			right.stop();
+			right.stop(true);
 			left.stop();
 		}'''
 }

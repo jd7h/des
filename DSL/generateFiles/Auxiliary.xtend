@@ -23,7 +23,6 @@ class Auxiliary {
 		return getAutomata(resource).statelist 
  	}
 
-	//stub
 	//returns name of s
 	def static String getStateName(State s){
 		return s.name
@@ -34,10 +33,16 @@ class Auxiliary {
 		return s.name.substring(0,1).toUpperCase() + s.name.substring(1)
 	}
 
-	//stub
 	//returns a unique int-id for state s
 	def static int getStateNumber(State s){
-		return Integer.parseInt(s.name)
+		statelist = getStates(resource)
+		nrstates = statelist.size()
+		for(int i : 0 ..< nrstates)
+		{
+			if(statelist.get(i) == s)
+				return i
+		}
+		return -1		
 	}
 	
 	//stub
