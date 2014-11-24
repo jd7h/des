@@ -34,7 +34,6 @@ class JavaGenerator {
 	import lejos.nxt.Sound;
 
 	public class Main{
-			//maak een enum van alle states, kan ook als Int?
 			//to do ^
 
 			//definieer standaard equipment op Robot
