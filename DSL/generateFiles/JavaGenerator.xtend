@@ -14,6 +14,7 @@ import robots.tasks.rDSL.SonarValue
 import robots.tasks.rDSL.State
 import robots.tasks.rDSL.StopAction
 import robots.tasks.rDSL.TurnAction
+import robots.tasks.rDSL.TimeUnit
 
 class JavaGenerator {
 
@@ -148,33 +149,57 @@ class JavaGenerator {
 	
 	//actions
 	//TODO Duration nog inzetten
-	def static dispatch action2Text(DriveAction action)'''
-		if( «action.driveDir» == «DriveDirection::FORWARDS» ){
-			right.forward();
-			left.forward();
-		}else{
-			right.backward();
-			left.backward();
-		}'''
+	def static dispatch action2Text(DriveAction action){
+		var int n = action.dl
+		if(action.unit == TimeUnit::SEC){
+			n =  n*1000
+		}
 		
-	def static dispatch action2Text(TurnAction action)'''
-		if( «action.direction» == «Direction::LEFT» ){
-			right.forward();
-			left.backward();
-		}else{
-			right.backward();
-			left.forward();
-		}'''	
-		
-	def static dispatch action2Text(StopAction action)'''
-		if( «action.motor» == «Motor::LEFT» ){
-			left.stop(true);
-		}else if( «action.motor» == «Motor::RIGHT» ){
-			right.stop(true);
-		}else {
-			right.stop(true);
-			left.stop(true);
-		}'''
+		switch(action.driveDir)
+		{
+			 case DriveDirection::FORWARDS: return '''
+			 	right.forward();
+			 	left.forward();
+			 	Delay.msDelay(«n»);'''
+			 case DriveDirection::BACKWARDS: return '''
+			 	right.backward();
+			 	left.backward();
+			 	Delay.msDelay(«n»);'''
+		}
+	}
+	
+	def static dispatch action2Text(TurnAction action){
+		var int n = 1000 //1sec
+		switch(action.direction)
+		{
+			 case Direction::LEFT: return '''
+			 	right.forward();
+			 	left.backward();
+			 	Delay.msDelay(«n»);'''
+			 case Direction::RIGHT: return '''
+			 	right.backward();
+			 	left.forward();
+			 	Delay.msDelay(«n»);'''
+		}
+	}
+
+	def static dispatch action2Text(StopAction action){
+		var int n = 500 //0.5sec
+		switch(action.motor)
+		{
+			 case Motor::LEFT: return '''
+			 	left.stop(true);
+			 	Delay.msDelay(«n»);'''
+			 case Motor::RIGHT: return '''
+			 	right.stop(true);
+			 	Delay.msDelay(«n»);'''
+			 case Motor::BOTH: return '''
+				right.stop(true);
+				left.stop(true);
+				Delay.msDelay(«n»);'''
+		}
+	}
+
 	
 	//Conditions	
 	def static dispatch condition2code(LightCondition condition){
@@ -199,7 +224,7 @@ class JavaGenerator {
 		
 		switch(condition.value)
 		{
-			case BumperValue::PRESSED: return ''' (robotbumper.isPressed()) '''
+			case BumperValue::PRESSED: return ''' (robot.bumper.isPressed()) '''
 			case BumperValue::NOTPRESSED: return ''' (!robot.bumper.isPressed()) '''
 		}
 	}
