@@ -30,4 +30,5 @@ performance:
 - if the robot has already measured a lake, he must skip the measurements if he encounters that same lake again.
 
 supportability:
+- the DSL can also be used as grammar for other languages, it needs only another code generator
 
