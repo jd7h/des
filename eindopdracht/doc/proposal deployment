@@ -1,0 +1,47 @@
+list of the actuators:
+2 motors
+1 motor for  the temperature sensor
+
+list of the sensors:
+1 lamp
+1 temperature sensor
+2 light sensors
+1 color sensor
+1 ultrasonar sensor
+2 touch sensors
+
+There can be 3 actuators and 4 sensors on 1 brick.
+Since it is vital that the motor does not fall off the table, we want that the communication between the light sensors and the motors does happen via bluetooth.
+
+Since the colorsensor, the motor for the temmperature sensor and the temperature sensor all have to do with the same functionality, it would seem logical to put these sensors and actuators on the same brick. 
+
+Brick 1:
+Motor 1
+Motor 2
+...
+Light 1
+Light 2
+...
+...
+
+Brick 2:
+...
+...
+...
+...
+...
+...
+...
+
+Use case:
+Robot wanders around the area without falling off the table.
+We need both motors and both the light sensors.
+
+On detection of a lake, the robot lowers the temperature sensor and measures the temperature.
+We need the color detector, the motor for the temperature sensor and the temperature sensor itself.
+
+Robot wanders around the area, without bumping into objects.
+We need both motors and the two touch sensors. But the communication does not have to be instanteneous, so we could use bluetooth, but it seems not the best thing to do.
+
+
+
