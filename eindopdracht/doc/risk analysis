@@ -1,0 +1,13 @@
+
+Id - Type - Description - Probability - Severity - Weight - Mitigation - Contingency
+ 1 - Technical risk - The computer with the installed software breaks and all progress will be lost. - 3 - 4 - High - Save everything in the repository, regularly. - Look for a replacement of the crushed laptop asap. 
+
+ 2 - Organizational risks - The robot is not available for testing. - 3 - 4 - High - Test regularly small pieces of code, such that it takes not a  huge effort of time to debug the system. - Simulate testing as much as possible and come on an other time back or wait until the robot is free. 
+
+ 3  - Technology risk - DSL level does not match with the implementation level. - 3 - 2 - Medium -  - Change DSL until it is possible to implement. 
+
+ 4 - Organizational - One of our team members become ill. - 3 - 2 - Small - Healthy living - The other one works further and the ill person work as possible from home. The communication will be via email/chat possible.
+
+ 5 - Requirements risk - The requirements contains ideas which are not compatible with the idea of the DSL. - 2 - 2 - Medium -  - Change requirements until it is possible to implement.
+
+
