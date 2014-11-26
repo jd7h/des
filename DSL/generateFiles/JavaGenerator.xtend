@@ -1,21 +1,25 @@
 package robots.tasks.generator
 
 import org.eclipse.emf.ecore.resource.Resource
-import robots.tasks.rDSL.DriveAction
-import robots.tasks.rDSL.State
-import robots.tasks.rDSL.TurnAction
-import robots.tasks.rDSL.StopAction
-import robots.tasks.rDSL.LightCondition
-import robots.tasks.rDSL.SonarCondition
 import robots.tasks.rDSL.BumperCondition
-import robots.tasks.rDSL.LightValue
-import robots.tasks.rDSL.SonarValue
 import robots.tasks.rDSL.BumperValue
+import robots.tasks.rDSL.Direction
+import robots.tasks.rDSL.DriveAction
+import robots.tasks.rDSL.DriveDirection
+import robots.tasks.rDSL.LightCondition
+import robots.tasks.rDSL.LightValue
+import robots.tasks.rDSL.Motor
+import robots.tasks.rDSL.SonarCondition
+import robots.tasks.rDSL.SonarValue
+import robots.tasks.rDSL.State
+import robots.tasks.rDSL.StopAction
+import robots.tasks.rDSL.TurnAction
+import robots.tasks.rDSL.TimeUnit
 
 class JavaGenerator {
 
 	def static generateMain(Resource resource)'''
-	package <<Auxilary.getAutomataName(resource)>>; //is this well-typed?
+	package «Auxiliary.getAutomata(resource).name»; //is this well-typed?
 
 	/* 
 	 * Automatically generated code
@@ -44,16 +48,16 @@ class JavaGenerator {
 			TouchSensor touch = new TouchSensor(SensorPort.S3);
 
 			//maak een robot
-			int startstate = <<Auxilary.getStateNumber(Auxilary.getStartState(resource))>>;
+			int startstate = «Auxiliary.getStateNumber(Auxiliary.getStartState(resource), resource)»;
 			Robot robot = new Robot(startstate,right,left,light,sonar,touch);
 
 			//maak een instantie aan van alle states/behaviors
-			<<FOR s : Auxilary.getStates(resource)>>
-			Behavior b_<<Auxilary.getStateName(s)>> = new <<Auxilary.getBehaviorName(s)>>(robot);
-			<<ENDFOR>>
+			«FOR s : Auxiliary.getStates(resource)»
+			Behavior b_«Auxiliary.getStateName(s)» = new «Auxiliary.getBehaviorName(s)»(robot);
+			«ENDFOR»
 
 			//maak een lijst van de behaviors op basis van prioriteit
-			Behavior[] behaviorlist = {<<FOR s : Auxilary.getSortedStates(resource) SEPARATOR ', '>>b_<<Auxilary.getStateName(s))>><<ENDFOR>>};	//separator is ','
+			Behavior[] behaviorlist = {«FOR s : Auxiliary.getSortedStates(resource) SEPARATOR ', '»b_«Auxiliary.getStateName(s)»«ENDFOR»};	//separator is ','
 
 			//maak een arbitrator aan en start	
 			Arbitrator arbitrator = new Arbitrator(behaviorlist);
@@ -66,23 +70,23 @@ class JavaGenerator {
 		}'''
 
 	def static generateBehavior(Resource resource,State s)'''
-		package <<Auxilary.getAutomataName(resource)>>;
+		package «Auxiliary.getAutomata(resource).name»;
 
 		import lejos.robotics.subsumption.*;
 
-		public class <<Auxilary.getBehaviorName(s)>> implements Behavior{
+		public class «Auxiliary.getBehaviorName(s)» implements Behavior{
 			private boolean suppressed = false;
 			private Robot robot;
 
-			public <<Auxilary.getBehaviorName(s)>>(Robot robot){ 
+			public «Auxiliary.getBehaviorName(s)»(Robot robot){ 
 				this.robot = robot;
 			}
 
 			public boolean takeControl(){
-				<<FOR a : Auxilary.getInArrows(s)>>
-				if(<<condition2code(a.condition)>> && robot.getCurrentState == <<Auxilary.getStateNumber(a.from)>>)
+				«FOR a : Auxiliary.getInArrows(resource,s)»
+				if(«condition2code(a.condition)» && robot.getCurrentState == «Auxiliary.getStateNumber(a.from, resource)»)
 					return true;
-				<<ENDFOR>>
+				«ENDFOR»
 				return false;
 			}
 
@@ -95,16 +99,16 @@ class JavaGenerator {
 			}
 
 			public void action(){
-				robot.setCurrentState(Auxilary.getStateNumber(s));
+				robot.setCurrentState(«Auxiliary.getStateNumber(s, resource)»);
 				suppressed = false;
 				//convert all actions of this state to javacode
-				<<FOR a : Auxilary.getActionList(s)>>
-					<<Auxilary.action2Java(a)>>
-				<<ENDFOR>>
+				«FOR a : Auxiliary.getActionList(s)»
+					«action2Text(a)»
+				«ENDFOR»
 			}'''
 
 	def static generateRobot(Resource resource)'''
-		package <<Auxilary.getAutomataName(resource)>>;
+		package «Auxiliary.getAutomata(resource).name»;
 
 		//imports
 		import lejos.nxt.Button;
@@ -145,33 +149,57 @@ class JavaGenerator {
 	
 	//actions
 	//TODO Duration nog inzetten
-	def static dispatch action2Text(DriveAction action)'''
-		if( <<action.driveDir>> == <<DriveDirection::FORWARDS>> ){
-			right.forward();
-			left.forward();
-		}else{
-			right.backward();
-			left.backward();
-		}'''
+	def static dispatch action2Text(DriveAction action){
+		var int n = action.dl
+		if(action.unit == TimeUnit::SEC){
+			n =  n*1000
+		}
 		
-	def static dispatch action2Text(TurnAction action)'''
-		if( <<action.direction>> == <<Direction::LEFT>> ){
-			right.forward();
-			left.backward();
-		}else{
-			right.backward();
-			left.forward();
-		}'''	
-		
-	def static dispatch action2Text(StopAction action)'''
-		if( <<action.motor>> == <<Motor::LEFT>> ){
-			left.stop(true);
-		}else if( <<action.motor>> == <<Motor::RIGHT>> ){
-			right.stop(true);
-		}else {
-			right.stop(true);
-			left.stop(true);
-		}'''
+		switch(action.driveDir)
+		{
+			 case DriveDirection::FORWARDS: return '''
+			 	right.forward();
+			 	left.forward();
+			 	Delay.msDelay(«n»);'''
+			 case DriveDirection::BACKWARDS: return '''
+			 	right.backward();
+			 	left.backward();
+			 	Delay.msDelay(«n»);'''
+		}
+	}
+	
+	def static dispatch action2Text(TurnAction action){
+		var int n = 1000 //1sec
+		switch(action.direction)
+		{
+			 case Direction::LEFT: return '''
+			 	right.forward();
+			 	left.backward();
+			 	Delay.msDelay(«n»);'''
+			 case Direction::RIGHT: return '''
+			 	right.backward();
+			 	left.forward();
+			 	Delay.msDelay(«n»);'''
+		}
+	}
+
+	def static dispatch action2Text(StopAction action){
+		var int n = 500 //0.5sec
+		switch(action.motor)
+		{
+			 case Motor::LEFT: return '''
+			 	left.stop(true);
+			 	Delay.msDelay(«n»);'''
+			 case Motor::RIGHT: return '''
+			 	right.stop(true);
+			 	Delay.msDelay(«n»);'''
+			 case Motor::BOTH: return '''
+				right.stop(true);
+				left.stop(true);
+				Delay.msDelay(«n»);'''
+		}
+	}
+
 	
 	//Conditions	
 	def static dispatch condition2code(LightCondition condition){
@@ -196,7 +224,7 @@ class JavaGenerator {
 		
 		switch(condition.value)
 		{
-			case BumperValue::PRESSED: return ''' (robotbumper.isPressed()) '''
+			case BumperValue::PRESSED: return ''' (robot.bumper.isPressed()) '''
 			case BumperValue::NOTPRESSED: return ''' (!robot.bumper.isPressed()) '''
 		}
 	}
