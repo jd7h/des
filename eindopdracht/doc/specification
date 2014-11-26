@@ -12,6 +12,7 @@ the robot must be able to
 
 usability:
 the robot must
+- be programmed by stating its behavior in a DSL and then generating code from that specification
 - not drive too fast, so that if the robot is heading for the edge of the table, the user still has time to interfere.
 - provide feedback for the user about measurements it makes
 - provide feedback for the user about the state of the program for debugging purposes
@@ -22,6 +23,7 @@ reliability:
 - the robot must stop if an error/bug is detected to avoid to go off of the table 
 - the robot components must be tested before it will work with the whole system
 - the sensors must be calibrated before the program starts
+
 
 performance:
 - if the light sensors spot the white border, the robot must react immediately to avoid falling off the table.

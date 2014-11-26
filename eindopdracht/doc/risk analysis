@@ -1,13 +1,17 @@
 
 Id - Type - Description - Probability - Severity - Weight - Mitigation - Contingency
- 1 - Technical risk - The computer with the installed software breaks and all progress will be lost. - 3 - 4 - High - Save everything in the repository, regularly. - Look for a replacement of the crushed laptop asap. 
+ 1 - Technical risk - The computer with the installed software breaks down and we lose access to our work. - 3 - 4 - High - Push all work to the repository, regularly. - Find a replacement for the broken laptop or use one of the lab computers.
 
- 2 - Organizational risks - The robot is not available for testing. - 3 - 4 - High - Test regularly small pieces of code, such that it takes not a  huge effort of time to debug the system. - Simulate testing as much as possible and come on an other time back or wait until the robot is free. 
+ 2 - Organizational - The robot is not available for testing. - 3 - 4 - High - Regulary test small pieces of code, so that debugging is not a lot of work. - Postpone testing until later or wait until the robot is free. Use the lab when when we know there won't be other students around (early morning).
 
- 3  - Technology risk - DSL level does not match with the implementation level. - 3 - 2 - Medium -  - Change DSL until it is possible to implement. 
+ 3  - Technical - The DSL does not fit with the implementation. - 3 - 2 - Medium - Change the DSL to a lower level of abstraction. 
 
- 4 - Organizational - One of our team members become ill. - 3 - 2 - Small - Healthy living - The other one works further and the ill person work as possible from home. The communication will be via email/chat possible.
+ 4 - Organizational - One of our team members become ill. - 3 - 2 - Small - Healthy living - The other one continues working on the project and the ill person works as much as possible from home. Keep communicating via email/chat.
 
  5 - Requirements risk - The requirements contains ideas which are not compatible with the idea of the DSL. - 2 - 2 - Medium -  - Change requirements until it is possible to implement.
+
+ 6 - Technical - Problems with the bluetooth communication between the two bricks - 5 - 3 - Medium - Test bluetooth functionality as soon as possible. - Ask for help from the teacher or other students.
+
+ 7 - Organizational - Lab partners have different schedules which makes it hard to find time to work together - 5 - 3 - Medium - The lab partners don't plan anything on Wedneyafternoon, so that there is at least one moment in the week when they are both free to work on the project - Reschedule work or work together during the weekends.
 
 
