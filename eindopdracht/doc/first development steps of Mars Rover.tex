@@ -1,0 +1,151 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[top=50pt,bottom=40pt,left=60pt,right=50pt]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{rotating}
+
+\author{Judith van Stegeren and Mirjam van Nahmen}
+\title{First development documents of Mars Rover}
+
+\begin{document}
+
+\maketitle
+
+\section*{Specifications}
+The main goal of the robot is: find all three lakes and measure the temperature.
+
+\subsection*{Functional requirements:}
+The robot must be able to ...
+\begin{itemize} 
+\item wander the area.
+\item recognize a lake and determine its color and not go across the lake.
+\item recognize the white barrier and not cross it.
+\item notice obstacles in the area and avoid them while wandering.
+\item lower the temperature sensor and measure the temperature in a lake.
+\item store the temperature with the color of the lake.
+\item see the difference between black, white, red, green and blue.
+\end{itemize}
+
+
+\subsection*{Usability:}
+The robot must ...
+\begin{itemize}
+\item be programmed by stating its behavior in a DSL and then generating code from that specification.
+\item not drive too fast, so that if the robot is heading for the edge of the table, the user still has time to interfere.
+\item provide feedback for the user about measurements it makes.
+\item provide feedback for the user about the state of the program for debugging purposes.
+\item provide feedback for the user when the robot is finished (show the table with measurements).
+\item provide feedback for the user about errors/bugs.
+\end{itemize}
+
+\subsection*{Reliability:}
+\begin{itemize}
+\item The robot must stop if an error/bug is detected to avoid to go off of the table. 
+\item The robot components must be tested before it will work with the whole system.
+\item The sensors must be calibrated before the program starts.
+\end{itemize}
+
+\subsection*{Performance:}
+\begin{itemize}
+\item If the light sensors spot the white border, the robot must react immediately to avoid falling off the table.
+\item If the light sensors spot the color border of a lake, the robot must react immediately to avoid falling in the lake.
+\item All three lakes must be found within a reasonable amount of time.
+\item If the robot has already measured a lake, he must skip the measurements if he encounters that same lake again.
+\end{itemize}
+
+\subsection*{Supportability:}
+\begin{itemize}
+\item the DSL can also be used as grammar for other languages, it needs only another code generator
+\end{itemize}
+
+
+\section*{Proposal deployment}
+List of the actuators:
+\begin{itemize}
+\item[2] motors
+\item[1] motor for  the temperature sensor
+\end{itemize}
+
+\noindent List of the sensors:
+\begin{itemize}
+\item[1] lamp
+\item[1] temperature sensor
+\item[2] light sensors
+\item[1] color sensor
+\item[1] ultra sonar sensor
+\item[2] touch sensors
+\end{itemize}
+
+There can be 3 actuators and 4 sensors on 1 brick.
+Since it is vital that the motor does not fall off the table, we want that the communication between the light sensors and the motors does happen via bluetooth. Also bumping against a rock is an important issue such that it seems to be useful to connect the touch sensors also directly with the master brick.\\ 
+
+Since the color sensor, the motor for the temperature sensor and the temperature sensor all have to do with the same functionality, it would seem logical to put these sensors and actuators on the same brick. Also the measurement of the distance with the ultra sonar sensor is not crucial it is logic to put them on the brick for the measurements.\\
+
+\subsection*{Brick 1 (Master):} crucial processes (driving without bumping or falling off the table)
+\begin{itemize}
+\item[] Motor 1
+\item[] Motor 2
+\item[]
+\item[] Light 1
+\item[] Light 2
+\item[] Touch 1
+\item[] Touch 2
+\end{itemize}
+
+\subsection*{Brick 2:} measurements (color of a lake, temperature and distance detection)
+\begin{itemize}
+\item[] Motor Temperature
+\item[]
+\item[] Temperature 
+\item[] Ultra sonar 
+\item[] Color
+\end{itemize}
+
+
+\subsection*{Use case:}
+
+Robot wanders around the area without falling off the black table, the borders are marked with a white line.
+We need both motors and both the light sensors.\\
+
+On detection of a colored lake, the robot lowers the temperature sensor and measures the temperature and store it with the color of the lake.
+We need the color detector, the motor for the temperature sensor and the temperature sensor itself.\\
+
+Robot wanders around the area, without bumping into objects.
+We need both motors and the two touch sensors and the sonar sensor.\\ %/*The touch sensors are for the situation that the sonar missed something, so it could be an advantage to put the sonar also on the brick of the motors. The communication with the sonar does not have to be instantaneous, so we could use bluetooth, but it seems not the best thing to do.*/
+
+If the robot finished the measurement of the last lake it stops wandering and shows the table with the temperatures of all lakes on his display. \\
+
+If the robot detects a rock with the ultra sonar sensor, it changes the direction and makes a bend to avoid bumping the rock.\\
+
+If the robot bumps against a rock, the robot should stop both motors immediately. After stopping the robot should go back straight to avoid to fall off the table during driving backwards. Afterwards the robot makes a turn to change the direction and starts again with wandering.\\
+
+If the robot detects a with line of the border it goes straight backwards and makes a turn to the opposite side of the light sensor which detected the white line. \\
+
+
+\section*{Risk analysis}
+
+\begin{tabular}{|p{0.4cm}|p{1.5cm}|p{3cm}|p{0.4cm}|p{0.4cm}|p{1.3cm}|p{3.5cm}|p{3.5cm}|} 
+\hline
+  Id & Type & Description & \rotatebox{90} {Probability} & \rotatebox{90} {Severity} & Weight & Mitigation & Contingency\\
+\hline
+\hline
+ 1 & Technical risk & The computer with the installed software breaks down and we lose access to our work. & 3 & 4 & High & Push all work to the repository, regularly. & Find a replacement for the broken laptop or use one of the lab computers.\\
+\hline
+ 2 & Organiza- tional risk & The robot is not available for testing. & 3 & 4 & High & Regulary test small pieces of code, so that debugging is not a lot of work. & Postpone testing until later or wait until the robot is free. Use the lab when when we know there won't be other students around (early morning).\\
+\hline
+ 3  & Technical risk & The DSL does not fit with the implementation. & 3 & 2 & Medium & Change the DSL to a lower level of abstraction. & \\
+\hline
+ 4 & Organiza- tional risk & One of our team members become ill. & 3 & 2 & Small & Healthy living & The other one continues working on the project and the ill person works as much as possible from home. Keep communicating via email/chat.\\
+\hline
+ 5 & Require- ments risk & The requirements contains ideas which are not compatible with the idea of the DSL. & 2 & 2 & Medium &  & Change requirements until it is possible to implement.\\
+\hline
+ 6 & Technical risk & Problems with the bluetooth communication between the two bricks & 5 & 3 & Medium & Test bluetooth functionality as soon as possible. & Ask for help from the teacher or other students.\\
+\hline
+ 7 & Organiza- tional risk & Lab partners have different schedules which makes it hard to find time to work together & 5 & 3 & Medium & The lab partners don't plan anything on Wednesday afternoon, so that there is at least one moment in the week when they are both free to work on the project & Reschedule work or work together during the weekends.\\
+ \hline
+\end{tabular}
+
+
+\end{document}
