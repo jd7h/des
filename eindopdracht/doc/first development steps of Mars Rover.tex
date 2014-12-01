@@ -7,20 +7,21 @@
 \usepackage{rotating}
 
 \author{Judith van Stegeren and Mirjam van Nahmen}
-\title{First development documents of Mars Rover}
+\title{Development of the Mars Rover robot}
 
 \begin{document}
 
 \maketitle
 
 \section*{Specifications}
-The main goal of the robot is: find all three lakes and measure the temperature.
+The main goal of the robot is to find all three lakes and measure the temperature.
 
-\subsection*{Functional requirements:}
+\subsection*{Functional requirements}
 The robot must be able to ...
 \begin{itemize} 
 \item wander the area.
-\item recognize a lake and determine its color and not go across the lake.
+\item recognize a lake and determine its color
+\item navigate around lakes.
 \item recognize the white barrier and not cross it.
 \item notice obstacles in the area and avoid them while wandering.
 \item lower the temperature sensor and measure the temperature in a lake.
@@ -29,7 +30,7 @@ The robot must be able to ...
 \end{itemize}
 
 
-\subsection*{Usability:}
+\subsection*{Usability}
 The robot must ...
 \begin{itemize}
 \item be programmed by stating its behavior in a DSL and then generating code from that specification.
@@ -40,14 +41,14 @@ The robot must ...
 \item provide feedback for the user about errors/bugs.
 \end{itemize}
 
-\subsection*{Reliability:}
+\subsection*{Reliability}
 \begin{itemize}
-\item The robot must stop if an error/bug is detected to avoid to go off of the table. 
+\item The robot must stop if an error/bug is detected.
 \item The robot components must be tested before it will work with the whole system.
 \item The sensors must be calibrated before the program starts.
 \end{itemize}
 
-\subsection*{Performance:}
+\subsection*{Performance}
 \begin{itemize}
 \item If the light sensors spot the white border, the robot must react immediately to avoid falling off the table.
 \item If the light sensors spot the color border of a lake, the robot must react immediately to avoid falling in the lake.
@@ -55,10 +56,44 @@ The robot must ...
 \item If the robot has already measured a lake, he must skip the measurements if he encounters that same lake again.
 \end{itemize}
 
-\subsection*{Supportability:}
+\subsection*{Supportability}
 \begin{itemize}
-\item the DSL can also be used as grammar for other languages, it needs only another code generator
+\item The DSL can also be used for the generation of code in another language or for use with a different API.
 \end{itemize}
+
+\subsection*{MoSCoW overview of requirements}
+\begin{tabular}{|p{3cm}|p{12cm}|} 
+\hline
+MoSCoW & requirement\\
+\hline
+M & wander the area.\\
+M & recognize a lake and determine its color\\
+M & navigate around lakes.\\
+M & recognize the white barrier and not cross it.\\
+M & notice obstacles in the area and avoid them while wandering.\\
+M & lower the temperature sensor and measure the temperature in a lake.\\
+M & see the difference between black, white, red, green and blue.\\\
+S & store the temperature with the color of the lake.\\
+\hline
+M & be programmed by stating its behavior in a DSL and then generating code from that specification.\\
+S & not drive too fast, so that if the robot is heading for the edge of the table, the user still has time to interfere.\\
+S & provide feedback for the user about the state of the program for debugging purposes.\\
+C & provide feedback for the user about measurements it makes.\\
+C & provide feedback for the user when the robot is finished (show the table with measurements).\\
+C & provide feedback for the user about errors/bugs.\\
+\hline
+M & The robot components must be tested before it will work with the whole system.\\
+S & The robot must stop if an error/bug is detected to avoid to go off of the table. \\
+S & The sensors must be calibrated before the program starts.\\
+\hline
+M & If the light sensors spot the white border, the robot must react immediately to avoid falling off the table.\\
+S & If the light sensors spot the color border of a lake, the robot must react immediately to avoid falling in the lake.\\
+S & All three lakes must be found within a reasonable amount of time.\\
+S & If the robot has already measured a lake, he must skip the measurements if he encounters that same lake again.\\
+\hline
+W & The DSL can also be used for the generation of code in another language or for use with a different API.\\
+\hline
+\end{tabular}
 
 
 \section*{Proposal deployment}
@@ -79,15 +114,14 @@ List of the actuators:
 \end{itemize}
 
 There can be 3 actuators and 4 sensors on 1 brick.
-Since it is vital that the motor does not fall off the table, we want that the communication between the light sensors and the motors does happen via bluetooth. Also bumping against a rock is an important issue such that it seems to be useful to connect the touch sensors also directly with the master brick.\\ 
+Since it is vital that the motor does not fall off the table, we want that the communication between the light sensors and the motors happens without bluetooth. Since collision with other objects is an important issue, it would seem logical to connect the touch sensors directly with the master brick as well.\\ 
 
-Since the color sensor, the motor for the temperature sensor and the temperature sensor all have to do with the same functionality, it would seem logical to put these sensors and actuators on the same brick. Also the measurement of the distance with the ultra sonar sensor is not crucial it is logic to put them on the brick for the measurements.\\
+Since the color sensor, the motor for the temperature sensor and the temperature sensor all have to do with the same functionality, it would seem logical to put these sensors and actuators on the same brick. Finally, as the measurement of the distance with the ultrasonic sensor is not crucial for the functionality of the robot, we suggest to put that sensor on the (slave) brick for the measurements as well.\\
 
-\subsection*{Brick 1 (Master):} crucial processes (driving without bumping or falling off the table)
+\subsection*{Brick 1 (Master):} crucial processes (wandering without collisions or falling off the table)
 \begin{itemize}
 \item[] Motor 1
 \item[] Motor 2
-\item[]
 \item[] Light 1
 \item[] Light 2
 \item[] Touch 1
@@ -97,9 +131,8 @@ Since the color sensor, the motor for the temperature sensor and the temperature
 \subsection*{Brick 2:} measurements (color of a lake, temperature and distance detection)
 \begin{itemize}
 \item[] Motor Temperature
-\item[]
-\item[] Temperature 
-\item[] Ultra sonar 
+\item[] Temperature sensor
+\item[] Ultrasonic sensor
 \item[] Color
 \end{itemize}
 
