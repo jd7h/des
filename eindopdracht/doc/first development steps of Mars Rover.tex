@@ -5,6 +5,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{rotating}
+\usepackage{verbatim}
 
 \author{Judith van Stegeren and Mirjam van Nahmen}
 \title{Development of the Mars Rover robot}
@@ -109,7 +110,7 @@ List of the actuators:
 \item[1] temperature sensor
 \item[2] light sensors
 \item[1] color sensor
-\item[1] ultra sonar sensor
+\item[1] ultra sonar
 \item[2] touch sensors
 \end{itemize}
 
@@ -118,6 +119,18 @@ Since it is vital that the motor does not fall off the table, we want that the c
 
 Since the color sensor, the motor for the temperature sensor and the temperature sensor all have to do with the same functionality, it would seem logical to put these sensors and actuators on the same brick. Finally, as the measurement of the distance with the ultrasonic sensor is not crucial for the functionality of the robot, we suggest to put that sensor on the (slave) brick for the measurements as well.\\
 
+\subsection*{Deployment diagram}
+\begin{tabular}{|p{3cm}|p{6cm}|p{6cm}|} 
+\hline
+brick & NXT1 (master) & NXT2 (slave)\\
+\hline
+tasks & wandering, navigating, avoiding collisions & recognizing colours, spotting far-away objects, temperature sensor control\\\hline
+actuators & motor 1, motor 2 & temperature sensor motor\\\hline
+sensors & light sensor 1, light sensor 2, touch sensor 1, touch sensor 2 & ultra sonic sensor, temperature sensor\\
+\hline
+\end{tabular}
+
+\begin{comment}
 \subsection*{Brick 1 (Master):} crucial processes (wandering without collisions or falling off the table)
 \begin{itemize}
 \item[] Motor 1
@@ -135,27 +148,16 @@ Since the color sensor, the motor for the temperature sensor and the temperature
 \item[] Ultrasonic sensor
 \item[] Color
 \end{itemize}
+\end{comment}
 
-
-\subsection*{Use case:}
-
-Robot wanders around the area without falling off the black table, the borders are marked with a white line.
-We need both motors and both the light sensors.\\
-
-On detection of a colored lake, the robot lowers the temperature sensor and measures the temperature and store it with the color of the lake.
-We need the color detector, the motor for the temperature sensor and the temperature sensor itself.\\
-
-Robot wanders around the area, without bumping into objects.
-We need both motors and the two touch sensors and the sonar sensor.\\ %/*The touch sensors are for the situation that the sonar missed something, so it could be an advantage to put the sonar also on the brick of the motors. The communication with the sonar does not have to be instantaneous, so we could use bluetooth, but it seems not the best thing to do.*/
-
-If the robot finished the measurement of the last lake it stops wandering and shows the table with the temperatures of all lakes on his display. \\
-
-If the robot detects a rock with the ultra sonar sensor, it changes the direction and makes a bend to avoid bumping the rock.\\
-
-If the robot bumps against a rock, the robot should stop both motors immediately. After stopping the robot should go back straight to avoid to fall off the table during driving backwards. Afterwards the robot makes a turn to change the direction and starts again with wandering.\\
-
-If the robot detects a with line of the border it goes straight backwards and makes a turn to the opposite side of the light sensor which detected the white line. \\
-
+\subsection*{Use cases}
+\begin{description}
+\item[Wandering within white line] The robot drives in a straight line until it encounters a white line with one of its light sensors. If it encounters the white line, it will back up a bit, make a turn away from the white line and proceed in a straight line. For this use case, we need both motors and both the light sensors.
+\item[New lake detection and measurements] On detection of a colored lake, the robot first checks if it hasn't encountered the lake before. If not, the robot positions itself before the lake. It then lowers the temperature sensor, measures the temperature and stores it together with the color of the lake. We need the color detector, the motor for the temperature sensor and the temperature sensor itself.
+\item[Old lake detection] On detection of a colored lake, the robot checks if he encountered this lake before. If this is the case, the robot drives around the lake. For this we need the color detector and the two motors, but it doesn't matter whether the color sensor is on the same brick as both motors.
+\item[Wandering without collisions] The robot drives in a straight line. If one of the bumpers touches an object, the robot backs up, makes a turn and proceeds in a straight line. For this we need the bumpers and both motors. Since reaction time is important in this use case, it would be best if the motors and the bumpers are connected to the same brick. The ultrasonic sensor can also play a role in this use case. The reaction time of the ultrasonic sensor is less important since it can spot obstacles from further away. %The touch sensors are for the situation that the sonar missed something, so it could be an advantage to put the sonar also on the brick of the motors. The communication with the sonar does not have to be instantaneous, so we could use bluetooth, but it seems not the best thing to do.
+\item[Ready] If the robot has measured the temperature in a lake, it check if all lakes have been measured. If that is the case, it stops wandering and shows the table with the temperatures of all lakes on his display.\\
+\end{description}
 
 \section*{Risk analysis}
 
