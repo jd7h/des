@@ -15,19 +15,20 @@
 \maketitle
 
 \section*{Specifications}
-The main goal of the robot is to find all three lakes and measure the temperature.
+The main goal of the robot is to find all three colored lakes and measure the temperature.
 
 \subsection*{Functional requirements}
 The robot must be able to ...
 \begin{itemize} 
 \item wander the area.
-\item recognize a lake and determine its color
+\item recognize a lake and determine its color.
 \item navigate around lakes.
 \item recognize the white barrier and not cross it.
 \item notice obstacles in the area and avoid them while wandering.
 \item lower the temperature sensor and measure the temperature in a lake.
 \item store the temperature with the color of the lake.
 \item see the difference between black, white, red, green and blue.
+\item recognize bumping against an obstacles and drive around it.
 \end{itemize}
 
 
@@ -73,7 +74,8 @@ M & navigate around lakes.\\
 M & recognize the white barrier and not cross it.\\
 M & notice obstacles in the area and avoid them while wandering.\\
 M & lower the temperature sensor and measure the temperature in a lake.\\
-M & see the difference between black, white, red, green and blue.\\\
+M & see the difference between black, white, red, green and blue.\\
+S & recognize bumping against an obstacles and drive around it.\\
 S & store the temperature with the color of the lake.\\
 \hline
 M & be programmed by stating its behavior in a DSL and then generating code from that specification.\\
@@ -135,10 +137,10 @@ sensors & light sensor 1, light sensor 2, touch sensor 1, touch sensor 2 & ultra
 \begin{itemize}
 \item[] Motor 1
 \item[] Motor 2
-\item[] Light 1
-\item[] Light 2
-\item[] Touch 1
-\item[] Touch 2
+\item[] Light sensor 1
+\item[] Light sensor 2
+\item[] Touch sensor 1
+\item[] Touch sensor 2
 \end{itemize}
 
 \subsection*{Brick 2:} measurements (color of a lake, temperature and distance detection)
@@ -146,7 +148,7 @@ sensors & light sensor 1, light sensor 2, touch sensor 1, touch sensor 2 & ultra
 \item[] Motor Temperature
 \item[] Temperature sensor
 \item[] Ultrasonic sensor
-\item[] Color
+\item[] Color sensor
 \end{itemize}
 \end{comment}
 
