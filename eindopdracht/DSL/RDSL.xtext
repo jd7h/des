@@ -1,0 +1,90 @@
+grammar robots.tasks.RDSL with org.eclipse.xtext.common.Terminals
+
+generate rDSL "http://www.tasks.robots/RDSL"
+
+
+Automata: 
+	'Automaton:' name=ID
+	'States:' statelist += State+		//we need at least one state
+	'Arrows:' arrowlist += Arrow*		//zero or more arrows
+	'Start state:' startstate = [State]	//s zit in de lijst van states
+;
+
+State: 
+	'State' name=ID 'with'
+	actionlist += Action+	//more than one action	
+;
+
+Arrow:
+	'Arrow' from=[State] '->' to=[State] 'if' condition = Condition //('and' Condition)+		//probleem: lijst met conditions nodig disjunction/conjunction?
+;
+
+Action: DriveAction | TurnAction | Stop
+;
+DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'with speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
+;
+TurnAction: 'turn' direction = Direction ('('min = INT ',' max = INT')' | degree = INT)// in graden of random met een max. Vraag: is dit voor implemetatie of voor de DSL?
+;
+Stop: {Stop} 'stop'
+;
+
+Condition: //sensorcondition
+	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition//light/bumper links&rechts
+;
+
+LightCondition:
+	'lightsensor' side = Direction 'reads' value = LightValue
+;
+
+ColorCondition:
+	'colorsensor reads' color = Color
+;
+
+TempCondition:
+	'temperaturesensor reads' temp = INT //int = graden
+;
+
+SonarCondition:
+	'sonar detects' value = SonarValue 'at' distance = INT
+;
+
+BumperCondition:
+	'bumper' side = Direction 'is' value = BumperValue
+;
+
+enum BumperValue:
+	PRESSED = 'pressed' | 
+	NOTPRESSED = 'not pressed'
+;
+
+enum LightValue:
+	BLACK = 'black' |
+	WHITE = 'white'
+;
+
+enum SonarValue:
+	NOTHING = 'nothing' |
+	SOMETHING = 'something'
+;	
+
+enum TimeUnit:
+	MS = 'ms' |
+	SEC = 'sec'
+;
+
+enum Direction:
+	LEFT = 'left' |
+	RIGHT = 'right'
+;
+
+enum DriveDirection:
+	BACKWARDS = 'backwards' |
+	FORWARDS = 'forwards'
+;
+
+enum Color:
+	BLUE = 'blue' |
+	BLACK = 'black'|
+	RED = 'red' |
+	GREEN = 'green'
+;
