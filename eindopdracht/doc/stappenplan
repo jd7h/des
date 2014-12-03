@@ -1,0 +1,26 @@
+Plan de campagne voor DES
+
+Voor deze week:
+- documenten aanpassen voor volgende week op basis van annotaties
+- brainstormen nieuwe DSL, naar welk abstractieniveau willen we?
+	Brainstorm 
+Optie 1: we blijven dichtbij de behavior-methode van LejOS. Voordeel: we hebben er veel ervaring mee, je krijgt de abitrator er gratis bij dus dan werkt het vrij snel. Nadeel: je zit vast aan de (beperkingen van) de abitrator.
+Optie 2: We implementeren zelf de state machine approach die bij ons eerste voorstel voor een DSL past. Voordeel: mooi abstract, waarschijnlijk goed te programmeren (ook: bluetooth). Nadeel: we hebben hier nog niet mee geoefend en het kost daarom waarschijnlijk meer tijd. 
+We kiezen voor de state machine approach: 
+1 abstracter
+2 makkelijk modulair te houden
+3 preciezer dan controle dmv behaviors/abitrator
+4 interessanter
+
+- begin maken implementatie nieuwe DSL (invoeren in document en laden in Eclipse) (of: aanpassen bestaande grammatica)
+- code generation voor de basics
+- classes testen -> supermodulair (is nu nog niet belangrijk omdat we alles rijden en ontwijken doen)
+- deliverable maken: robot die kan wanderen en zonder botsen en van de tafel vallen rondjes rijdt.
+
+Dingen die grote problemen kunnen opleveren:
+- bluetooth verbinding opzetten los testen -> hoe verwerken we dit in de DSL? -> testen buiten de DSL.
+- los testen met het aansturen van de RCX-motor en de temperatuursensor
+- automatische code generation moet geen onmodulaire spaghetti worden, dus tussendoor heel vaak testen
+- het manouvreren rond de lakes, zodat de temp-sensor goed terecht komt
+- kleuren herkennen (opgelost door jozef?) -> colorsensor los testen
+
