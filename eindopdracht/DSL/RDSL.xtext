@@ -11,25 +11,26 @@ Automata:
 ;
 
 State: 
-	'State' name=ID 'with'
-	actionlist += Action+	//more than one action	
+	'State' name=ID 'do' actionlist += Action+	//more than one action	
 ;
 
 Arrow:
-	'Arrow' from=[State] '->' to=[State] 'if' condition = Condition //('and' Condition)+		//probleem: lijst met conditions nodig disjunction/conjunction?
+	'Arrow' from=[State] '->' to=[State] 'if' disjunctionlist += Conjunction+
 ;
 
-Action: DriveAction | TurnAction | Stop
+Action: DriveAction | TurnAction | {Action} 'stop'
 ;
-DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'with speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
+DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
 ;
 TurnAction: 'turn' direction = Direction ('('min = INT ',' max = INT')' | degree = INT)// in graden of random met een max. Vraag: is dit voor implemetatie of voor de DSL?
 ;
-Stop: {Stop} 'stop'
+
+Conjunction:
+	'(and ' conjuctionlist += Condition+ ')'
 ;
 
 Condition: //sensorcondition
-	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition//light/bumper links&rechts
+	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition //scheiding tussen condities???
 ;
 
 LightCondition:
