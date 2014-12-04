@@ -1,5 +1,7 @@
 package robots.tasks.generator
 
+
+
 import org.eclipse.emf.ecore.resource.Resource
 import robots.tasks.rDSL.DriveAction
 import robots.tasks.rDSL.DriveDirection
@@ -10,8 +12,23 @@ import robots.tasks.rDSL.StopAction
 import robots.tasks.rDSL.LightCondition
 import robots.tasks.rDSL.LightValue
 import robots.tasks.rDSL.SonarValue
+import robots.tasks.rDSL.BumperValue
+import robots.tasks.rDSL.SonarCondition
+import robots.tasks.rDSL.Arrow
+import robots.tasks.rDSL.Color
+import robots.tasks.rDSL.BumperCondition
+import robots.tasks.rDSL.ColorCondition
+import robots.tasks.rDSL.TempCondition
 
 class JavaGenerator {
+	
+	def static arrow2conditional(Arrow a)'''
+		«FOR c : a.disjunctionlist SEPARATOR '||'»
+			«FOR el : c.conjuctionlist BEFORE '(' SEPARATOR '&&' AFTER ')'»
+				el.condition2Code()
+			«ENDFOR»
+		«ENDFOR»
+	'''
 
 	def static generateMain(Resource resource)'''
 	package «Auxiliary.getAutomata(resource).name»;
@@ -37,20 +54,35 @@ class JavaGenerator {
 	import lejos.nxt.UltrasonicSensor;
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.Sound;
+	import lejos.nxt.ColorSensor;
 	
 	//Constance for the Lightsensorvalues
 	public static int BRIGHT = 20;
 	public static int DARK = 80;
 
 	//make methods for every state seperately
-	«FOR s : Auxiliary.getStates(resource)»
-	public void «Auxiliary.getStateMethod(s)»()
-	{
-		«FOR a : Auxiliary.getActionList(s)»
-			
+		«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
+		public void «Auxiliary.getStateMethod(s)»()
+		{
+			«FOR a : Auxiliary.getActionList(s)»
+				«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
+				«arrow2conditional(ar)»)
+					break;
+				«ENDFOR»
+				else
+					«action2code(a)»
+			«ENDFOR»
+		}
+
+		«FOR a : Auxiliary.getOutArrows(resource,s)»
+			«FOR c : a.disjunctionlist BEFORE '(' SEPARATOR '||' AFTER ')'»
+				«FOR el : c.conjuctionlist SEPARATOR '&&'»
+					«condition2code(el)»
+				«ENDFOR»
+			«ENDFOR»
 		«ENDFOR»
-	}
 	«ENDFOR»
+	
 
 	public class Main{
 
@@ -197,11 +229,11 @@ class JavaGenerator {
 		
 		switch(condition.value)
 		{
-			case LightValue::WHITE: if(condition.Direction == Direction::LEFT)
+			case LightValue::WHITE: if(condition.side == Direction::LEFT)
 										return ''' (BRIGHT == robot.lightL.readValue()) '''
 									else
 										return ''' (BRIGHT == robot.lightR.readValue()) '''
-			case LightValue::BLACK: if(condition.Direction == Direction::LEFT)
+			case LightValue::BLACK: if(condition.side == Direction::LEFT)
 										return ''' (DARK == robot.lightL.readValue()) '''
 									else
 										return ''' (DARK == robot.lightR.readValue()) '''
@@ -221,16 +253,32 @@ class JavaGenerator {
 		
 		switch(condition.value)
 		{
-			case BumperValue::PRESSED: if(condition.Direction == Direction::LEFT)
+			case BumperValue::PRESSED: if(condition.side == Direction::LEFT)
 										return ''' (robot.bumperL.isPressed()) '''
 									else
 										return ''' (robot.bumperR.isPressed()) '''
-			case BumperValue::NOTPRESSED: if(condition.Direction == Direction::LEFT)
+			case BumperValue::NOTPRESSED: if(condition.side == Direction::LEFT)
 										return ''' (!robot.bumperL.isPressed()) '''
 									else
 										return ''' (!robot.bumperR.isPressed()) '''
 		}
 	}
 	
+	//TODO add colorsensor and add to the conditions
+	def static dispatch condition2code(ColorCondition condition){
+		
+		switch(condition.color)
+		{
+			case Color::BLUE: return '''lejos.robotics.Colors.Color.BLUE '''
+			case Color::BLACK: return '''lejos.robotics.Colors.Color.BLACK'''
+			case Color::RED: return '''lejos.robotics.Colors.Color.RED'''
+			case Color::GREEN: return '''lejos.robotics.Colors.Color.GREEN'''
+		}
+	}
+	
+	//TODO add tempsensor and add conditions
+	def static dispatch condition2code(TempCondition condition){ 
+		return condition.temp
+		}
 
 }
