@@ -23,11 +23,17 @@ class Auxiliary {
 		return getAutomata(resource).statelist 
  	}
 
-	//returns name of s capitalized (as used in the enums)
+	//returns state name as unformatted string
 	def static String getStateName(State s){
 		return s.name
 	}
 
+	//returns state name with first letter capitalized
+	def static String getStateMethod(State s){
+		return s.name.substring(0,1).toUpperCase() + s.name.substring(1)
+	}
+
+	//returns name of s in all caps (as used in the enums)
 	def static String getStateItem(State s){
 		return Str.toUpperCase(s.name)
 	}
@@ -35,6 +41,12 @@ class Auxiliary {
 	//returns the start state
 	def static State getStartState(Resource resource) {
 		return getAutomata(resource).startstate
+	}
+
+	//stub
+	//returns the list of final states
+	def static List<State> getFinalStates(Resource resource){
+		return getAutomata(resource).endstates
 	}
 
 	def static List<Arrow> getArrows(Resource resource) {

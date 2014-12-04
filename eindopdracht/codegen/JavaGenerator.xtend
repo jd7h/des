@@ -29,7 +29,27 @@ class JavaGenerator {
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.Sound;
 
+	//make methods for every state seperately
+	<<FOR s : Auxilary.getStates(resource)>>
+	public void <<Auxilary.getStateMethod(s)>>()
+	{
+		<<FOR a : Auxilary.getActionList(s)>>
+			<<Auxilary.action2text(a)>>
+		<<ENDFOR>>
+	}
+	<<ENDFOR>
+
 	public class Main{
+
+			//maak een enum van de beginstates
+			public enum State {
+			<<FOR s : Auxilary.getStates(resource) SEPARATOR ','>>
+				<<Auxilary.getStateItem(s)>>
+			<<ENDFOR>>
+			}
+
+			//definieer lijst van endstates
+			State[] endStates = {<<FOR e : <<Auxilary.getEndStates SEPARATOR ','>><<Auxilary.getStateItem(e)>><<ENDFOR>>};
 			
 			//definieer standaard equipment op Robot
 			//maak de robot
@@ -45,6 +65,7 @@ class JavaGenerator {
 			//todo: zet een BT-kanaal op tussen de master en de slave
 
 			//todo: zet de robot in de beginstate
+			State current = <<Auxilary.getStateItem(Auxilary.getStartState(resource))>>
 			
 			//startconfiguratie met feedback
 			LCD.drawString("EndGameRobot",0,1);
@@ -60,4 +81,5 @@ class JavaGenerator {
 		
 
 		}'''
+
 }
