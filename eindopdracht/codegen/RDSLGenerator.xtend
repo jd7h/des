@@ -16,9 +16,6 @@ class RDSLGenerator implements IGenerator {
 	
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 		fsa.generateFile("Main.java", JavaGenerator.generateMain(resource)); 
-//			resource.allContents
-//				.filter(typeof(Greeting))
-//				.map[name]
-//				.join(', '))
+		
 	}
 }

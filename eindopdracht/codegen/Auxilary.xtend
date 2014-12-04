@@ -7,7 +7,6 @@ import robots.tasks.rDSL.Action
 import org.eclipse.emf.ecore.resource.Resource
 import java.util.List
 import java.util.ArrayList
-import robots.tasks.rDSL.Priority
 
 class Auxiliary {
 	def static Automata getAutomata(Resource resource) {
@@ -35,7 +34,7 @@ class Auxiliary {
 
 	//returns name of s in all caps (as used in the enums)
 	def static String getStateItem(State s){
-		return Str.toUpperCase(s.name)
+		return s.name.toUpperCase()
 	}
 
 	//returns the start state
@@ -45,7 +44,7 @@ class Auxiliary {
 
 	//stub
 	//returns the list of final states
-	def static List<State> getFinalStates(Resource resource){
+	def static List<State> getEndStates(Resource resource){
 		return getAutomata(resource).endstates
 	}
 

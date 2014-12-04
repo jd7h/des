@@ -35,26 +35,26 @@ class JavaGenerator {
 	import lejos.nxt.Sound;
 
 	//make methods for every state seperately
-	<<FOR s : Auxilary.getStates(resource)>>
-	public void <<Auxilary.getStateMethod(s)>>()
+	«FOR s : Auxiliary.getStates(resource)»
+	public void «Auxiliary.getStateMethod(s)»()
 	{
-		<<FOR a : Auxilary.getActionList(s)>>
-			<<Auxilary.action2text(a)>>
-		<<ENDFOR>>
+		«FOR a : Auxiliary.getActionList(s)»
+			
+		«ENDFOR»
 	}
-	<<ENDFOR>
+	«ENDFOR»
 
 	public class Main{
 
 			//maak een enum van de beginstates
 			public enum State {
-			<<FOR s : Auxilary.getStates(resource) SEPARATOR ','>>
-				<<Auxilary.getStateItem(s)>>
-			<<ENDFOR>>
+			«FOR s : Auxiliary.getStates(resource) SEPARATOR ','»
+				«Auxiliary.getStateItem(s)»
+			«ENDFOR»
 			}
 
 			//definieer lijst van endstates
-			State[] endStates = {<<FOR e : <<Auxilary.getEndStates SEPARATOR ','>><<Auxilary.getStateItem(e)>><<ENDFOR>>};
+			State[] endStates = {«FOR e : Auxiliary.getEndStates(resource) SEPARATOR ','»«Auxiliary.getStateItem(e)»«ENDFOR»};
 			
 			//definieer standaard equipment op Robot
 			//maak de robot
@@ -70,7 +70,7 @@ class JavaGenerator {
 			//todo: zet een BT-kanaal op tussen de master en de slave
 
 			//todo: zet de robot in de beginstate
-			State current = <<Auxilary.getStateItem(Auxilary.getStartState(resource))>>
+			State current = «Auxiliary.getStateItem(Auxiliary.getStartState(resource))»
 			
 			//startconfiguratie met feedback
 			LCD.drawString("EndGameRobot",0,1);

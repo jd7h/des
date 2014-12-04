@@ -1,4 +1,4 @@
-Automaton example2
+Automaton example1
 	States 
 		State start do drive forwards INF speed 200
 		State problemLeft do stop turn right (15,90)
@@ -12,3 +12,4 @@ Automaton example2
 		Arrow problemRight - start if (and lightsensor right reads black bumper right is not pressed)
 	
 	Start state start
+	
