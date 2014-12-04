@@ -9,6 +9,14 @@ import robots.tasks.rDSL.Direction
 
 class JavaGenerator {
 
+	def static arrow2conditional(Arrow a)'''
+		«FOR c : a.disjunctionlist SEPARATOR '||'»
+			«FOR el : c.conjuctionlist BEFORE '(' SEPARATOR '&&' AFTER ')'»
+				el.condition2Code()
+			«ENDFOR»
+		«ENDFOR»
+	'''
+
 	def static generateMain(Resource resource)'''
 	package «Auxiliary.getAutomata(resource).name»;
 
@@ -35,13 +43,28 @@ class JavaGenerator {
 	import lejos.nxt.Sound;
 
 	//make methods for every state seperately
-	«FOR s : Auxiliary.getStates(resource)»
-	public void «Auxiliary.getStateMethod(s)»()
-	{
-		«FOR a : Auxiliary.getActionList(s)»
-			
+	«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
+		public void «Auxiliary.getStateMethod(s)»()
+		{
+			«FOR a : Auxiliary.getActionList(s)»
+				«FOR a : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
+				«arrow2Conditional(a)»)
+					break;
+				«ENDFOR»
+				else
+					«a.action2Text()»
+			«ENDFOR»
+		}
+
+		«FOR a : Auxiliary.getOutArrows(resource,s)»
+			«FOR c : a.disjunctionlist BEFORE '(' SEPARATOR '||' AFTER ')'»
+				«FOR el : c.conjuctionlist SEPARATOR '&&'»
+					el.condition2Text()
+				«ENDFOR»
+			«ENDFOR»
 		«ENDFOR»
-	}
+	
+	
 	«ENDFOR»
 
 	public class Main{

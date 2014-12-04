@@ -60,8 +60,17 @@ class Auxiliary {
  			}
  		}
  		return arrowlist; 
- 		
  	}
+
+	def static List<Arrow> getOutArrows (Resource resource, State s){
+		var List<Arrow> arrowlist = new ArrayList<Arrow>()
+		for (Arrow a : getArrows(resource)){
+			if a.from == s){
+				arrowlist.add(a)
+			}
+		}
+		return arrowlist;
+	}
  	
  	def static List<Action> getActionList(State s) {
  				return s.actionlist; 
