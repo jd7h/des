@@ -1,6 +1,11 @@
 package robots.tasks.generator
 
 import org.eclipse.emf.ecore.resource.Resource
+import robots.tasks.rDSL.DriveAction
+import robots.tasks.rDSL.DriveDirection
+import robots.tasks.rDSL.TimeUnit
+import robots.tasks.rDSL.TurnAction
+import robots.tasks.rDSL.Direction
 
 class JavaGenerator {
 
@@ -60,4 +65,66 @@ class JavaGenerator {
 		
 
 		}'''
+		
+	//actions
+	def static dispatch action2Text(DriveAction action){
+
+		var int s = action.speed
+		
+		if(action.dl != 0)
+		{
+			var int n = action.dl
+			if(action.unit == TimeUnit::SEC){
+				n =  n*1000
+			}
+			
+			switch(action.driveDir)
+			{
+				 case DriveDirection::FORWARDS: return '''
+				 	right.setSpeed(«s»);
+				 	left.setSpeed(«s»);
+				 	right.forward();
+				 	left.forward();
+					Delay.msDelay(«n»);'''
+				 case DriveDirection::BACKWARDS: return '''
+				 	right.setSpeed(«s»);
+				 	left.setSpeed(«s»);
+				 	right.backward();
+				 	left.backward();
+				 	Delay.msDelay(«n»);'''
+			}
+				
+		}		 
+		switch(action.driveDir)
+		{
+			 case DriveDirection::FORWARDS: return '''
+			 	right.setSpeed(«s»);
+			 	left.setSpeed(«s»);
+			 	right.forward();
+			 	left.forward();'''
+			 case DriveDirection::BACKWARDS: return '''
+			 	right.setSpeed(«s»);
+			 	left.setSpeed(«s»);
+			 	right.backward();
+			 	left.backward();'''
+		}
+		
+	}
+	
+	def static dispatch action2Text(TurnAction action){
+		
+		if(action.degree == 0)
+		
+		switch(action.direction)
+		{
+			case Direction::LEFT: return '''
+			right.forward();
+			left.backward();'''
+			case Direction::RIGHT: return '''
+			right.backward();
+			left.forward();'''			
+		}
+	}
+	
+
 }
