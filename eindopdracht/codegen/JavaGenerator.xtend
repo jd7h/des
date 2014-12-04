@@ -6,16 +6,12 @@ import robots.tasks.rDSL.DriveDirection
 import robots.tasks.rDSL.TimeUnit
 import robots.tasks.rDSL.TurnAction
 import robots.tasks.rDSL.Direction
+import robots.tasks.rDSL.StopAction
+import robots.tasks.rDSL.LightCondition
+import robots.tasks.rDSL.LightValue
+import robots.tasks.rDSL.SonarValue
 
 class JavaGenerator {
-
-	def static arrow2conditional(Arrow a)'''
-		«FOR c : a.disjunctionlist SEPARATOR '||'»
-			«FOR el : c.conjuctionlist BEFORE '(' SEPARATOR '&&' AFTER ')'»
-				el.condition2Code()
-			«ENDFOR»
-		«ENDFOR»
-	'''
 
 	def static generateMain(Resource resource)'''
 	package «Auxiliary.getAutomata(resource).name»;
@@ -41,30 +37,19 @@ class JavaGenerator {
 	import lejos.nxt.UltrasonicSensor;
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.Sound;
+	
+	//Constance for the Lightsensorvalues
+	public static int BRIGHT = 20;
+	public static int DARK = 80;
 
 	//make methods for every state seperately
-	«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
-		public void «Auxiliary.getStateMethod(s)»()
-		{
-			«FOR a : Auxiliary.getActionList(s)»
-				«FOR a : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
-				«arrow2Conditional(a)»)
-					break;
-				«ENDFOR»
-				else
-					«a.action2Text()»
-			«ENDFOR»
-		}
-
-		«FOR a : Auxiliary.getOutArrows(resource,s)»
-			«FOR c : a.disjunctionlist BEFORE '(' SEPARATOR '||' AFTER ')'»
-				«FOR el : c.conjuctionlist SEPARATOR '&&'»
-					el.condition2Text()
-				«ENDFOR»
-			«ENDFOR»
+	«FOR s : Auxiliary.getStates(resource)»
+	public void «Auxiliary.getStateMethod(s)»()
+	{
+		«FOR a : Auxiliary.getActionList(s)»
+			
 		«ENDFOR»
-	
-	
+	}
 	«ENDFOR»
 
 	public class Main{
@@ -108,10 +93,34 @@ class JavaGenerator {
 			}
 		
 
+		}
+		
+		
+		/**
+		 * Returns a pseudo-random number between min and max, inclusive.
+		 * The difference between min and max can be at most
+		 * <code>Integer.MAX_VALUE - 1</code>.
+		 *
+		 * @param min Minimum value
+		 * @param max Maximum value.  Must be greater than min.
+		 * @return Integer between min and max, inclusive.
+		 * @see java.util.Random#nextInt(int)
+		 */
+		public static int randInt(int min, int max) {
+		
+		    // NOTE: Usually this should be a field rather than a method
+		    // variable so that it is not re-seeded every call.
+		    Random rand = new Random();
+		
+		    // nextInt is normally exclusive of the top value,
+		    // so add 1 to make it inclusive
+		    int randomNum = rand.nextInt((max - min) + 1) + min;
+		
+		    return randomNum;
 		}'''
 		
 	//actions
-	def static dispatch action2Text(DriveAction action){
+	def static dispatch action2code(DriveAction action){
 
 		var int s = action.speed
 		
@@ -155,19 +164,73 @@ class JavaGenerator {
 		
 	}
 	
-	def static dispatch action2Text(TurnAction action){
+	def static dispatch action2code(TurnAction action){
 		
-		if(action.degree == 0)
+		if(action.degree == 0){
+			switch(action.direction)
+			{
+				case Direction::LEFT: return '''
+				int degree =  randInt(min, max);
+				left.rotate(degree);'''
+				case Direction::RIGHT: return '''
+				int degree =  randInt(min, max);
+				right.rotate(degree);'''			
+			}
+		}else{
+			switch(action.direction)
+			{
+				case Direction::LEFT: return '''
+				left.rotate(«action.degree»);'''
+				case Direction::RIGHT: return '''
+				right.rotate(«action.degree»);'''			
+			}
+		}		
+	}
+	
+	def static dispatch action2code(StopAction action)'''
+		left.stop(true);
+		right.stop(true);'''
+	
+	
+	//Conditions
+	def static dispatch condition2code(LightCondition condition){
 		
-		switch(action.direction)
+		switch(condition.value)
 		{
-			case Direction::LEFT: return '''
-			right.forward();
-			left.backward();'''
-			case Direction::RIGHT: return '''
-			right.backward();
-			left.forward();'''			
+			case LightValue::WHITE: if(condition.Direction == Direction::LEFT)
+										return ''' (BRIGHT == robot.lightL.readValue()) '''
+									else
+										return ''' (BRIGHT == robot.lightR.readValue()) '''
+			case LightValue::BLACK: if(condition.Direction == Direction::LEFT)
+										return ''' (DARK == robot.lightL.readValue()) '''
+									else
+										return ''' (DARK == robot.lightR.readValue()) '''
 		}
 	}
+	
+	def static dispatch condition2code(SonarCondition condition){
+		
+		switch(condition.value)
+		{
+			case SonarValue::NOTHING: return ''' (robot.sonar.getDistance() > «condition.distance» ) '''
+			case SonarValue::SOMETHING: return ''' (robot.sonar.getDistance() < «condition.distance») '''
+		}
+	}
+	
+	def static dispatch condition2code(BumperCondition condition){
+		
+		switch(condition.value)
+		{
+			case BumperValue::PRESSED: if(condition.Direction == Direction::LEFT)
+										return ''' (robot.bumperL.isPressed()) '''
+									else
+										return ''' (robot.bumperR.isPressed()) '''
+			case BumperValue::NOTPRESSED: if(condition.Direction == Direction::LEFT)
+										return ''' (!robot.bumperL.isPressed()) '''
+									else
+										return ''' (!robot.bumperR.isPressed()) '''
+		}
+	}
+	
 
 }
