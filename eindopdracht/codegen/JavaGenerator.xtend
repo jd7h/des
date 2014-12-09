@@ -61,28 +61,20 @@ class JavaGenerator {
 	public static int DARK = 80;
 
 	//make methods for every state seperately
-		«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
-		public void «Auxiliary.getStateMethod(s)»()
-		{
-			«FOR a : Auxiliary.getActionList(s)»
-				«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
-				«arrow2conditional(ar)»)
-					break;
-				«ENDFOR»
-				else
-					«action2code(a)»
+	«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
+	public void «Auxiliary.getStateMethod(s)»()
+	{
+		«FOR a : Auxiliary.getActionList(s)»
+			«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
+			«arrow2conditional(ar)»)
+				return; //later aanpassen: switch state
 			«ENDFOR»
-		}
-
-		«FOR a : Auxiliary.getOutArrows(resource,s)»
-			«FOR c : a.disjunctionlist BEFORE '(' SEPARATOR '||' AFTER ')'»
-				«FOR el : c.conjuctionlist SEPARATOR '&&'»
-					«condition2code(el)»
-				«ENDFOR»
-			«ENDFOR»
+			else{
+				«action2code(a)»
+			}
 		«ENDFOR»
-	«ENDFOR»
-	
+	}
+	«ENDFOR»	
 
 	public class Main{
 
@@ -156,7 +148,7 @@ class JavaGenerator {
 
 		var int s = action.speed
 		
-		if(action.dl != 0)
+		if(action.dl != 0)								//als we dl niet invullen, wordt action.dl dan 0?
 		{
 			var int n = action.dl
 			if(action.unit == TimeUnit::SEC){
@@ -177,8 +169,7 @@ class JavaGenerator {
 				 	right.backward();
 				 	left.backward();
 				 	Delay.msDelay(«n»);'''
-			}
-				
+			}	
 		}		 
 		switch(action.driveDir)
 		{
@@ -193,7 +184,6 @@ class JavaGenerator {
 			 	right.backward();
 			 	left.backward();'''
 		}
-		
 	}
 	
 	def static dispatch action2code(TurnAction action){
@@ -221,7 +211,7 @@ class JavaGenerator {
 	
 	def static dispatch action2code(StopAction action)'''
 		left.stop(true);
-		right.stop(true);'''
+		right.stop();'''
 	
 	
 	//Conditions
@@ -230,13 +220,13 @@ class JavaGenerator {
 		switch(condition.value)
 		{
 			case LightValue::WHITE: if(condition.side == Direction::LEFT)
-										return ''' (BRIGHT == robot.lightL.readValue()) '''
+										return '''BRIGHT == lightL.readValue() '''
 									else
-										return ''' (BRIGHT == robot.lightR.readValue()) '''
+										return '''BRIGHT == lightR.readValue()'''
 			case LightValue::BLACK: if(condition.side == Direction::LEFT)
-										return ''' (DARK == robot.lightL.readValue()) '''
+										return '''DARK == lightL.readValue()'''
 									else
-										return ''' (DARK == robot.lightR.readValue()) '''
+										return '''DARK == lightR.readValue()'''
 		}
 	}
 	
@@ -244,8 +234,8 @@ class JavaGenerator {
 		
 		switch(condition.value)
 		{
-			case SonarValue::NOTHING: return ''' (robot.sonar.getDistance() > «condition.distance» ) '''
-			case SonarValue::SOMETHING: return ''' (robot.sonar.getDistance() < «condition.distance») '''
+			case SonarValue::NOTHING: return '''sonar.getDistance == 255 || sonar.getDistance() > «condition.distance»'''
+			case SonarValue::SOMETHING: return '''sonar.getDistance() < «condition.distance»'''
 		}
 	}
 	
@@ -254,13 +244,13 @@ class JavaGenerator {
 		switch(condition.value)
 		{
 			case BumperValue::PRESSED: if(condition.side == Direction::LEFT)
-										return ''' (robot.bumperL.isPressed()) '''
+										return '''bumperL.isPressed()'''
 									else
-										return ''' (robot.bumperR.isPressed()) '''
+										return '''bumperR.isPressed()'''
 			case BumperValue::NOTPRESSED: if(condition.side == Direction::LEFT)
-										return ''' (!robot.bumperL.isPressed()) '''
+										return '''!bumperL.isPressed()'''
 									else
-										return ''' (!robot.bumperR.isPressed()) '''
+										return '''!bumperR.isPressed()'''
 		}
 	}
 	
