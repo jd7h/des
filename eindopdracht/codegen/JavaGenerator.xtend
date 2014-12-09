@@ -73,6 +73,7 @@ class JavaGenerator {
 			«ENDFOR»
 			else{
 				«action2code(a)»
+				current = FINISHED;
 			}
 		«ENDFOR»
 	}
@@ -99,7 +100,7 @@ class JavaGenerator {
 
 			//maak een enum van de beginstates
 			public enum State {
-			«FOR s : Auxiliary.getStates(resource) SEPARATOR ',' AFTER ',FINISHED»			//added extra state for when everything is finished
+			«FOR s : Auxiliary.getStates(resource) SEPARATOR ',' AFTER ',FINISHED' »			//added extra state for when everything is finished
 				«Auxiliary.getStateItem(s)»
 			«ENDFOR»
 			}
