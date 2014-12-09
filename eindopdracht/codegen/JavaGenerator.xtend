@@ -66,21 +66,40 @@ class JavaGenerator {
 	{
 		«FOR a : Auxiliary.getActionList(s)»
 			«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
-			«arrow2conditional(ar)»)
+			«arrow2conditional(ar)»){
+				current = «Auxiliary.getStateItem(ar.to)»;
 				return; //later aanpassen: switch state
+			}
 			«ENDFOR»
 			else{
 				«action2code(a)»
 			}
 		«ENDFOR»
 	}
-	«ENDFOR»	
+	«ENDFOR»
+
+	public void execute(State s)
+	{
+		switch(s):
+		«FOR state : Auxiliary.getStates(resource)»
+			case «Auxiliary.getStateItem(state)»:
+				«Auxiliary.getStateMethod(state)»;
+				break;
+		«ENDFOR»
+			default:
+				break;
+	}	
+
+	public boolean inEndState()
+	{
+		return Arrays.asList(endStates).contains(current);
+	}
 
 	public class Main{
 
 			//maak een enum van de beginstates
 			public enum State {
-			«FOR s : Auxiliary.getStates(resource) SEPARATOR ','»
+			«FOR s : Auxiliary.getStates(resource) SEPARATOR ',' AFTER ',FINISHED»			//added extra state for when everything is finished
 				«Auxiliary.getStateItem(s)»
 			«ENDFOR»
 			}
@@ -112,8 +131,7 @@ class JavaGenerator {
 			//start de loop of doom
 			while(!inEndState())
 			{
-				executeCurrentStateWhileChecking();
-				nextState();			
+				execute(current);
 			}
 		
 
