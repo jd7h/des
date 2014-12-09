@@ -19,11 +19,13 @@ Arrow:
 	'Arrow' from=[State] '->' to=[State] 'if' disjunctionlist += Conjunction+
 ;
 
-Action: DriveAction | TurnAction | {Action} 'stop'
+Action: DriveAction | TurnAction | StopAction
 ;
 DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
 ;
 TurnAction: 'turn' direction = Direction ('('min = INT ',' max = INT')' | degree = INT)// in graden of random met een max. Vraag: is dit voor implemetatie of voor de DSL?
+;
+StopAction: {StopAction} 'stop'	
 ;
 
 Conjunction:
