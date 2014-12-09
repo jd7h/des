@@ -65,7 +65,7 @@ class Auxiliary {
 	def static List<Arrow> getOutArrows (Resource resource, State s){
 		var List<Arrow> arrowlist = new ArrayList<Arrow>()
 		for (Arrow a : getArrows(resource)){
-			if a.from == s){
+			if (a.from == s){
 				arrowlist.add(a)
 			}
 		}
