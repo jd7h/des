@@ -73,7 +73,12 @@ class JavaGenerator {
 			«ENDFOR»
 			else{
 				«action2code(a)»
-				current = FINISHED;
+				«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
+			«arrow2conditional(ar)»){
+					current = «Auxiliary.getStateItem(ar.to)»;
+					return; //later aanpassen: switch state
+				}
+			«ENDFOR»
 			}
 		«ENDFOR»
 	}
