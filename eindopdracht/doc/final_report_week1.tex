@@ -188,7 +188,12 @@ measurements (color of a lake, temperature and distance detection)
 \end{tabular}
 
 \section*{DSL of the mars rover}
-The idea behind the DSL is a state machine. In the practice it is an often used system. It uses states and arrows to describe the transitions and conditions in which the robot can be. For this we decided not to use the behavior functions in the  generation code but to implement our own arbitrator system. 
+We had two options for the structur of the DSL of the Mars Rover. First option was to create a DSL which is close to the behavior programming concepts of LeJOS. The advantage of this approach is the experience with during the last weeks of the class 'Design of embedded Systems' and the thread/task management is already made in form of the Arbitrator class.\\
+The second option is the implementation of the state machine approach which was the first idea for our DSL. We see the advantages here in the abstraction level which can be create. That makes it easier for us to implement such complex things like the Bluetooth communication, where we had a lot of problems with the Arbitrator. The disadvantage is the implementation itself. We do not have many experience with it, such that it will be approximately cost more time to implement the robot.\\
+The main reason why we chose for the state machine approach was the possibility to have more control over the threads and task of the robot and so a better overview what the does and why. Another reason is, that it is also more abstract and therefore also easier to make the implementation modular. That is in the future useful to use it again for comparable projects which is in the business world quite often the case.  Furthermore seems it for us more interesting to implement a state machine with all the challenges. \\
+
+The idea behind the DSL is a state machine. In the practice it is an often used system, which uses states and arrows to describe the transitions and conditions in which the robot can be. 
+%More description of the DSL
 
 \subsection*{Syntax} 
 %  Describe the concrete syntax of the DSL; what is the main idea, what is the meaning of the language?
