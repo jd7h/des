@@ -148,7 +148,10 @@ class JavaGenerator {
     //TODO: Fix Error: "The method asList(Main.State[]) is undefined for the type Arrays"
 	public boolean inEndState()
 	{
-		//return Arrays.asList(endStates).contains(current);
+		for (State s : endStates) 
+			if (s.equals(current)) 
+				return true;
+	
 		return false;
 	}
 
