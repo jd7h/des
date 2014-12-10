@@ -10,4 +10,4 @@ Automaton: example1
 		Arrow problemRight -> start if (and lightsensor right reads black bumper right is not pressed)
 	
 	Start state: start 
-	End state: problemLeft
+	End state: problemRight

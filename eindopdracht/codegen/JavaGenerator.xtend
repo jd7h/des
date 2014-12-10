@@ -25,7 +25,7 @@ class JavaGenerator {
 	def static arrow2conditional(Arrow a)'''
 		«FOR c : a.disjunctionlist SEPARATOR '||'»
 			«FOR el : c.conjuctionlist BEFORE '(' SEPARATOR '&&' AFTER ')'»
-				el.condition2Code()
+				«condition2code(el)»
 			«ENDFOR»
 		«ENDFOR»
 	'''
@@ -55,10 +55,58 @@ class JavaGenerator {
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.Sound;
 	import lejos.nxt.ColorSensor;
+	import java.util.Random;
+	import java.util.Arrays;
+	
+	public class Main{
 	
 	//Constance for the Lightsensorvalues
 	public static int BRIGHT = 20;
 	public static int DARK = 80;
+	
+	//public variables 
+	public State current;
+	
+	//maak een enum van de beginstates
+		public enum State {
+		«FOR s : Auxiliary.getStates(resource) SEPARATOR ',' AFTER ',FINISHED' »			//added extra state for when everything is finished
+			«Auxiliary.getStateItem(s)»
+		«ENDFOR»
+		}
+		
+	//definieer lijst van endstates
+	State[] endStates = {«FOR e : Auxiliary.getEndStates(resource) SEPARATOR ','»State.«Auxiliary.getStateItem(e)»«ENDFOR»};
+	
+	//definieer standaard equipment op Robot
+	//maak de robot
+	//things on brick1 (Master)
+	NXTRegulatedMotor left = Motor.A;
+	NXTRegulatedMotor right = Motor.B;
+	LightSensor lightL = new LightSensor(SensorPort.S1);
+	LightSensor lightR = new LightSensor(SensorPort.S2);
+	TouchSensor bumperL = new TouchSensor(SensorPort.S3);
+	TouchSensor bumperR = new TouchSensor(SensorPort.S4);
+	NXTRegulatedMotor lamp = Motor.C;
+
+	//todo: zet een BT-kanaal op tussen de master en de slave
+		
+	public Main(){
+
+		//todo: zet de robot in de beginstate
+		State current = State.«Auxiliary.getStateItem(Auxiliary.getStartState(resource))»;
+		
+		//startconfiguratie met feedback
+		LCD.drawString("EndGameRobot",0,1);
+		LCD.drawString("Judith & Mirjam",0,2);
+		Button.waitForAnyPress();
+
+		//start de loop of doom
+		while(!inEndState())
+		{
+			execute(current);
+		}
+	}
+
 
 	//make methods for every state seperately
 	«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
@@ -67,7 +115,7 @@ class JavaGenerator {
 		«FOR a : Auxiliary.getActionList(s)»
 			«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
 			«arrow2conditional(ar)»){
-				current = «Auxiliary.getStateItem(ar.to)»;
+				current = State.«Auxiliary.getStateItem(ar.to)»;
 				return; //later aanpassen: switch state
 			}
 			«ENDFOR»
@@ -75,7 +123,7 @@ class JavaGenerator {
 				«action2code(a)»
 				«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
 			«arrow2conditional(ar)»){
-					current = «Auxiliary.getStateItem(ar.to)»;
+					current = State.«Auxiliary.getStateItem(ar.to)»;
 					return; //later aanpassen: switch state
 				}
 			«ENDFOR»
@@ -86,62 +134,25 @@ class JavaGenerator {
 
 	public void execute(State s)
 	{
-		switch(s):
+		switch(s){
 		«FOR state : Auxiliary.getStates(resource)»
 			case «Auxiliary.getStateItem(state)»:
-				«Auxiliary.getStateMethod(state)»;
+				«Auxiliary.getStateMethod(state)»();
 				break;
 		«ENDFOR»
 			default:
 				break;
+		}
 	}	
 
+    //TODO: Fix Error: "The method asList(Main.State[]) is undefined for the type Arrays"
 	public boolean inEndState()
 	{
-		return Arrays.asList(endStates).contains(current);
+		//return Arrays.asList(endStates).contains(current);
+		return false;
 	}
 
-	public class Main{
 
-			//maak een enum van de beginstates
-			public enum State {
-			«FOR s : Auxiliary.getStates(resource) SEPARATOR ',' AFTER ',FINISHED' »			//added extra state for when everything is finished
-				«Auxiliary.getStateItem(s)»
-			«ENDFOR»
-			}
-
-			//definieer lijst van endstates
-			State[] endStates = {«FOR e : Auxiliary.getEndStates(resource) SEPARATOR ','»«Auxiliary.getStateItem(e)»«ENDFOR»};
-			
-			//definieer standaard equipment op Robot
-			//maak de robot
-			//things on brick1 (Master)
-			NXTRegulatedMotor left = Motor.A;
-			NXTRegulatedMotor right = Motor.B;
-			LightSensor lightL = new LightSensor(SensorPort.S1);
-			LightSensor lightR = new LightSensor(SensorPort.S2);
-			TouchSensor touchL = new TouchSensor(SensorPort.S3);
-			TouchSensor touchR = new TouchSensor(SensorPort.S4);
-			Lamp lamp = new Motor.C;
-
-			//todo: zet een BT-kanaal op tussen de master en de slave
-
-			//todo: zet de robot in de beginstate
-			State current = «Auxiliary.getStateItem(Auxiliary.getStartState(resource))»
-			
-			//startconfiguratie met feedback
-			LCD.drawString("EndGameRobot",0,1);
-			LCD.drawString("Judith & Mirjam",0,2);
-			Button.waitForAnyPress();
-
-			//start de loop of doom
-			while(!inEndState())
-			{
-				execute(current);
-			}
-		
-
-		}
 		
 		
 		/**
@@ -165,7 +176,8 @@ class JavaGenerator {
 		    int randomNum = rand.nextInt((max - min) + 1) + min;
 		
 		    return randomNum;
-		}'''
+		}
+	}	'''
 		
 	//actions
 	def static dispatch action2code(DriveAction action){
@@ -216,10 +228,10 @@ class JavaGenerator {
 			switch(action.direction)
 			{
 				case Direction::LEFT: return '''
-				int degree =  randInt(min, max);
+				int degree =  randInt(«action.min», «action.max»);
 				left.rotate(degree);'''
 				case Direction::RIGHT: return '''
-				int degree =  randInt(min, max);
+				int degree =  randInt(«action.min», «action.max»);
 				right.rotate(degree);'''			
 			}
 		}else{
@@ -296,3 +308,4 @@ class JavaGenerator {
 		}
 
 }
+ 
