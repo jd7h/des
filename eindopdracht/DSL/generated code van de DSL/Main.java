@@ -75,7 +75,7 @@ public Main(){
 	//opstart-info
 	LCD.drawString("EndGameRobot",0,1);
 	LCD.drawString("Judith & Mirjam",0,2);
-	Button.waitForPress();
+	Button.waitForAnyPress();
 
 	//start de loop of doom
 	while(!inEndState())
@@ -213,7 +213,6 @@ public void execute(State s)
 	}
 }	
 
-//TODO: Fix Error: "The method asList(Main.State[]) is undefined for the type Arrays"
 public boolean inEndState()
 {
 	for (State s : endStates) 
