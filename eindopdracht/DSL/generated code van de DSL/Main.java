@@ -23,7 +23,6 @@ import lejos.nxt.TouchSensor;
 import lejos.nxt.Sound;
 import lejos.nxt.ColorSensor;
 import java.util.Random;
-import java.util.Arrays;
 
 public class Main{
 
@@ -44,7 +43,7 @@ public State current;
 		PROBLEMRIGHT,
 			//added extra state for when everything is finished
 		FINISHED
-,FINISHED	}
+	}
 	
 //definieer lijst van endstates
 State[] endStates = {State.FINISHED};
@@ -76,13 +75,12 @@ public Main(){
 	//opstart-info
 	LCD.drawString("EndGameRobot",0,1);
 	LCD.drawString("Judith & Mirjam",0,2);
-	Button.waitForAnyPress();
+	Button.waitForPress();
 
 	//start de loop of doom
 	while(!inEndState())
 	{
 		execute(current);
-		waitForTransition(current);//?
 	}
 }
 
