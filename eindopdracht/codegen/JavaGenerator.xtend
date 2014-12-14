@@ -20,6 +20,7 @@ import robots.tasks.rDSL.BumperCondition
 import robots.tasks.rDSL.ColorCondition
 import robots.tasks.rDSL.TempCondition
 import robots.tasks.rDSL.TimeCondition
+import robots.tasks.rDSL.TimeCondition
 
 class JavaGenerator {
 	
@@ -104,7 +105,7 @@ class JavaGenerator {
 		//opstart-info
 		LCD.drawString("EndGameRobot",0,1);
 		LCD.drawString("Judith & Mirjam",0,2);
-		Button.waitForPress();
+		Button.waitForAnyPress();
 
 		//start de loop of doom
 		while(!inEndState())
@@ -155,7 +156,6 @@ class JavaGenerator {
 		}
 	}	
 
-	//TODO: Fix Error: "The method asList(Main.State[]) is undefined for the type Arrays"
 	public boolean inEndState()
 	{
 		for (State s : endStates) 
