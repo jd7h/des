@@ -33,7 +33,7 @@ Conjunction:
 ;
 
 Condition: //sensorcondition
-	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition //scheiding tussen condities???
+	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition | TimeCondition //scheiding tussen condities???
 ;
 
 LightCondition:
@@ -54,6 +54,10 @@ SonarCondition:
 
 BumperCondition:
 	'bumper' side = Direction 'is' value = BumperValue
+;
+
+TimeCondition:
+	'timeout' t = INT unit = TimeUnit
 ;
 
 enum BumperValue:
