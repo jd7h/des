@@ -10,7 +10,7 @@ package example1;
 /* 
  * assumptions:
  * this week only one brick, no bluetooth
-     */
+*/
 
 import lejos.nxt.Button;
 import lejos.nxt.LightSensor;
@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 public class Main{
 
-//Constance for the Lightsensorvalues
+//Constants for the Lightsensorvalues
 public static int BRIGHT = 20;
 public static int DARK = 80;
 
@@ -41,31 +41,39 @@ public State current;
 			//added extra state for when everything is finished
 		PROBLEMLEFT,
 			//added extra state for when everything is finished
-		PROBLEMRIGHT
+		PROBLEMRIGHT,
+			//added extra state for when everything is finished
+		FINISHED
 ,FINISHED	}
 	
 //definieer lijst van endstates
-State[] endStates = {State.PROBLEMRIGHT};
+State[] endStates = {State.FINISHED};
 
-//definieer standaard equipment op Robot
-//maak de robot
-//things on brick1 (Master)
-NXTRegulatedMotor left = Motor.A;
-NXTRegulatedMotor right = Motor.B;
-LightSensor lightL = new LightSensor(SensorPort.S1);
-LightSensor lightR = new LightSensor(SensorPort.S2);
-TouchSensor bumperL = new TouchSensor(SensorPort.S3);
-TouchSensor bumperR = new TouchSensor(SensorPort.S4);
-NXTRegulatedMotor lamp = Motor.C;
+//standaard equipment op Robot
+private NXTRegulatedMotor left;
+private NXTRegulatedMotor right;
+private LightSensor lightL;
+private LightSensor lightR;
+private TouchSensor bumperL;
+private TouchSensor bumperR;
+private NXTRegulatedMotor lamp;
 
 //todo: zet een BT-kanaal op tussen de master en de slave
 	
 public Main(){
+	//initialiseer alle equipment
+	NXTRegulatedMotor left = Motor.A;
+	NXTRegulatedMotor right = Motor.B;
+	LightSensor lightL = new LightSensor(SensorPort.S1);
+	LightSensor lightR = new LightSensor(SensorPort.S2);
+	TouchSensor bumperL = new TouchSensor(SensorPort.S3);
+	TouchSensor bumperR = new TouchSensor(SensorPort.S4);
+	NXTRegulatedMotor lamp = Motor.C;
 
 	//todo: zet de robot in de beginstate
 	State current = State.START;
 	
-	//startconfiguratie met feedback
+	//opstart-info
 	LCD.drawString("EndGameRobot",0,1);
 	LCD.drawString("Judith & Mirjam",0,2);
 	Button.waitForAnyPress();
@@ -74,6 +82,7 @@ public Main(){
 	while(!inEndState())
 	{
 		execute(current);
+		waitForTransition(current);//?
 	}
 }
 
@@ -81,108 +90,109 @@ public Main(){
 //make methods for every state seperately
 public void Start()
 {
-if(	(BRIGHT == lightL.readValue() 
-	)||(bumperL.isPressed()
-	)){
-		current = State.PROBLEMLEFT;
-		return; //later aanpassen: switch state
-	}else if(
-	(BRIGHT == lightR.readValue()
-	)||(bumperR.isPressed()
-	)){
-		current = State.PROBLEMRIGHT;
-		return; //later aanpassen: switch state
-	}
-	else{
-		right.setSpeed(200);
-		left.setSpeed(200);
-		right.forward();
-		left.forward();
-if((BRIGHT == lightL.readValue() 
-)||(bumperL.isPressed()
-)){
-		current = State.PROBLEMLEFT;
-		return; //later aanpassen: switch state
-	}else if(
+	//first, execute all actions of this state
+	right.setSpeed(200);
+	left.setSpeed(200);
+	right.forward();
+	left.forward();
+	
+
+	//leg de huidige tijd vast voor alle transitions met een timeoutcondition
+	long starttime = System.currentTimeMillis();
+
+	//when done, wait for a trigger for a transition
+	boolean transitionTaken = false; 
+	while(!transitionTaken){	
+		if((BRIGHT == lightL.readValue()
+		)||(bumperL.isPressed()
+		)){
+			current = State.PROBLEMLEFT;
+			transitionTaken = true;
+		}else if(
 (BRIGHT == lightR.readValue()
-)||(bumperR.isPressed()
-)){
-		current = State.PROBLEMRIGHT;
-		return; //later aanpassen: switch state
+		)||(bumperR.isPressed()
+		)){
+			current = State.PROBLEMRIGHT;
+			transitionTaken = true;
+		}else if(
+(starttime + 10000 <= System.currentTimeMillis()
+		)){
+			current = State.FINISHED;
+			transitionTaken = true;
+		}
 	}
-	}
+	return;
 }
 
 public void ProblemLeft()
 {
-if(	(DARK == lightL.readValue()&&
-	!bumperL.isPressed()
-	)){
-		current = State.START;
-		return; //later aanpassen: switch state
+	//first, execute all actions of this state
+	left.stop(true);
+	right.stop();
+	int degree =  randInt(15, 90);
+	right.rotate(degree);
+	
+
+	//leg de huidige tijd vast voor alle transitions met een timeoutcondition
+	long starttime = System.currentTimeMillis();
+
+	//when done, wait for a trigger for a transition
+	boolean transitionTaken = false; 
+	while(!transitionTaken){	
+		if((DARK == lightL.readValue()&&
+		!bumperL.isPressed()
+		)){
+			current = State.START;
+			transitionTaken = true;
+		}else if(
+(BRIGHT == lightL.readValue()
+		)||(bumperL.isPressed()
+		)){
+			current = State.PROBLEMLEFT;
+			transitionTaken = true;
+		}
 	}
-	else{
-		left.stop(true);
-		right.stop();
-if((DARK == lightL.readValue()&&
-!bumperL.isPressed()
-)){
-		current = State.START;
-		return; //later aanpassen: switch state
-	}
-	}
-if(	(DARK == lightL.readValue()&&
-	!bumperL.isPressed()
-	)){
-		current = State.START;
-		return; //later aanpassen: switch state
-	}
-	else{
-		int degree =  randInt(15, 90);
-		right.rotate(degree);
-if((DARK == lightL.readValue()&&
-!bumperL.isPressed()
-)){
-		current = State.START;
-		return; //later aanpassen: switch state
-	}
-	}
+	return;
 }
 
 public void ProblemRight()
 {
-if(	(DARK == lightR.readValue()&&
-	!bumperR.isPressed()
-	)){
-		current = State.START;
-		return; //later aanpassen: switch state
+	//first, execute all actions of this state
+	left.stop(true);
+	right.stop();
+	int degree =  randInt(15, 90);
+	left.rotate(degree);
+	
+
+	//leg de huidige tijd vast voor alle transitions met een timeoutcondition
+	long starttime = System.currentTimeMillis();
+
+	//when done, wait for a trigger for a transition
+	boolean transitionTaken = false; 
+	while(!transitionTaken){	
+		if((BRIGHT == lightR.readValue()
+		)||(bumperR.isPressed()
+		)){
+			current = State.PROBLEMRIGHT;
+			transitionTaken = true;
+		}else if(
+(DARK == lightR.readValue()&&
+		!bumperR.isPressed()
+		)){
+			current = State.START;
+			transitionTaken = true;
+		}
 	}
-	else{
-		left.stop(true);
-		right.stop();
-if((DARK == lightR.readValue()&&
-!bumperR.isPressed()
-)){
-		current = State.START;
-		return; //later aanpassen: switch state
-	}
-	}
-if(	(DARK == lightR.readValue()&&
-	!bumperR.isPressed()
-	)){
-		current = State.START;
-		return; //later aanpassen: switch state
-	}
-	else{
-		int degree =  randInt(15, 90);
-		left.rotate(degree);
-if((DARK == lightR.readValue()&&
-!bumperR.isPressed()
-)){
-		current = State.START;
-		return; //later aanpassen: switch state
-	}
-	}
+	return;
+}
+
+public void Finished()
+{
+	//first, execute all actions of this state
+	left.stop(true);
+	right.stop();
+	
+	return;
 }
 
 public void execute(State s)
@@ -197,14 +207,22 @@ public void execute(State s)
 	case PROBLEMRIGHT:
 		ProblemRight();
 		break;
+	case FINISHED:
+		Finished();
+		break;
 		default:
 			break;
 	}
 }	
 
+//TODO: Fix Error: "The method asList(Main.State[]) is undefined for the type Arrays"
 public boolean inEndState()
 {
-	return Arrays.asList(endStates).contains(current);
+	for (State s : endStates) 
+		if (s.equals(current)) 
+			return true;
+
+	return false;
 }
 
 

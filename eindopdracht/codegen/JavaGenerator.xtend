@@ -1,4 +1,4 @@
-package robots.tasks.generator
+﻿package robots.tasks.generator
 
 
 
@@ -19,6 +19,7 @@ import robots.tasks.rDSL.Color
 import robots.tasks.rDSL.BumperCondition
 import robots.tasks.rDSL.ColorCondition
 import robots.tasks.rDSL.TempCondition
+import robots.tasks.rDSL.TimeCondition
 
 class JavaGenerator {
 	
@@ -43,7 +44,7 @@ class JavaGenerator {
 	/* 
 	 * assumptions:
 	 * this week only one brick, no bluetooth
-     */
+	*/
 
 	import lejos.nxt.Button;
 	import lejos.nxt.LightSensor;
@@ -60,7 +61,7 @@ class JavaGenerator {
 	
 	public class Main{
 	
-	//Constance for the Lightsensorvalues
+	//Constants for the Lightsensorvalues
 	public static int BRIGHT = 20;
 	public static int DARK = 80;
 	
@@ -77,25 +78,31 @@ class JavaGenerator {
 	//definieer lijst van endstates
 	State[] endStates = {«FOR e : Auxiliary.getEndStates(resource) SEPARATOR ','»State.«Auxiliary.getStateItem(e)»«ENDFOR»};
 	
-	//definieer standaard equipment op Robot
-	//maak de robot
-	//things on brick1 (Master)
-	NXTRegulatedMotor left = Motor.A;
-	NXTRegulatedMotor right = Motor.B;
-	LightSensor lightL = new LightSensor(SensorPort.S1);
-	LightSensor lightR = new LightSensor(SensorPort.S2);
-	TouchSensor bumperL = new TouchSensor(SensorPort.S3);
-	TouchSensor bumperR = new TouchSensor(SensorPort.S4);
-	NXTRegulatedMotor lamp = Motor.C;
+	//standaard equipment op Robot
+	private NXTRegulatedMotor left;
+	private NXTRegulatedMotor right;
+	private LightSensor lightL;
+	private LightSensor lightR;
+	private TouchSensor bumperL;
+	private TouchSensor bumperR;
+	private NXTRegulatedMotor lamp;
 
 	//todo: zet een BT-kanaal op tussen de master en de slave
 		
 	public Main(){
+		//initialiseer alle equipment
+		NXTRegulatedMotor left = Motor.A;
+		NXTRegulatedMotor right = Motor.B;
+		LightSensor lightL = new LightSensor(SensorPort.S1);
+		LightSensor lightR = new LightSensor(SensorPort.S2);
+		TouchSensor bumperL = new TouchSensor(SensorPort.S3);
+		TouchSensor bumperR = new TouchSensor(SensorPort.S4);
+		NXTRegulatedMotor lamp = Motor.C;
 
 		//todo: zet de robot in de beginstate
 		State current = State.«Auxiliary.getStateItem(Auxiliary.getStartState(resource))»;
 		
-		//startconfiguratie met feedback
+		//opstart-info
 		LCD.drawString("EndGameRobot",0,1);
 		LCD.drawString("Judith & Mirjam",0,2);
 		Button.waitForAnyPress();
@@ -104,31 +111,36 @@ class JavaGenerator {
 		while(!inEndState())
 		{
 			execute(current);
+			waitForTransition(current);//?
 		}
 	}
 
-
+	
 	//make methods for every state seperately
 	«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
 	public void «Auxiliary.getStateMethod(s)»()
 	{
+		//first, execute all actions of this state
 		«FOR a : Auxiliary.getActionList(s)»
-			«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
-			«arrow2conditional(ar)»){
+			«action2code(a)»
+		«ENDFOR»
+		
+		«IF !Auxiliary.isEndState(resource,s)»
+
+		//leg de huidige tijd vast voor alle transitions met een timeoutcondition
+		long starttime = System.currentTimeMillis();
+
+		//when done, wait for a trigger for a transition
+		boolean transitionTaken = false; 
+		while(!transitionTaken){	
+			«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»«arrow2conditional(ar)»){
 				current = State.«Auxiliary.getStateItem(ar.to)»;
-				return; //later aanpassen: switch state
-			}
-			«ENDFOR»
-			else{
-				«action2code(a)»
-				«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»
-			«arrow2conditional(ar)»){
-					current = State.«Auxiliary.getStateItem(ar.to)»;
-					return; //later aanpassen: switch state
-				}
-			«ENDFOR»
+				transitionTaken = true;
 			}
 		«ENDFOR»
+		}
+		«ENDIF»
+		return;
 	}
 	«ENDFOR»
 
@@ -145,7 +157,7 @@ class JavaGenerator {
 		}
 	}	
 
-    //TODO: Fix Error: "The method asList(Main.State[]) is undefined for the type Arrays"
+	//TODO: Fix Error: "The method asList(Main.State[]) is undefined for the type Arrays"
 	public boolean inEndState()
 	{
 		for (State s : endStates) 
@@ -201,7 +213,7 @@ class JavaGenerator {
 				 	left.setSpeed(«s»);
 				 	right.forward();
 				 	left.forward();
-					Delay.msDelay(«n»);'''
+				 	Delay.msDelay(«n»);'''
 				 case DriveDirection::BACKWARDS: return '''
 				 	right.setSpeed(«s»);
 				 	left.setSpeed(«s»);
@@ -259,7 +271,7 @@ class JavaGenerator {
 		switch(condition.value)
 		{
 			case LightValue::WHITE: if(condition.side == Direction::LEFT)
-										return '''BRIGHT == lightL.readValue() '''
+										return '''BRIGHT == lightL.readValue()'''
 									else
 										return '''BRIGHT == lightR.readValue()'''
 			case LightValue::BLACK: if(condition.side == Direction::LEFT)
@@ -303,6 +315,13 @@ class JavaGenerator {
 			case Color::RED: return '''lejos.robotics.Colors.Color.RED'''
 			case Color::GREEN: return '''lejos.robotics.Colors.Color.GREEN'''
 		}
+	}
+	
+	def static dispatch condition2code(TimeCondition condition){
+		var time = condition.t
+		if(condition.unit == TimeUnit::SEC)
+				time =  time*1000
+		return '''starttime + «time» <= System.currentTimeMillis()'''
 	}
 	
 	//TODO add tempsensor and add conditions

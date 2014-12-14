@@ -47,6 +47,15 @@ class Auxiliary {
 	def static List<State> getEndStates(Resource resource){
 		return getAutomata(resource).endstates
 	}
+	
+	def static boolean isEndState(Resource resource, State s)
+	{
+		for (State e : getEndStates(resource)){
+			if(e == s)
+				return true;
+		}
+		return false;
+	}
 
 	def static List<Arrow> getArrows(Resource resource) {
 		return getAutomata(resource).arrowlist 
