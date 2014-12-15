@@ -1,0 +1,17 @@
+Automaton: example1
+	States:  
+		State start do drive forwards INF speed 200
+		State problemLeft do stop turn right (15,90)
+		State problemRight do stop turn left (15,90)
+		State finished do stop
+	Arrows: 
+		Arrow start -> problemLeft if (and lightsensor left reads white) (and bumper left is pressed)
+		Arrow problemLeft -> start if (and lightsensor left reads black bumper left is not pressed)
+		Arrow problemLeft -> problemLeft if (and lightsensor left reads white) (and bumper left is pressed)
+		Arrow start -> problemRight if (and lightsensor right reads white) (and bumper right is pressed)
+		Arrow problemRight -> problemRight if (and lightsensor right reads white) (and bumper right is pressed)
+		Arrow problemRight -> start if (and lightsensor right reads black bumper right is not pressed)
+		Arrow start -> finished if (and timeout 10 sec)
+	
+	Start state: start 
+	End state: finished
