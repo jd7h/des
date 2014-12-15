@@ -1,4 +1,4 @@
-package example1;
+
 
 /* 
  * Automatically generated code
@@ -22,16 +22,18 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.Sound;
 import lejos.nxt.ColorSensor;
+import lejos.util.Delay;
+
 import java.util.Random;
 
 public class Main{
 
 //Constants for the Lightsensorvalues
-public static int BRIGHT = 20;
-public static int DARK = 80;
+public static int BRIGHT = 40;
+public static int DARK = 30;
 
 //public variables 
-public State current;
+public static State current;
 
 //maak een enum van de beginstates
 	public enum State {
@@ -46,36 +48,43 @@ public State current;
 	}
 	
 //definieer lijst van endstates
-State[] endStates = {State.FINISHED};
+static State[] endStates = {State.FINISHED};
 
 //standaard equipment op Robot
-private NXTRegulatedMotor left;
-private NXTRegulatedMotor right;
-private LightSensor lightL;
-private LightSensor lightR;
-private TouchSensor bumperL;
-private TouchSensor bumperR;
-private NXTRegulatedMotor lamp;
+private static NXTRegulatedMotor left;
+private static NXTRegulatedMotor right;
+private static LightSensor lightL;
+private static LightSensor lightR;
+private static TouchSensor bumperL;
+private static TouchSensor bumperR;
+private static NXTRegulatedMotor lamp;
 
 //todo: zet een BT-kanaal op tussen de master en de slave
 	
-public Main(){
+public static void main(String[] args){
 	//initialiseer alle equipment
-	NXTRegulatedMotor left = Motor.A;
-	NXTRegulatedMotor right = Motor.B;
-	LightSensor lightL = new LightSensor(SensorPort.S1);
-	LightSensor lightR = new LightSensor(SensorPort.S2);
-	TouchSensor bumperL = new TouchSensor(SensorPort.S3);
-	TouchSensor bumperR = new TouchSensor(SensorPort.S4);
-	NXTRegulatedMotor lamp = Motor.C;
+	left = Motor.A;
+	right = Motor.B;
+	lightL = new LightSensor(SensorPort.S1);
+	lightR = new LightSensor(SensorPort.S2);
+	bumperL = new TouchSensor(SensorPort.S3);
+	bumperR = new TouchSensor(SensorPort.S4);
+	lamp = Motor.C;
 
 	//todo: zet de robot in de beginstate
-	State current = State.START;
+	current = State.START;
 	
 	//opstart-info
 	LCD.drawString("EndGameRobot",0,1);
 	LCD.drawString("Judith & Mirjam",0,2);
 	Button.waitForAnyPress();
+	
+	LCD.drawString("Left white",0,1);
+	Button.waitForAnyPress();
+	BRIGHT = lightL.readValue();
+	LCD.drawString("Left black",0,1);
+	Button.waitForAnyPress();
+	DARK = lightL.readValue();
 
 	//start de loop of doom
 	while(!inEndState())
@@ -86,9 +95,10 @@ public Main(){
 
 
 //make methods for every state seperately
-public void Start()
+public static void Start()
 {
 	//first, execute all actions of this state
+	LCD.drawString("Start",0,3);
 	right.setSpeed(200);
 	left.setSpeed(200);
 	right.forward();
@@ -101,61 +111,37 @@ public void Start()
 	//when done, wait for a trigger for a transition
 	boolean transitionTaken = false; 
 	while(!transitionTaken){	
-		if((BRIGHT == lightL.readValue()
+		if((BRIGHT-10 <= lightL.readValue() && lightL.readValue() <= BRIGHT+10
 		)||(bumperL.isPressed()
 		)){
 			current = State.PROBLEMLEFT;
 			transitionTaken = true;
 		}else if(
-(BRIGHT == lightR.readValue()
+(BRIGHT-10 <= lightR.readValue() && lightR.readValue() <= BRIGHT+10
 		)||(bumperR.isPressed()
 		)){
 			current = State.PROBLEMRIGHT;
 			transitionTaken = true;
 		}else if(
-(starttime + 10000 <= System.currentTimeMillis()
+(starttime + 3000 <= System.currentTimeMillis()
 		)){
 			current = State.FINISHED;
 			transitionTaken = true;
 		}
 	}
-	return;
 }
 
-public void ProblemLeft()
+public static void ProblemLeft()
 {
 	//first, execute all actions of this state
+	LCD.drawString("ProblemLeft",0,3);
 	left.stop(true);
 	right.stop();
-	int degree =  randInt(15, 90);
-	right.rotate(degree);
-	
-
-	//leg de huidige tijd vast voor alle transitions met een timeoutcondition
-	long starttime = System.currentTimeMillis();
-
-	//when done, wait for a trigger for a transition
-	boolean transitionTaken = false; 
-	while(!transitionTaken){	
-		if((DARK == lightL.readValue()&&
-		!bumperL.isPressed()
-		)){
-			current = State.START;
-			transitionTaken = true;
-		}else if(
-(BRIGHT == lightL.readValue()
-		)||(bumperL.isPressed()
-		)){
-			current = State.PROBLEMLEFT;
-			transitionTaken = true;
-		}
-	}
-	return;
-}
-
-public void ProblemRight()
-{
-	//first, execute all actions of this state
+	right.setSpeed(200);
+	left.setSpeed(200);
+	right.backward();
+	left.backward();
+	Delay.msDelay(500);
 	left.stop(true);
 	right.stop();
 	int degree =  randInt(15, 90);
@@ -168,32 +154,69 @@ public void ProblemRight()
 	//when done, wait for a trigger for a transition
 	boolean transitionTaken = false; 
 	while(!transitionTaken){	
-		if((BRIGHT == lightR.readValue()
+		if((DARK-10 <= lightL.readValue() && lightL.readValue() <= DARK+10&&
+		!bumperL.isPressed()
+		)){
+			current = State.START;
+			transitionTaken = true;
+		}else if(
+(BRIGHT-10 <= lightL.readValue() && lightL.readValue() <= BRIGHT+10
+		)||(bumperL.isPressed()
+		)){
+			current = State.PROBLEMLEFT;
+			transitionTaken = true;
+		}
+	}
+}
+
+public static void ProblemRight()
+{
+	//first, execute all actions of this state
+	LCD.drawString("ProblemRight",0,3);
+	left.stop(true);
+	right.stop();
+	right.setSpeed(200);
+	left.setSpeed(200);
+	right.backward();
+	left.backward();
+	Delay.msDelay(500);
+	left.stop(true);
+	right.stop();
+	int degree =  randInt(15, 90);
+	right.rotate(degree);
+	
+
+	//leg de huidige tijd vast voor alle transitions met een timeoutcondition
+	long starttime = System.currentTimeMillis();
+
+	//when done, wait for a trigger for a transition
+	boolean transitionTaken = false; 
+	while(!transitionTaken){	
+		if((BRIGHT-10 <= lightR.readValue() && lightR.readValue() <= BRIGHT+10
 		)||(bumperR.isPressed()
 		)){
 			current = State.PROBLEMRIGHT;
 			transitionTaken = true;
 		}else if(
-(DARK == lightR.readValue()&&
+(DARK-10 <= lightR.readValue() && lightR.readValue() <= DARK+10&&
 		!bumperR.isPressed()
 		)){
 			current = State.START;
 			transitionTaken = true;
 		}
 	}
-	return;
 }
 
-public void Finished()
+public static void Finished()
 {
 	//first, execute all actions of this state
+	LCD.drawString("Finished",0,3);
 	left.stop(true);
 	right.stop();
 	
-	return;
 }
 
-public void execute(State s)
+public static void execute(State s)
 {
 	switch(s){
 	case START:
@@ -213,7 +236,7 @@ public void execute(State s)
 	}
 }	
 
-public boolean inEndState()
+public static boolean inEndState()
 {
 	for (State s : endStates) 
 		if (s.equals(current)) 

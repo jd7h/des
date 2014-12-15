@@ -20,7 +20,6 @@ import robots.tasks.rDSL.BumperCondition
 import robots.tasks.rDSL.ColorCondition
 import robots.tasks.rDSL.TempCondition
 import robots.tasks.rDSL.TimeCondition
-import robots.tasks.rDSL.TimeCondition
 
 class JavaGenerator {
 	
@@ -33,7 +32,7 @@ class JavaGenerator {
 	'''
 
 	def static generateMain(Resource resource)'''
-	package «Auxiliary.getAutomata(resource).name»;
+	
 
 	/* 
 	 * Automatically generated code
@@ -58,15 +57,16 @@ class JavaGenerator {
 	import lejos.nxt.Sound;
 	import lejos.nxt.ColorSensor;
 	import java.util.Random;
+	import lejos.util.Delay;
 	
 	public class Main{
 	
 	//Constants for the Lightsensorvalues
-	public static int BRIGHT = 20;
-	public static int DARK = 80;
+	public static int BRIGHT = 40;
+	public static int DARK = 30;
 	
 	//public variables 
-	public State current;
+	public static State current;
 	
 	//maak een enum van de beginstates
 		public enum State {
@@ -76,36 +76,43 @@ class JavaGenerator {
 		}
 		
 	//definieer lijst van endstates
-	State[] endStates = {«FOR e : Auxiliary.getEndStates(resource) SEPARATOR ','»State.«Auxiliary.getStateItem(e)»«ENDFOR»};
+	static State[] endStates = {«FOR e : Auxiliary.getEndStates(resource) SEPARATOR ','»State.«Auxiliary.getStateItem(e)»«ENDFOR»};
 	
 	//standaard equipment op Robot
-	private NXTRegulatedMotor left;
-	private NXTRegulatedMotor right;
-	private LightSensor lightL;
-	private LightSensor lightR;
-	private TouchSensor bumperL;
-	private TouchSensor bumperR;
-	private NXTRegulatedMotor lamp;
+	private static NXTRegulatedMotor left;
+	private static NXTRegulatedMotor right;
+	private static LightSensor lightL;
+	private static LightSensor lightR;
+	private static TouchSensor bumperL;
+	private static TouchSensor bumperR;
+	private static NXTRegulatedMotor lamp;
 
 	//todo: zet een BT-kanaal op tussen de master en de slave
 		
-	public Main(){
+	public static void main(String[] args){
 		//initialiseer alle equipment
-		NXTRegulatedMotor left = Motor.A;
-		NXTRegulatedMotor right = Motor.B;
-		LightSensor lightL = new LightSensor(SensorPort.S1);
-		LightSensor lightR = new LightSensor(SensorPort.S2);
-		TouchSensor bumperL = new TouchSensor(SensorPort.S3);
-		TouchSensor bumperR = new TouchSensor(SensorPort.S4);
-		NXTRegulatedMotor lamp = Motor.C;
+		left = Motor.A;
+		right = Motor.B;
+		lightL = new LightSensor(SensorPort.S1);
+		lightR = new LightSensor(SensorPort.S2);
+		bumperL = new TouchSensor(SensorPort.S3);
+		bumperR = new TouchSensor(SensorPort.S4);
+		lamp = Motor.C;
 
 		//todo: zet de robot in de beginstate
-		State current = State.«Auxiliary.getStateItem(Auxiliary.getStartState(resource))»;
+		current = State.«Auxiliary.getStateItem(Auxiliary.getStartState(resource))»;
 		
 		//opstart-info
 		LCD.drawString("EndGameRobot",0,1);
 		LCD.drawString("Judith & Mirjam",0,2);
 		Button.waitForAnyPress();
+		
+		LCD.drawString("Left white",0,1);
+		Button.waitForAnyPress();
+		BRIGHT = lightL.readValue();
+		LCD.drawString("Left black",0,1);
+		Button.waitForAnyPress();
+		DARK = lightL.readValue();
 
 		//start de loop of doom
 		while(!inEndState())
@@ -117,9 +124,10 @@ class JavaGenerator {
 	
 	//make methods for every state seperately
 	«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
-	public void «Auxiliary.getStateMethod(s)»()
+	public static void «Auxiliary.getStateMethod(s)»()
 	{
 		//first, execute all actions of this state
+		LCD.drawString("«Auxiliary.getStateMethod(s)»",0,3);
 		«FOR a : Auxiliary.getActionList(s)»
 			«action2code(a)»
 		«ENDFOR»
@@ -139,11 +147,10 @@ class JavaGenerator {
 		«ENDFOR»
 		}
 		«ENDIF»
-		return;
 	}
 	«ENDFOR»
 
-	public void execute(State s)
+	public static void execute(State s)
 	{
 		switch(s){
 		«FOR state : Auxiliary.getStates(resource)»
@@ -156,7 +163,7 @@ class JavaGenerator {
 		}
 	}	
 
-	public boolean inEndState()
+	public static boolean inEndState()
 	{
 		for (State s : endStates) 
 			if (s.equals(current)) 
@@ -240,19 +247,19 @@ class JavaGenerator {
 		if(action.degree == 0){
 			switch(action.direction)
 			{
-				case Direction::LEFT: return '''
+				case Direction::RIGHT: return '''
 				int degree =  randInt(«action.min», «action.max»);
 				left.rotate(degree);'''
-				case Direction::RIGHT: return '''
+				case Direction::LEFT: return '''
 				int degree =  randInt(«action.min», «action.max»);
 				right.rotate(degree);'''			
 			}
 		}else{
 			switch(action.direction)
 			{
-				case Direction::LEFT: return '''
-				left.rotate(«action.degree»);'''
 				case Direction::RIGHT: return '''
+				left.rotate(«action.degree»);'''
+				case Direction::LEFT: return '''
 				right.rotate(«action.degree»);'''			
 			}
 		}		
@@ -269,13 +276,13 @@ class JavaGenerator {
 		switch(condition.value)
 		{
 			case LightValue::WHITE: if(condition.side == Direction::LEFT)
-										return '''BRIGHT == lightL.readValue()'''
+										return '''BRIGHT-10 <= lightL.readValue() && lightL.readValue() <= BRIGHT+10'''
 									else
-										return '''BRIGHT == lightR.readValue()'''
+										return '''BRIGHT-10 <= lightR.readValue() && lightR.readValue() <= BRIGHT+10'''
 			case LightValue::BLACK: if(condition.side == Direction::LEFT)
-										return '''DARK == lightL.readValue()'''
+										return '''DARK-10 <= lightL.readValue() && lightL.readValue() <= DARK+10'''
 									else
-										return '''DARK == lightR.readValue()'''
+										return '''DARK-10 <= lightR.readValue() && lightR.readValue() <= DARK+10'''
 		}
 	}
 	
@@ -283,7 +290,7 @@ class JavaGenerator {
 		
 		switch(condition.value)
 		{
-			case SonarValue::NOTHING: return '''sonar.getDistance == 255 || sonar.getDistance() > «condition.distance»'''
+			case SonarValue::NOTHING: return '''sonar.getDistance >= 255 || sonar.getDistance() > «condition.distance»'''
 			case SonarValue::SOMETHING: return '''sonar.getDistance() < «condition.distance»'''
 		}
 	}
