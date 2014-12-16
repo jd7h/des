@@ -288,9 +288,10 @@ class JavaGenerator {
 	//assumptions: slavename is parameter of init, kind of action is in enum e
 	//change later: enum e, add slavename
 	def static dispatch action2code(BTAction action)
-		switch(e)
+	{
+		if (slavename != null)
 		{
-			case e::INIT: return '''
+			return '''
 				//bluetooth connection, master side
 				LCD.drawString("Connecting...", 0, 0);
 				LCD.refresh();
@@ -320,8 +321,11 @@ class JavaGenerator {
 				LCD.refresh();
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
-				'''
-			case e::WAIT return '''				
+			'''
+		}
+		else
+		{
+			return '''				
 				LCD.drawString("Waiting...",0,0);
 				LCD.refresh();
 
@@ -334,6 +338,9 @@ class JavaGenerator {
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
 			'''
+		}
+	}
+
 	//returns the code for the calibration of the sensors
 	def static dispatch action2code(CalibrateAction action)'''
 		LCD.drawString("Left white",0,1);

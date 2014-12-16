@@ -34,7 +34,7 @@ CalibrateAction: {CalibrateAction} 'calibrate'
 SendAction: 'send' message = Message
 ;
 BTAction:
-	{BTAction} ('init bt' | 'wait for bt')
+	{BTAction} ('init bt' slavename = STRING | 'wait for bt')
 ;
 BeepAction:
 	{BeepAction} 'beep'
