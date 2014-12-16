@@ -19,7 +19,7 @@ Arrow:
 	'Arrow' from=[State] '->' to=[State] 'if' disjunctionlist += Conjunction+
 ;
 
-Action: DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction
+Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction) (', ')?
 ;
 DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
 ;
@@ -44,7 +44,7 @@ Conjunction:
 ;
 
 Condition: //sensorcondition
-	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition | TimeCondition | ReceiveCondition | True
+	(LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition | TimeCondition | ReceiveCondition | True) (', ')?
 ;
 
 ReceiveCondition:
