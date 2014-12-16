@@ -19,7 +19,7 @@ Arrow:
 	'Arrow' from=[State] '->' to=[State] 'if' disjunctionlist += Conjunction+
 ;
 
-Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction) (', ')?
+Action: DriveAction | TurnAction | StopAction
 ;
 DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
 ;
@@ -27,32 +27,13 @@ TurnAction: 'turn' direction = Direction ('('min = INT ',' max = INT')' | degree
 ;
 StopAction: {StopAction} 'stop'	
 ;
-ParkAction: {ParkAction} 'park'
-;
-CalibrateAction: {CalibrateAction} 'calibrate'
-;
-SendAction: 'send' message = Message
-;
-BTAction:
-	{BTAction} ('init bt' | 'wait for bt')
-;
-
-
 
 Conjunction:
 	'(and ' conjuctionlist += Condition+ ')'
 ;
 
 Condition: //sensorcondition
-	(LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition | TimeCondition | ReceiveCondition | True) (', ')?
-;
-
-ReceiveCondition:
-	'receive ' message = Message
-;
-
-True:
-	{True} 'true'
+	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition | TimeCondition //scheiding tussen condities???
 ;
 
 LightCondition:
@@ -114,11 +95,4 @@ enum Color:
 	BLACK = 'black'|
 	RED = 'red' |
 	GREEN = 'green'
-;
-
-//not finished
-enum Message:
-	OK = 'ok' |
-	SONAR = 'sonar' |
-	COLOR = 'color'
 ;

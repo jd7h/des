@@ -1,0 +1,36 @@
+The main goal of the robot is: find all three lakes and measure the temperature.
+
+Functional requirements:
+the robot must be able to
+- wander the area
+- recognize a lake and determine its color and not go across the lake
+- recognize the white barrier and not cross it
+- notice obstacles in the area and avoid them while wandering
+- lower the temperature sensor and measure the temperature in a lake
+- store the temperature with the color of the lake
+- see the difference between black, white, red, green and blue
+
+usability:
+the robot must
+- be programmed by stating its behavior in a DSL and then generating code from that specification
+- not drive too fast, so that if the robot is heading for the edge of the table, the user still has time to interfere.
+- provide feedback for the user about measurements it makes
+- provide feedback for the user about the state of the program for debugging purposes
+- provide feedback for the user when the robot is finished (show the table with measurements)
+- provide feedback for the user about errors/bugs
+
+reliability:
+- the robot must stop if an error/bug is detected to avoid to go off of the table 
+- the robot components must be tested before it will work with the whole system
+- the sensors must be calibrated before the program starts
+
+
+performance:
+- if the light sensors spot the white border, the robot must react immediately to avoid falling off the table.
+- if the light sensors spot the color border of a lake, the robot must react immediately to avoid falling in the lake.
+- all three lakes must be found within a reasonable amount of time
+- if the robot has already measured a lake, he must skip the measurements if he encounters that same lake again.
+
+supportability:
+- the DSL can also be used as grammar for other languages, it needs only another code generator
+

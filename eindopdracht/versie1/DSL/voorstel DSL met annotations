@@ -1,0 +1,96 @@
+grammar robots.tasks.RDSL with org.eclipse.xtext.common.Terminals
+
+generate rDSL "http://www.tasks.robots/RDSL"
+
+
+Automata: 
+	'Automaton:' name=ID
+	'States:' statelist += State+		//we need at least one state
+	'Arrows:' arrowlist += Arrow*		//zero or more arrows
+	'Start state:' startstate = [State]	//s zit in de lijst van states
+;
+
+State: 
+	'State' name=ID 'with'
+	'Priority' priority = Priority 'is' 	//hebben we nog priorities nodig?
+	actionlist += Action+	//more than one action	
+;
+
+Arrow:
+	'Arrow' from=[State] '->' to=[State] 'if' condition = Condition //('and' Condition)+		//probleem: lijst met conditions nodig disjunction/conjunction?
+;
+
+Action: DriveAction | TurnAction | Stop
+;
+DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit || INF ) //voor een bepaalde tijd of loopen
+;
+TurnAction: 'turn' direction = Direction // in graden of random met een max. Vraag: is dit voor implemetatie of voor de DSL?
+;
+StopAction: 'stop' //motor = Motor (dit mag officieel niet, oplossing in de slides)
+;
+
+Condition: //sensorcondition
+	LightCondition | SonarCondition | BumperCondition
+;
+
+LightCondition:
+	'lightsensor reads' value = LightValue
+;
+
+//ColorCondition toevoegen
+
+//TempCondition toevoegen
+
+SonarCondition:
+	'sonar detects' value = SonarValue 'at' distance = INT
+;
+
+BumperCondition:
+	'bumper is' value = BumperValue
+;
+
+enum BumperValue:
+	PRESSED = 'pressed' | 
+	NOTPRESSED = 'not pressed'
+;
+
+
+enum LightValue:
+	BLACK = 'black' |
+	WHITE = 'white'
+;
+
+enum SonarValue:
+	NOTHING = 'nothing' |
+	SOMETHING = 'something'
+;	
+
+enum TimeUnit:
+	MS = 'ms' |
+	SEC = 'sec'
+;
+
+enum Direction:
+	LEFT = 'left' |
+	RIGHT = 'right'
+;
+
+enum DriveDirection:
+	BACKWARDS = 'backwards' |
+	FORWARDS = 'forwards'
+;
+
+//dit moet weg
+enum Motor:
+	LEFT = 'left' |
+	RIGHT = 'right'|
+	BOTH = 'both'
+;
+
+//dit moet weg
+enum Priority:
+	HIGH = 'high' |
+	MIDDLE = 'middle'|
+	LOW = 'low'
+;
+
