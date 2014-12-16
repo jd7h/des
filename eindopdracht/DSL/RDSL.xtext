@@ -44,11 +44,15 @@ Conjunction:
 ;
 
 Condition: //sensorcondition
-	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition | TimeCondition | ReceiveCondition
+	LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition | TimeCondition | ReceiveCondition | True
 ;
 
 ReceiveCondition:
 	'receive ' message = Message
+;
+
+True:
+	{True} 'true'
 ;
 
 LightCondition:
