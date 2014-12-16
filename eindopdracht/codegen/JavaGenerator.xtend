@@ -21,6 +21,7 @@ import robots.tasks.rDSL.ColorCondition
 import robots.tasks.rDSL.TempCondition
 import robots.tasks.rDSL.TimeCondition
 
+
 class JavaGenerator {
 	
 	def static arrow2conditional(Arrow a)'''
@@ -46,18 +47,32 @@ class JavaGenerator {
 	 * this week only one brick, no bluetooth
 	*/
 
+	//sensors
 	import lejos.nxt.Button;
 	import lejos.nxt.LightSensor;
-	import lejos.nxt.Motor;
-	import lejos.nxt.NXTRegulatedMotor;
-	import lejos.nxt.LCD;
 	import lejos.nxt.SensorPort;
 	import lejos.nxt.UltrasonicSensor;
 	import lejos.nxt.TouchSensor;
-	import lejos.nxt.Sound;
 	import lejos.nxt.ColorSensor;
+
+	//actuators
+	import lejos.nxt.Motor;
+	import lejos.nxt.NXTRegulatedMotor;
+	import lejos.nxt.LCD;
+	import lejos.nxt.Sound;
+
+	//for bluetooth:
+	import java.io.DataInputStream;
+	import java.io.DataOutputStream;
+	import lejos.nxt.comm.BTConnection;
+	import lejos.nxt.comm.Bluetooth;
+	import javax.bluetooth.RemoteDevice;
+	import java.io.IOException;
+
+	//misc
 	import java.util.Random;
 	import lejos.util.Delay;
+
 	
 	public class Main{
 	
@@ -269,6 +284,55 @@ class JavaGenerator {
 		left.stop(true);
 		right.stop();'''
 	
+	//assumptions: slavename is parameter of init, kind of action is in enum e
+	//change later: enum e, add slavename
+	def static dispatch action2code(BTAction action)
+		switch(e)
+		{
+			case e::INIT: return '''
+				//bluetooth connection, master side
+				LCD.drawString("Connecting...", 0, 0);
+				LCD.refresh();
+	
+				RemoteDevice btrd = Bluetooth.getKnownDevice(«action.slavename»);
+
+				if (btrd == null) {
+					LCD.clear();
+					LCD.drawString("No such device", 0, 0);
+					LCD.refresh();
+					Thread.sleep(2000);
+					System.exit(1);
+				}
+	
+				BTConnection btc = Bluetooth.connect(btrd);
+	
+				if (btc == null) {
+					LCD.clear();
+					LCD.drawString("Connect fail", 0, 0);
+					LCD.refresh();
+					Thread.sleep(2000);
+					System.exit(1);
+				}
+	
+				LCD.clear();
+				LCD.drawString("Connected", 0, 0);
+				LCD.refresh();
+				DataInputStream dis = btc.openDataInputStream();
+				DataOutputStream dos = btc.openDataOutputStream();
+				'''
+			case e::WAIT return '''				
+				LCD.drawString("Waiting...",0,0);
+				LCD.refresh();
+
+				BTConnection btc = Bluetooth.waitForConnection();
+				
+				LCD.clear();
+				LCD.drawString("Connected",0,0);
+				LCD.refresh();	
+
+				DataInputStream dis = btc.openDataInputStream();
+				DataOutputStream dos = btc.openDataOutputStream();
+			'''
 	
 	//Conditions
 	def static dispatch condition2code(LightCondition condition){
