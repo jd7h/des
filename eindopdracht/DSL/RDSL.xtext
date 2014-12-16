@@ -19,7 +19,7 @@ Arrow:
 	'Arrow' from=[State] '->' to=[State] 'if' disjunctionlist += Conjunction+
 ;
 
-Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction) (', ')?
+Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction | BeepAction | PrintAction) (', ')?
 ;
 DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
 ;
@@ -35,6 +35,12 @@ SendAction: 'send' message = Message
 ;
 BTAction:
 	{BTAction} ('init bt' | 'wait for bt')
+;
+BeepAction:
+	{BeepAction} 'beep'
+;
+PrintAction:
+	'print' msg = STRING
 ;
 
 
