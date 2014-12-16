@@ -1,5 +1,5 @@
-Automaton: examplebt
-	States:  
+Automaton: examplebt 
+	States:   
 		State start do init bt		
 		State finished do drive forwards duration 3 sec speed 100 stop 
 		
@@ -7,4 +7,4 @@ Automaton: examplebt
 		Arrow start -> finished if (and receive ok)
 			
 	Start state: start 
-	End state: finished
+	End state: finished 

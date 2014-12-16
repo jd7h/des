@@ -20,6 +20,9 @@ import robots.tasks.rDSL.BumperCondition
 import robots.tasks.rDSL.ColorCondition
 import robots.tasks.rDSL.TempCondition
 import robots.tasks.rDSL.TimeCondition
+import robots.tasks.rDSL.BeepAction
+import robots.tasks.rDSL.PrintAction
+import robots.tasks.rDSL.CalibrateAction
 
 
 class JavaGenerator {
@@ -121,13 +124,6 @@ class JavaGenerator {
 		LCD.drawString("EndGameRobot",0,1);
 		LCD.drawString("Judith & Mirjam",0,2);
 		Button.waitForAnyPress();
-		
-		LCD.drawString("Left white",0,1);
-		Button.waitForAnyPress();
-		BRIGHT = lightL.readValue();
-		LCD.drawString("Left black",0,1);
-		Button.waitForAnyPress();
-		DARK = lightL.readValue();
 
 		//start de loop of doom
 		while(!inEndState())
@@ -215,11 +211,13 @@ class JavaGenerator {
 	}	'''
 		
 	//actions
+	//returns the code for the drive action forward and backwards with and without duration
 	def static dispatch action2code(DriveAction action){
 
 		var int s = action.speed
 		
-		if(action.dl != 0)								//als we dl niet invullen, wordt action.dl dan 0?
+		//if the duration variable is not used it is 0
+		if(action.dl != 0)
 		{
 			var int n = action.dl
 			if(action.unit == TimeUnit::SEC){
@@ -257,8 +255,10 @@ class JavaGenerator {
 		}
 	}
 	
+	//returns the code for the turn action left/right with and without the variable degree
 	def static dispatch action2code(TurnAction action){
 		
+		//if the variable degree is not used in the instance of the DSL
 		if(action.degree == 0){
 			switch(action.direction)
 			{
@@ -280,6 +280,7 @@ class JavaGenerator {
 		}		
 	}
 	
+	//returns the code for stop action(left returns immediately so right can also stop)
 	def static dispatch action2code(StopAction action)'''
 		left.stop(true);
 		right.stop();'''
@@ -333,8 +334,27 @@ class JavaGenerator {
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
 			'''
+	//returns the code for the calibration of the sensors
+	def static dispatch action2code(CalibrateAction action)'''
+		LCD.drawString("Left white",0,1);
+		Button.waitForAnyPress();
+		BRIGHT = lightL.readValue();
+		LCD.drawString("Left black",0,1);
+		Button.waitForAnyPress();
+		DARK = lightL.readValue();'''			
+
+	//returns the code for a beep sound
+	def static dispatch action2code(BeepAction action)'''
+		beepSequenceUp();'''
+		
+	//returns the code for print on the screen
+	def static dispatch action2code(PrintAction action)'''
+		LCD.clear();
+		LCD.drawString("«action.msg»",0,2);'''		
 	
 	//Conditions
+	//returns the code for the conditions with the lightsensors left and right
+	//BRIGHT and DARK must be calibrated in the beginning
 	def static dispatch condition2code(LightCondition condition){
 		
 		switch(condition.value)
@@ -350,15 +370,17 @@ class JavaGenerator {
 		}
 	}
 	
+	//returns the code for the conditions with the sonar sensor Nothing can used without a distance(then use default value)
 	def static dispatch condition2code(SonarCondition condition){
 		
 		switch(condition.value)
 		{
-			case SonarValue::NOTHING: return '''sonar.getDistance >= 255 || sonar.getDistance() > «condition.distance»'''
-			case SonarValue::SOMETHING: return '''sonar.getDistance() < «condition.distance»'''
+			case SonarValue::NOTHING: return '''sonar.getDistance >= 255 || sonar.getDistance() => «condition.distance»'''
+			case SonarValue::SOMETHING: return '''sonar.getDistance() <= «condition.distance»'''
 		}
 	}
 	
+	//returns the code for conditions with the touchsensors left and right
 	def static dispatch condition2code(BumperCondition condition){
 		
 		switch(condition.value)
@@ -375,6 +397,7 @@ class JavaGenerator {
 	}
 	
 	//TODO add colorsensor and add to the conditions
+	//returns the code for the conditions with the color sensors it used the predefined colors
 	def static dispatch condition2code(ColorCondition condition){
 		
 		switch(condition.color)
@@ -386,6 +409,7 @@ class JavaGenerator {
 		}
 	}
 	
+	//returns the code for the conditions with the time to check the timeouts 
 	def static dispatch condition2code(TimeCondition condition){
 		var time = condition.t
 		if(condition.unit == TimeUnit::SEC)

@@ -18,6 +18,7 @@ class Auxiliary {
  		return Automata.name
  	}
 
+	//returns a list with all states in the state machine 
 	def static List<State> getStates(Resource resource) {
 		return getAutomata(resource).statelist 
  	}
@@ -48,6 +49,7 @@ class Auxiliary {
 		return getAutomata(resource).endstates
 	}
 	
+	//returns true if the endstate is reached
 	def static boolean isEndState(Resource resource, State s)
 	{
 		for (State e : getEndStates(resource)){
@@ -57,10 +59,12 @@ class Auxiliary {
 		return false;
 	}
 
+	//returns a list with the arrows in the state machine
 	def static List<Arrow> getArrows(Resource resource) {
 		return getAutomata(resource).arrowlist 
  	}
  	
+ 	//returns a list with the input arrwos of state s
  	def static List<Arrow> getInArrows (Resource resource, State s){
  		var List<Arrow> arrowlist = new ArrayList<Arrow>() 
  		for (Arrow a : getArrows(resource)){ 
@@ -72,6 +76,7 @@ class Auxiliary {
  		
  	}
  	
+ 	//returns a list with output arrows of state s
  	def static List<Arrow> getOutArrows (Resource resource, State s){
 		var List<Arrow> arrowlist = new ArrayList<Arrow>()
 		for (Arrow a : getArrows(resource)){
@@ -82,7 +87,7 @@ class Auxiliary {
 		return arrowlist;
 	}
  	
- 	
+ 	//returns a list with actions of state s
  	def static List<Action> getActionList(State s) {
  				return s.actionlist; 
  	}
