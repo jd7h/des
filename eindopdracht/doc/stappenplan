@@ -56,6 +56,53 @@ Week 2:
 Interessant reading material:
 http://www.drdobbs.com/parallel/robots-and-finite-state-machines/184410132
 
+Week 3:
+Mirjam bouwt de Runnable class die ervoor zorgt dat wij bt-connectivity krijgen.
+Opmerking van Jozef: is de DSL uitgebreid genoeg dat je kan specificeren "Als alle kleuren zijn gevonden, dan ben je klaar"?
+Nadenken over een data class voor de packets die we oversturen tussen master en slave -> API bekijken (ook tip van Wouter)
+Doel: op zondag 21 December doet de hele BT het (getest en al). Vrijdag 19/12 gaan we de hele dag in het lab zitten.
+We hebben twee minimale instanties gebouwd, een voor de master en een voor de slave, die we kunnen gebruiken om de bluetooth-functionality te testen.
+In de kerstvakantie: Colorsensor aan de praat krijgen, inbouwen in DSL, documentatie updaten aan de hand van dit document.
+
+Data packets:
+http://docs.oracle.com/javase/7/docs/api/java/io/DataInputStream.html
+Conclusie: het is niet mogelijk om zelf een class/struct te definieren want de DataInputStream werkt niet primitives. We kunnen dus kiezen om alle informatie op te slaan in een byte of in een int ofzo.
+Welke informatie wordt er gecommuniceerd?
+Master -> slave
+---------------
+Klaar met parkeren			PARK_ACK		00001001
+Error
+
+Slave -> Master
+---------------
+Klaar met kleuren zoeken	FOUND_ALL_COLOURS
+Kleur gevonden, ga parkeren	NEW_COLOR_FOUND
+Klaar met meten				TEMP_ACK
+Sonar meet XXX (voor ontwijken)
+
+First bit: master = 1 or slave = 0
+Second bit: found all colours = 1
+Third bit: found new colour = 1
+Fourth bit: action done
+fifth bit: sonar measures something within earlier specified distance
+
+De sonar info past precies in een byte, maar het is chiller om de byte te benutten voor alle info in de package.
+
+Alternatief (werkt beter) (kan je implementeren met een switch)
+-------------------------
+0-255: sonar info
+300: all done
+400: found new colour
+500: action done;
+default: error (ofzo)
+
+
+
+
+
+
+
+
 
 
 
