@@ -23,7 +23,7 @@ import robots.tasks.rDSL.TimeCondition
 import robots.tasks.rDSL.BeepAction
 import robots.tasks.rDSL.PrintAction
 import robots.tasks.rDSL.CalibrateAction
-
+import robots.tasks.rDSL.BTAction
 
 class JavaGenerator {
 	
@@ -289,7 +289,7 @@ class JavaGenerator {
 	//change later: enum e, add slavename
 	def static dispatch action2code(BTAction action)
 	{
-		if (slavename != null)
+		if (action.slavename != null)
 		{
 			return '''
 				//bluetooth connection, master side
@@ -321,7 +321,10 @@ class JavaGenerator {
 				LCD.refresh();
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
-			'''
+				
+				BTfunctionality runnable = new BTfunctionality("MasterReader",dis,dos);
+			    Thread slaveReader = new Thread(runnable, "MasterReader");
+			    '''
 		}
 		else
 		{
@@ -337,6 +340,9 @@ class JavaGenerator {
 
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
+				
+				BTfunctionality runnable = new BTfunctionality("SlaveReader",dis,dos);
+			    Thread slaveReader = new Thread(runnable, "SlaveReader");
 			'''
 		}
 	}

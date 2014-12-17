@@ -1,9 +1,28 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.LinkedList;
+
+import lejos.nxt.LCD;
+
+
+/*
+ *  de inputList is de lijst met alle inputs die binnen gekomen zijn
+ *  en nog niet verwrkt zijn 
+ * 
+ * to create a thread and start it use: 
+ *  t = new Thread("threadname");
+ *  t.start();
+ *  then it runs the run() method in the thread
+ */
+
 class BTfunctionality implements Runnable{
 
 	private DataInputStream dis;
 	private DataOutputStream dos;
-	private Thread t;
 	private String threadname;
+	private int buf;
+	public LinkedList<Integer> inputList;
 	
 
 	public BTfunctionality(String name, DataInputStream dis, DataOutputStream dos)
@@ -11,24 +30,31 @@ class BTfunctionality implements Runnable{
 		this.dis = dis;
 		this.dos = dos;
 		this.threadname = name;
+		inputList = new LinkedList<Integer>();
 	}
 
 	public void run()
 	{
+		try {
+			buf = dis.readInt();
+			inputList.add(buf);
+
+		} catch (IOException e) {
+			LCD.clear();
+			LCD.drawString("Bluetooth error", 0, 1);
+		}
 		
 	}
-
-	public void start()
+	
+	public void write(int msg) 
 	{
-		if(t==null)
-		{
-			
-			t = new Thread(this,threadname);
-			t.start();
+		try {
+			dos.writeInt(msg);
+			dos.flush();
+		} catch (IOException e) {
+			LCD.clear();
+			LCD.drawString("Bluetooth writing Error", 0, 1);
 		}
+
 	}
-
-
-
-
 }
