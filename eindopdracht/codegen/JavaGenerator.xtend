@@ -35,6 +35,44 @@ class JavaGenerator {
 			«ENDFOR»
 		«ENDFOR»
 	'''
+	
+	def static masterEquipment()'''
+	//standaard equipment op Robot Master
+	private static NXTRegulateMdotor left;
+	private static NXTRegulatedMotor right;
+	private static LightSensor lightL;
+	private static LightSensor lightR;
+	private static TouchSensor bumperL;
+	private static TouchSensor bumperR;
+	private static NXTRegulatedMotor lamp;
+	'''
+	
+	def static SlaveEquipment()'''
+	//standaard equipment op Robot Slave
+	private static RCXMotor tempArm;
+	private static NXTRegulatedMotor lamp;
+	private static ColorSensor colorsens;
+	private static UltraSonicSensor sonic;
+	private static TemperatureSensor temp;
+	'''
+	
+	def static masterInit()'''
+	left = Motor.A;
+	right = Motor.B;
+	lightL = new LightSensor(SensorPort.S1);
+	lightR = new LightSensor(SensorPort.S2);
+	bumperL = new TouchSensor(SensorPort.S3);
+	bumperR = new TouchSensor(SensorPort.S4);
+	lamp = Motor.C;
+	'''
+	
+	def static slaveInit()'''
+	tempArm = Motor.A;
+	lamp = Motor.C;
+	colorsens = new ColorSensor(SensorPort.S1);
+	sonic = new UltraSonicSensor(SensorPort.S2);
+	temp = new TemperatureSensor(SensorPort.S3);
+	'''
 
 	def static generateMain(Resource resource)'''
 	
@@ -97,27 +135,24 @@ class JavaGenerator {
 	//definieer lijst van endstates
 	static State[] endStates = {«FOR e : Auxiliary.getEndStates(resource) SEPARATOR ','»State.«Auxiliary.getStateItem(e)»«ENDFOR»};
 	
-	//standaard equipment op Robot
-	private static NXTRegulatedMotor left;
-	private static NXTRegulatedMotor right;
-	private static LightSensor lightL;
-	private static LightSensor lightR;
-	private static TouchSensor bumperL;
-	private static TouchSensor bumperR;
-	private static NXTRegulatedMotor lamp;
-
-	//todo: zet een BT-kanaal op tussen de master en de slave
+	//specificeer alle equipment
+	«IF Auxiliary.isMaster(resource)»
+	«masterEquipment()»
+	«ENDIF»
+	«IF !Auxiliary.isMaster(resource)»
+	«slaveEquipment()»
+	«ENDIF»
+	
 		
 	public static void main(String[] args){
 		//initialiseer alle equipment
-		left = Motor.A;
-		right = Motor.B;
-		lightL = new LightSensor(SensorPort.S1);
-		lightR = new LightSensor(SensorPort.S2);
-		bumperL = new TouchSensor(SensorPort.S3);
-		bumperR = new TouchSensor(SensorPort.S4);
-		lamp = Motor.C;
-
+		«IF Auxiliary.isMaster(resource)»
+		«masterInit()»
+		«ENDIF»
+		«IF !Auxiliary.isMaster(resource)»
+		«slaveInit()»
+		«ENDIF»
+		
 		//todo: zet de robot in de beginstate
 		current = State.«Auxiliary.getStateItem(Auxiliary.getStartState(resource))»;
 		
