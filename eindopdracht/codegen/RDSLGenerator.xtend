@@ -15,7 +15,14 @@ import org.eclipse.xtext.generator.IFileSystemAccess
 class RDSLGenerator implements IGenerator {
 	
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		fsa.generateFile("Main.java", JavaGenerator.generateMain(resource)); 
+		if(Auxiliary.isMaster(resource))
+		{
+			fsa.generateFile("MasterMain.java", JavaGenerator.generateMain(resource)); 
+		}
+		else{
+			fsa.generateFile("SlaveMain.java", JavaGenerator.generateMain(resource)); 	
+		}
+		
 		
 	}
 }

@@ -24,6 +24,7 @@ import robots.tasks.rDSL.BeepAction
 import robots.tasks.rDSL.PrintAction
 import robots.tasks.rDSL.CalibrateAction
 import robots.tasks.rDSL.BTAction
+import robots.tasks.rDSL.True
 
 class JavaGenerator {
 	
@@ -130,6 +131,7 @@ class JavaGenerator {
 		{
 			execute(current);
 		}
+		execute(current); //execute Endstate
 	}
 
 	
@@ -296,13 +298,17 @@ class JavaGenerator {
 				LCD.drawString("Connecting...", 0, 0);
 				LCD.refresh();
 	
-				RemoteDevice btrd = Bluetooth.getKnownDevice(«action.slavename»);
+				RemoteDevice btrd = Bluetooth.getKnownDevice("«action.slavename»");
 
 				if (btrd == null) {
 					LCD.clear();
 					LCD.drawString("No such device", 0, 0);
 					LCD.refresh();
-					Thread.sleep(2000);
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						LCD.drawString("Master setUp sleep", 0, 1);
+					}
 					System.exit(1);
 				}
 	
@@ -312,7 +318,11 @@ class JavaGenerator {
 					LCD.clear();
 					LCD.drawString("Connect fail", 0, 0);
 					LCD.refresh();
-					Thread.sleep(2000);
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						LCD.drawString("Master connectionfail sleep", 0, 1);
+					};
 					System.exit(1);
 				}
 	
@@ -323,7 +333,8 @@ class JavaGenerator {
 				DataOutputStream dos = btc.openDataOutputStream();
 				
 				BTfunctionality runnable = new BTfunctionality("MasterReader",dis,dos);
-			    Thread slaveReader = new Thread(runnable, "MasterReader");
+			    Thread MasterReader = new Thread(runnable, "MasterReader");
+			    
 			    '''
 		}
 		else
@@ -358,7 +369,7 @@ class JavaGenerator {
 
 	//returns the code for a beep sound
 	def static dispatch action2code(BeepAction action)'''
-		beepSequenceUp();'''
+		Sound.beepSequenceUp();'''
 		
 	//returns the code for print on the screen
 	def static dispatch action2code(PrintAction action)'''
@@ -434,6 +445,10 @@ class JavaGenerator {
 	def static dispatch condition2code(TempCondition condition){ 
 		return condition.temp
 		}
+		
+	def static dispatch condition2code(True condition)
+		'''true'''
+	
 
 }
  

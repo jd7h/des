@@ -5,6 +5,7 @@ generate rDSL "http://www.tasks.robots/RDSL"
 
 Automata: 
 	'Automaton:' name=ID
+	'Class:' type = Type
 	'States:' statelist += State+		//we need at least one state
 	'Arrows:' arrowlist += Arrow*		//zero or more arrows
 	'Start state:' startstate = [State]	//s zit in de lijst van states
@@ -127,4 +128,9 @@ enum Message:
 	OK = 'ok' |
 	SONAR = 'sonar' |
 	COLOR = 'color'
+;
+
+enum Type:
+	MASTER = 'master' |
+	SLAVE =  'slave'
 ;

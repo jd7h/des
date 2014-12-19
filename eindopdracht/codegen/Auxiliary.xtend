@@ -7,6 +7,7 @@ import robots.tasks.rDSL.Action
 import org.eclipse.emf.ecore.resource.Resource
 import java.util.List
 import java.util.ArrayList
+import robots.tasks.rDSL.Type
 
 class Auxiliary {
 	def static Automata getAutomata(Resource resource) {
@@ -91,4 +92,12 @@ class Auxiliary {
  	def static List<Action> getActionList(State s) {
  				return s.actionlist; 
  	}
+ 	
+ 	def static boolean isMaster(Resource resource){
+ 		if(getAutomata(resource).type == Type::MASTER) 
+ 		{
+ 			return true;
+ 		}
+ 		return false;
+ 	} 
  }
