@@ -96,7 +96,16 @@ Alternatief (werkt beter) (kan je implementeren met een switch)
 500: action done;
 default: error (ofzo)
 
+Verder: er zit nog een foutje in het framework: hij voert niet de laatste state uit odmat hij dan al in een finished state zit. Dit is adhoc aangepast met een extra call na de while-loop.
+We kunnen nu in de instance specificeren of het een master of een slave betreft. Daar kunnen we ook de initialisatie op aanpassen. Dit is gedaan. 
+De BT-connection opzetten werkt. Nu nog de threads testen en de send en receive functies schrijven.
 
+Idee voor later:
+in de instantie kunnen specificeren welke sensoren en actuatoren hij heeft.
+
+Probleem: Sonar uitlezen kan, maar het resultaat gebruiken kan nog niet. 
+
+De send en receive functies werken. Op het moment gebeurd het afhandelen van de pakketjes nog niet helemaal naar wens: als hij een ander pakketje heeft dan hij verwacht, wordt het pakketje weggegooit én de actie niet uitgevoerd. Is dit gewenst gedrag? 
 
 
 
