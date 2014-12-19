@@ -25,6 +25,9 @@ import robots.tasks.rDSL.PrintAction
 import robots.tasks.rDSL.CalibrateAction
 import robots.tasks.rDSL.BTAction
 import robots.tasks.rDSL.True
+import robots.tasks.rDSL.Message
+import robots.tasks.rDSL.SendAction
+import robots.tasks.rDSL.ReceiveCondition
 
 class JavaGenerator {
 	
@@ -38,7 +41,7 @@ class JavaGenerator {
 	
 	def static masterEquipment()'''
 	//standaard equipment op Robot Master
-	private static NXTRegulateMdotor left;
+	private static NXTRegulatedMotor left;
 	private static NXTRegulatedMotor right;
 	private static LightSensor lightL;
 	private static LightSensor lightR;
@@ -47,12 +50,12 @@ class JavaGenerator {
 	private static NXTRegulatedMotor lamp;
 	'''
 	
-	def static SlaveEquipment()'''
+	def static slaveEquipment()'''
 	//standaard equipment op Robot Slave
 	private static RCXMotor tempArm;
 	private static NXTRegulatedMotor lamp;
 	private static ColorSensor colorsens;
-	private static UltraSonicSensor sonic;
+	private static UltrasonicSensor sonic;
 	private static TemperatureSensor temp;
 	'''
 	
@@ -67,16 +70,16 @@ class JavaGenerator {
 	'''
 	
 	def static slaveInit()'''
-	tempArm = Motor.A;
+	tempArm = new RCXMotor(MotorPort.A);
 	lamp = Motor.C;
 	colorsens = new ColorSensor(SensorPort.S1);
-	sonic = new UltraSonicSensor(SensorPort.S2);
+	sonic = new UltrasonicSensor(SensorPort.S2);
 	temp = new TemperatureSensor(SensorPort.S3);
 	'''
 
 	def static generateMain(Resource resource)'''
 	
-
+	package Robot;
 	/* 
 	 * Automatically generated code
 	 * eindopdracht DES
@@ -96,12 +99,15 @@ class JavaGenerator {
 	import lejos.nxt.UltrasonicSensor;
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.ColorSensor;
+	import lejos.nxt.TemperatureSensor;
 
 	//actuators
 	import lejos.nxt.Motor;
 	import lejos.nxt.NXTRegulatedMotor;
+	import lejos.nxt.MotorPort;
 	import lejos.nxt.LCD;
 	import lejos.nxt.Sound;
+	import lejos.nxt.addon.RCXMotor;
 
 	//for bluetooth:
 	import java.io.DataInputStream;
@@ -110,6 +116,7 @@ class JavaGenerator {
 	import lejos.nxt.comm.Bluetooth;
 	import javax.bluetooth.RemoteDevice;
 	import java.io.IOException;
+	import java.util.ListIterator;
 
 	//misc
 	import java.util.Random;
@@ -124,6 +131,7 @@ class JavaGenerator {
 	
 	//public variables 
 	public static State current;
+	private static ListIterator<Integer> it;
 	
 	//maak een enum van de beginstates
 		public enum State {
@@ -245,7 +253,15 @@ class JavaGenerator {
 		
 		    return randomNum;
 		}
-	}	'''
+		
+		//TODO: sonar stubfunction
+		public static int getLastSonarData()
+		{
+			return 255;
+		}
+			 
+	}	
+	'''
 		
 	//actions
 	//returns the code for the drive action forward and backwards with and without duration
@@ -367,8 +383,10 @@ class JavaGenerator {
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
 				
-				BTfunctionality runnable = new BTfunctionality("MasterReader",dis,dos);
-			    Thread MasterReader = new Thread(runnable, "MasterReader");
+				BTfunctionality btThread = new BTfunctionality("MasterReader",dis,dos);
+				//LCD.drawString("Thread initialist", 1, 4);
+				
+				btThread.start();
 			    
 			    '''
 		}
@@ -387,8 +405,8 @@ class JavaGenerator {
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
 				
-				BTfunctionality runnable = new BTfunctionality("SlaveReader",dis,dos);
-			    Thread slaveReader = new Thread(runnable, "SlaveReader");
+				BTfunctionality btThread = new BTfunctionality("SlaveReader",dis,dos);
+				btThread.start();
 			'''
 		}
 	}
@@ -410,6 +428,16 @@ class JavaGenerator {
 	def static dispatch action2code(PrintAction action)'''
 		LCD.clear();
 		LCD.drawString("«action.msg»",0,2);'''		
+		
+		def static dispatch action2code(SendAction action){
+			switch (action.message){
+				case Message::SONAR: return ''' btThread.write(getLastSonarData());'''
+				case Message::ALLDONE: return '''btThread.write(300);''' 
+				case Message::NEWCOLOR: return '''btThread.write(400);'''
+				case Message::ACTIONDONE: return '''btThread.write(500);'''
+				default: return '''btThread.write(-1);'''	
+			}
+		}
 	
 	//Conditions
 	//returns the code for the conditions with the lightsensors left and right
@@ -434,7 +462,7 @@ class JavaGenerator {
 		
 		switch(condition.value)
 		{
-			case SonarValue::NOTHING: return '''sonar.getDistance >= 255 || sonar.getDistance() => «condition.distance»'''
+			case SonarValue::NOTHING: return '''sonar.getDistance() >= 255 || sonar.getDistance() => «condition.distance»'''
 			case SonarValue::SOMETHING: return '''sonar.getDistance() <= «condition.distance»'''
 		}
 	}
@@ -483,6 +511,17 @@ class JavaGenerator {
 		
 	def static dispatch condition2code(True condition)
 		'''true'''
+		
+	def static dispatch condition2code(ReceiveCondition condition)
+	{
+		switch (condition.message){
+				//case Message::SONAR: return ''''''
+				case Message::ALLDONE: return '''btThread.getElement() == 300''' 
+				case Message::NEWCOLOR: return '''btThread.getElement() == 400'''
+				case Message::ACTIONDONE: return '''btThread.getElement() == 500'''
+				default: return '''false'''	//TODO change to error statement
+			}
+	}
 	
 
 }

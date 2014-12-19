@@ -1,0 +1,11 @@
+Automaton: examplebt 
+	Class: master
+	States:   
+		State start do init bt "Rover2"
+		State finished do drive forwards duration 3 sec speed 100 stop 
+		
+	Arrows: 
+		Arrow start -> finished if (and receive all done)
+			
+	Start state: start 
+	End state: finished 

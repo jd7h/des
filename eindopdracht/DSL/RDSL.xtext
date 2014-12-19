@@ -32,7 +32,8 @@ ParkAction: {ParkAction} 'park'
 ;
 CalibrateAction: {CalibrateAction} 'calibrate'
 ;
-SendAction: 'send' message = Message
+SendAction: 
+	'send' message = Message
 ;
 BTAction:
 	{BTAction} ('init bt' slavename = STRING | 'wait for bt')
@@ -125,9 +126,11 @@ enum Color:
 
 //not finished
 enum Message:
-	OK = 'ok' |
 	SONAR = 'sonar' |
-	COLOR = 'color'
+	ALLDONE = 'all done' |
+	NEWCOLOR = 'found new color' |
+	ACTIONDONE = 'action done' |
+	ERROR = 'found error'
 ;
 
 enum Type:

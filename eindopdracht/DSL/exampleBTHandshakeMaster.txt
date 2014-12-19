@@ -1,0 +1,11 @@
+Automaton: examplebt 
+	Class: master
+	States:   
+		State start do init bt "NXT2"		
+		State finished do beep
+		
+	Arrows: 
+		Arrow start -> finished if (and true)
+			
+	Start state: start 
+	End state: finished 

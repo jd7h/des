@@ -1,7 +1,9 @@
+package Robot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Queue;
 
 import lejos.nxt.LCD;
 
@@ -16,13 +18,13 @@ import lejos.nxt.LCD;
  *  then it runs the run() method in the thread
  */
 
-class BTfunctionality implements Runnable{
+class BTfunctionality extends Thread {
 
 	private DataInputStream dis;
 	private DataOutputStream dos;
 	private String threadname;
 	private int buf;
-	public LinkedList<Integer> inputList;
+	public Queue<Integer> inputList;
 	
 
 	public BTfunctionality(String name, DataInputStream dis, DataOutputStream dos)
@@ -30,15 +32,15 @@ class BTfunctionality implements Runnable{
 		this.dis = dis;
 		this.dos = dos;
 		this.threadname = name;
-		inputList = new LinkedList<Integer>();
+		inputList = new Queue<Integer>();
+		buf = -1;
 	}
 
 	public void run()
 	{
 		try {
 			buf = dis.readInt();
-			inputList.add(buf);
-
+			inputList.push(buf);
 		} catch (IOException e) {
 			LCD.clear();
 			LCD.drawString("Bluetooth error", 0, 1);
@@ -55,6 +57,20 @@ class BTfunctionality implements Runnable{
 			LCD.clear();
 			LCD.drawString("Bluetooth writing Error", 0, 1);
 		}
-
+	}
+	
+	public Queue<Integer> getInputList()
+	{
+		return inputList;
+	}
+	
+	public int getElement()
+	{
+		
+		if(inputList.empty()){
+			return -1;
+		}else{
+			return 	(int) inputList.pop();	
+		}
 	}
 }

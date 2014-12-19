@@ -1,0 +1,12 @@
+Automaton: examplebtslave
+	Class: slave
+	 States: 
+	 State s1 do wait for bt
+	 State s3 do send all done
+	 State s2 do beep 
+	 
+	 Arrows:
+	  Arrow s1 -> s3 if (and timeout 2 sec) 
+	  Arrow s3 -> s2 if (and true)
+	  Start state: s1
+	  End state: s2
