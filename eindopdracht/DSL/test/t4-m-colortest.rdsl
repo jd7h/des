@@ -1,0 +1,16 @@
+Automaton: examplebt
+	Class: master
+	 States: 
+	 State s1 do init bt "rover2"
+	 State s2 do drive forwards INF speed 100
+	 State s3 stop, drive backwards 1 sec speed 100, beep, turn right 180
+	 State s4 stop
+	 
+	 Arrows:
+	 s1 -> s2 if (and true)
+	 s2 -> s3 if (and receive found new color)
+	 s3 -> s2 if (and true)
+	 s2 -> s4 if (and timeout 20 sec)
+
+	 Start state: s1
+	 End state: s4

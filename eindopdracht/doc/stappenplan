@@ -106,13 +106,23 @@ in de instantie kunnen specificeren welke sensoren en actuatoren hij heeft.
 Probleem: Sonar uitlezen kan, maar het resultaat gebruiken kan nog niet. 
 
 De send en receive functies werken. Op het moment gebeurd het afhandelen van de pakketjes nog niet helemaal naar wens: als hij een ander pakketje heeft dan hij verwacht, wordt het pakketje weggegooit Ã©n de actie niet uitgevoerd. Is dit gewenst gedrag? 
+Ik denk het wel, we moeten dus de automaat zo specificeren dat hij met alle situaties kan dealen. However, als er meerdere potentiele transities zijn, afhankelijk van het soort pakketje, dan moet hij bij het controleren op de transitie niet het pakketje weggooien, maar slechts kijken. 
 
 
+X controleren of alle acties ook daadwerkelijk een implementatie hebben
+controleren of alle arrows op de goede manier worden afgehandeld
+X nieuwe tests bedenken voor kleurensensor en instantie maken
+RDSL aanpassen
+implementatie uitbreiden
+testen in lab
+als er tijd over is: sonar. we doen er alleen maar iets mee in de slave, maar alleen als conditional terwijl de slave niet over sturen gaat. 
 
+overweging: op het moment nemen we geen transactie meer zodra we in een eindstate zitten
 
+Sonar heeft dezelfde problemen als colorsensor. Hoe vangen we het af? Aan de ene kant kunnen de conditionals/actions alleen door slave worden gebruikt, maar we kunnen de implementatie laten afhangen van of het de master of de slave betreft. Als slave: lees direct uit de sensor, als master: lees uit een queue van messages. Ofzo. Of triggert het ontvangen van een message een actie? HOE!? 
 
+we hoeven geen extra info mee te zenden als het alleen maar gaan om het herkennen van nog niet afgevinkte kleuren. als we méér willen moeten we ook kleur-parameters meegeven in de grammatica. Nu nog niet van toepassing. 
 
-
-
-
+test toegevoegd voor het testen van de kleurensensor. 
+toevoegen: controle van of de kleur al gezien is. 
 

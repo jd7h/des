@@ -1,0 +1,16 @@
+Automaton: examplebtslave
+	Class: slave
+	 States: 
+	 State s1 do wait for bt
+	 State s2 do nothing
+	 State s3 do beep, send found new color 
+	 State s4 do beep, beep
+	 
+	 Arrows:
+	 s1 -> s2 if (and true)
+	 s2 -> s3 if (and colorsensor reads red) (and colorsensor reads blue) (and colorsensor reads green)
+	 s3 -> s2 if (and timeout 1 sec)
+	 s2 -> s4 if (and timeout 10 sec)
+
+	 Start state: s1
+	 End state: s2
