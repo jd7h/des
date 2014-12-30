@@ -1,9 +1,0 @@
-Automaton: examplebtslave
-	 States: 
-	 State s1 do wait for bt send ok
-	 State s2 do beep 
-	 
-	 Arrows:
-	  Arrow s1 -> s2 if (and receive ok) 
-	  Start state: s1
-	  End state: s2
