@@ -110,19 +110,35 @@ Ik denk het wel, we moeten dus de automaat zo specificeren dat hij met alle situ
 
 
 X controleren of alle acties ook daadwerkelijk een implementatie hebben
-controleren of alle arrows op de goede manier worden afgehandeld
 X nieuwe tests bedenken voor kleurensensor en instantie maken
-RDSL aanpassen
+X RDSL aanpassen
+X controleren of alle arrows op de goede manier worden afgehandeld
+X implementatie uitbreiden
+X nieuwe test maken voor temperatuursensor en motorarm
 implementatie uitbreiden
 testen in lab
+
 als er tijd over is: sonar. we doen er alleen maar iets mee in de slave, maar alleen als conditional terwijl de slave niet over sturen gaat. 
 
-overweging: op het moment nemen we geen transactie meer zodra we in een eindstate zitten
+overweging: op het moment nemen we geen transactie meer zodra we in een eindstate zitten.
 
-Sonar heeft dezelfde problemen als colorsensor. Hoe vangen we het af? Aan de ene kant kunnen de conditionals/actions alleen door slave worden gebruikt, maar we kunnen de implementatie laten afhangen van of het de master of de slave betreft. Als slave: lees direct uit de sensor, als master: lees uit een queue van messages. Ofzo. Of triggert het ontvangen van een message een actie? HOE!? 
+Sonar heeft dezelfde problemen als colorsensor. Hoe vangen we het af? Aan de ene kant kunnen de conditionals/actions alleen door slave worden gebruikt, maar we kunnen de implementatie laten afhangen van of het de master of de slave betreft. 
+Als slave: lees direct uit de sensor, 
+als master: lees uit een queue van messages. 
 
-we hoeven geen extra info mee te zenden als het alleen maar gaan om het herkennen van nog niet afgevinkte kleuren. als we méér willen moeten we ook kleur-parameters meegeven in de grammatica. Nu nog niet van toepassing. 
+we hoeven geen extra info mee te zenden als het alleen maar gaan om het herkennen van nog niet afgevinkte kleuren. als we méér willen moeten we ook kleur-parameters meegeven in de grammatica. Dit is nu nog niet van toepassing. 
 
-test toegevoegd voor het testen van de kleurensensor. 
-toevoegen: controle van of de kleur al gezien is. 
+Het lijkt handiger om geen hele grote aanpassingen aan de RDSL te doen zolang we de hoofdfunctionaliteit nog niet afhebben. 
+
+test toegevoegd voor het testen van de kleurensensor. (t4)
+test toegevoegd voor de werking van het afvangen van de messages van de slave (t5)
+test toegevoegd voor het geheel (t6)
+
+toevoegen: controle bij slave van of de kleur al gezien is. 
+
+De arrows worden nu netjes afgehandeld. Welke implementatie wordt gebruik is afhankelijk van het type van de instantie (master/slave).
+Messages worden op het moment niet langer gedelete in de conditionals. Volgens de eerdere implementatie zouden messages zomaar weggegooid worden op het moment dat we controleren of we een transitie kunnen nemen. Dit is onhandig en dus aangepast. Er zijn nu in Btfunctinality functies voor peeking (non-destructive) en polling (destructive).
+We moeten niet vergeten dan een actie 'consume package' (oid) toe te voegen dat het bovenste package uit de queue eet, anders raakt alles verstopt. Belangrijk om rekening mee te houden bij het bouwen van instanties! 
+
+
 
