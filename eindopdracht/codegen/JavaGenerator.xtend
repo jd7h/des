@@ -18,7 +18,6 @@ import robots.tasks.rDSL.Arrow
 import robots.tasks.rDSL.Color
 import robots.tasks.rDSL.BumperCondition
 import robots.tasks.rDSL.ColorCondition
-import robots.tasks.rDSL.TempCondition
 import robots.tasks.rDSL.TimeCondition
 import robots.tasks.rDSL.BeepAction
 import robots.tasks.rDSL.PrintAction
@@ -28,17 +27,11 @@ import robots.tasks.rDSL.True
 import robots.tasks.rDSL.Message
 import robots.tasks.rDSL.SendAction
 import robots.tasks.rDSL.ReceiveCondition
+import robots.tasks.rDSL.ParkAction
 
 class JavaGenerator {
 	
-	def static arrow2conditional(Arrow a)'''
-		«FOR c : a.disjunctionlist SEPARATOR '||'»
-			«FOR el : c.conjuctionlist BEFORE '(' SEPARATOR '&&' AFTER ')'»
-				«condition2code(el)»
-			«ENDFOR»
-		«ENDFOR»
-	'''
-	
+
 	def static masterEquipment()'''
 	//standaard equipment op Robot Master
 	private static NXTRegulatedMotor left;
@@ -125,7 +118,7 @@ class JavaGenerator {
 	
 	public class Main{
 	
-	//Constants for the Lightsensorvalues
+	//Uncalibrated constants for the Lightsensorvalues
 	public static int BRIGHT = 40;
 	public static int DARK = 30;
 	
@@ -135,7 +128,7 @@ class JavaGenerator {
 	
 	//maak een enum van de beginstates
 		public enum State {
-		«FOR s : Auxiliary.getStates(resource) SEPARATOR ','»			//added extra state for when everything is finished
+		«FOR s : Auxiliary.getStates(resource) SEPARATOR ','»
 			«Auxiliary.getStateItem(s)»
 		«ENDFOR»
 		}
@@ -151,6 +144,9 @@ class JavaGenerator {
 	«slaveEquipment()»
 	«ENDIF»
 	
+	//bluetooth draadje
+	private static BTfunctionality btThread;
+	
 		
 	public static void main(String[] args){
 		//initialiseer alle equipment
@@ -161,7 +157,7 @@ class JavaGenerator {
 		«slaveInit()»
 		«ENDIF»
 		
-		//todo: zet de robot in de beginstate
+		//zet de robot in de beginstate
 		current = State.«Auxiliary.getStateItem(Auxiliary.getStartState(resource))»;
 		
 		//opstart-info
@@ -182,7 +178,7 @@ class JavaGenerator {
 	«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
 	public static void «Auxiliary.getStateMethod(s)»()
 	{
-		//first, execute all actions of this state
+		//execute all actions of this state
 		LCD.drawString("«Auxiliary.getStateMethod(s)»",0,3);
 		«FOR a : Auxiliary.getActionList(s)»
 			«action2code(a)»
@@ -196,11 +192,11 @@ class JavaGenerator {
 		//when done, wait for a trigger for a transition
 		boolean transitionTaken = false; 
 		while(!transitionTaken){	
-			«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»«arrow2conditional(ar)»){
+			«FOR ar : Auxiliary.getOutArrows(resource,s) BEFORE 'if(' SEPARATOR 'else if('»«arrow2conditional(ar,resource)»){
 				current = State.«Auxiliary.getStateItem(ar.to)»;
 				transitionTaken = true;
 			}
-		«ENDFOR»
+			«ENDFOR»
 		}
 		«ENDIF»
 	}
@@ -229,42 +225,43 @@ class JavaGenerator {
 	}
 
 
-		
-		
-		/**
-		 * Returns a pseudo-random number between min and max, inclusive.
-		 * The difference between min and max can be at most
-		 * <code>Integer.MAX_VALUE - 1</code>.
-		 *
-		 * @param min Minimum value
-		 * @param max Maximum value.  Must be greater than min.
-		 * @return Integer between min and max, inclusive.
-		 * @see java.util.Random#nextInt(int)
-		 */
-		public static int randInt(int min, int max) {
-		
-		    // NOTE: Usually this should be a field rather than a method
-		    // variable so that it is not re-seeded every call.
-		    Random rand = new Random();
-		
-		    // nextInt is normally exclusive of the top value,
-		    // so add 1 to make it inclusive
-		    int randomNum = rand.nextInt((max - min) + 1) + min;
-		
-		    return randomNum;
-		}
-		
-		//TODO: sonar stubfunction
-		public static int getLastSonarData()
-		{
-			return 255;
-		}
-			 
-	}	
-	'''
+	
+	
+	/**
+	 * Returns a pseudo-random number between min and max, inclusive.
+	 * The difference between min and max can be at most
+	 * <code>Integer.MAX_VALUE - 1</code>.
+	 *
+	 * @param min Minimum value
+	 * @param max Maximum value.  Must be greater than min.
+	 * @return Integer between min and max, inclusive.
+	 * @see java.util.Random#nextInt(int)
+	 */
+	public static int randInt(int min, int max) {
+	
+	    // NOTE: Usually this should be a field rather than a method
+	    // variable so that it is not re-seeded every call.
+	    Random rand = new Random();
+	
+	    // nextInt is normally exclusive of the top value,
+	    // so add 1 to make it inclusive
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+	
+	    return randomNum;
+	}
+	
+	//TODO: sonar stubfunction
+	public static int getLastSonarData()
+	{
+		return 255;
+	}
+		 
+}	
+'''
 		
 	//actions
-	//returns the code for the drive action forward and backwards with and without duration
+	
+	//drive action forward and backwards with and without duration
 	def static dispatch action2code(DriveAction action){
 
 		var int s = action.speed
@@ -308,7 +305,7 @@ class JavaGenerator {
 		}
 	}
 	
-	//returns the code for the turn action left/right with and without the variable degree
+	//turnaction left/right with and without the variable degree
 	def static dispatch action2code(TurnAction action){
 		
 		//if the variable degree is not used in the instance of the DSL
@@ -333,16 +330,32 @@ class JavaGenerator {
 		}		
 	}
 	
-	//returns the code for stop action(left returns immediately so right can also stop)
+	//stop action(left returns immediately so right can also stop)
 	def static dispatch action2code(StopAction action)'''
 		left.stop(true);
 		right.stop();'''
+		
+	//SendAction 
+	def static dispatch action2code(SendAction action){
+		switch (action.message){
+			case Message::SONAR: return ''' btThread.write(getLastSonarData());'''
+			case Message::ALLDONE: return '''btThread.write(300);''' 
+			case Message::NEWCOLOR: return '''btThread.write(400);'''
+			case Message::ACTIONDONE: return '''btThread.write(500);'''
+			default: return '''btThread.write(-1);'''	
+		}
+	}
 	
+	//todo
+	//ParkAction
+	def static dispatch action2code(ParkAction action)''''''
+	
+	//bt action
 	//assumptions: slavename is parameter of init, kind of action is in enum e
 	//change later: enum e, add slavename
 	def static dispatch action2code(BTAction action)
 	{
-		if (action.slavename != null)
+		if (action.slavename != null) //master
 		{
 			return '''
 				//bluetooth connection, master side
@@ -383,7 +396,8 @@ class JavaGenerator {
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
 				
-				BTfunctionality btThread = new BTfunctionality("MasterReader",dis,dos);
+				//BTfunctionality btThread = new BTfunctionality("MasterReader",dis,dos);
+				btThread = new BTfunctionality("MasterReader",dis,dos);
 				//LCD.drawString("Thread initialist", 1, 4);
 				
 				btThread.start();
@@ -405,12 +419,14 @@ class JavaGenerator {
 				DataInputStream dis = btc.openDataInputStream();
 				DataOutputStream dos = btc.openDataOutputStream();
 				
-				BTfunctionality btThread = new BTfunctionality("SlaveReader",dis,dos);
+				//BTfunctionality btThread = new BTfunctionality("SlaveReader",dis,dos);
+				btThread = new BTfunctionality("SlaveReader",dis,dos);
 				btThread.start();
 			'''
 		}
 	}
 
+	//calibrate action
 	//returns the code for the calibration of the sensors
 	def static dispatch action2code(CalibrateAction action)'''
 		LCD.drawString("Left white",0,1);
@@ -420,105 +436,130 @@ class JavaGenerator {
 		Button.waitForAnyPress();
 		DARK = lightL.readValue();'''			
 
+	//beep action
 	//returns the code for a beep sound
 	def static dispatch action2code(BeepAction action)'''
 		Sound.beepSequenceUp();'''
 		
+	//print action
 	//returns the code for print on the screen
 	def static dispatch action2code(PrintAction action)'''
 		LCD.clear();
 		LCD.drawString("«action.msg»",0,2);'''		
 		
-		def static dispatch action2code(SendAction action){
-			switch (action.message){
-				case Message::SONAR: return ''' btThread.write(getLastSonarData());'''
-				case Message::ALLDONE: return '''btThread.write(300);''' 
-				case Message::NEWCOLOR: return '''btThread.write(400);'''
-				case Message::ACTIONDONE: return '''btThread.write(500);'''
-				default: return '''btThread.write(-1);'''	
-			}
-		}
+		
+	
+	//Arrows
+		def static arrow2conditional(Arrow a, Resource resource)'''
+		«FOR c : a.disjunctionlist SEPARATOR '||'»
+			«FOR el : c.conjuctionlist BEFORE '(' SEPARATOR '&&' AFTER ')'»
+				«condition2code(el, resource)»
+			«ENDFOR»
+		«ENDFOR»
+	'''
 	
 	//Conditions
+	
 	//returns the code for the conditions with the lightsensors left and right
 	//BRIGHT and DARK must be calibrated in the beginning
-	def static dispatch condition2code(LightCondition condition){
-		
-		switch(condition.value)
+	//only relevant for masterbot
+	def static dispatch condition2code(LightCondition condition, Resource resource){
+		if(Auxiliary.isMaster(resource))
 		{
-			case LightValue::WHITE: if(condition.side == Direction::LEFT)
-										return '''BRIGHT-10 <= lightL.readValue() && lightL.readValue() <= BRIGHT+10'''
-									else
-										return '''BRIGHT-10 <= lightR.readValue() && lightR.readValue() <= BRIGHT+10'''
-			case LightValue::BLACK: if(condition.side == Direction::LEFT)
-										return '''DARK-10 <= lightL.readValue() && lightL.readValue() <= DARK+10'''
-									else
-										return '''DARK-10 <= lightR.readValue() && lightR.readValue() <= DARK+10'''
+			switch(condition.value)
+			{
+				case LightValue::WHITE: if(condition.side == Direction::LEFT)
+											return '''BRIGHT-10 <= lightL.readValue() && lightL.readValue() <= BRIGHT+10'''
+										else
+											return '''BRIGHT-10 <= lightR.readValue() && lightR.readValue() <= BRIGHT+10'''
+				case LightValue::BLACK: if(condition.side == Direction::LEFT)
+											return '''DARK-10 <= lightL.readValue() && lightL.readValue() <= DARK+10'''
+										else
+											return '''DARK-10 <= lightR.readValue() && lightR.readValue() <= DARK+10'''
+			}
 		}
+		else
+			return ''''''
 	}
 	
-	//returns the code for the conditions with the sonar sensor Nothing can used without a distance(then use default value)
-	def static dispatch condition2code(SonarCondition condition){
-		
-		switch(condition.value)
-		{
-			case SonarValue::NOTHING: return '''sonar.getDistance() >= 255 || sonar.getDistance() => «condition.distance»'''
-			case SonarValue::SOMETHING: return '''sonar.getDistance() <= «condition.distance»'''
+	//returns the code for the conditions with the sonar sensor 
+	//Nothing can used without a distance(then use default value)
+	//only relevant for slavebot
+	def static dispatch condition2code(SonarCondition condition, Resource resource){
+		if(Auxiliary.isMaster(resource)){
+			switch(condition.value)
+				{
+					case SonarValue::NOTHING: return '''btThread.headIsSonarElement() && (btThread.peekElement() == 255 || btThread.peekElement() >= «condition.distance»)'''
+					case SonarValue::SOMETHING: return '''btThread.headIsSonarElement() && btThread.peekElement() <= «condition.distance»'''
+				}
+			}
+			 
+		else{
+			switch(condition.value)
+			{
+				case SonarValue::NOTHING: return '''sonar.getDistance() >= 255 || sonar.getDistance() => «condition.distance»'''
+				case SonarValue::SOMETHING: return '''sonar.getDistance() <= «condition.distance»'''
+			}
 		}
 	}
 	
 	//returns the code for conditions with the touchsensors left and right
-	def static dispatch condition2code(BumperCondition condition){
-		
-		switch(condition.value)
+	def static dispatch condition2code(BumperCondition condition, Resource resource){
+		if(Auxiliary.isMaster(resource))
 		{
-			case BumperValue::PRESSED: if(condition.side == Direction::LEFT)
-										return '''bumperL.isPressed()'''
-									else
-										return '''bumperR.isPressed()'''
-			case BumperValue::NOTPRESSED: if(condition.side == Direction::LEFT)
-										return '''!bumperL.isPressed()'''
-									else
-										return '''!bumperR.isPressed()'''
+			switch(condition.value)
+			{
+				case BumperValue::PRESSED: if(condition.side == Direction::LEFT)
+											return '''bumperL.isPressed()'''
+										else
+											return '''bumperR.isPressed()'''
+				case BumperValue::NOTPRESSED: if(condition.side == Direction::LEFT)
+											return '''!bumperL.isPressed()'''
+										else
+											return '''!bumperR.isPressed()'''
+			}
+		}
+		return ''''''
+	}
+	
+	//color sensors 
+	//uses the predefined colors
+	def static dispatch condition2code(ColorCondition condition, Resource resource){
+		if(Auxiliary.isMaster(resource))
+		{
+			return '''btThread.peekElement() == 400'''
+		}
+		else{
+			switch(condition.color)
+			{
+				case Color::BLUE: return '''lejos.robotics.Colors.Color.BLUE '''
+				case Color::BLACK: return '''lejos.robotics.Colors.Color.BLACK'''
+				case Color::RED: return '''lejos.robotics.Colors.Color.RED'''
+				case Color::GREEN: return '''lejos.robotics.Colors.Color.GREEN'''
+				case Color::WHITE: return '''lejos.robotics.Colors.Color.WHITE'''
+			}
 		}
 	}
 	
-	//TODO add colorsensor and add to the conditions
-	//returns the code for the conditions with the color sensors it used the predefined colors
-	def static dispatch condition2code(ColorCondition condition){
-		
-		switch(condition.color)
-		{
-			case Color::BLUE: return '''lejos.robotics.Colors.Color.BLUE '''
-			case Color::BLACK: return '''lejos.robotics.Colors.Color.BLACK'''
-			case Color::RED: return '''lejos.robotics.Colors.Color.RED'''
-			case Color::GREEN: return '''lejos.robotics.Colors.Color.GREEN'''
-		}
-	}
-	
-	//returns the code for the conditions with the time to check the timeouts 
-	def static dispatch condition2code(TimeCondition condition){
+	//time out conditions
+	def static dispatch condition2code(TimeCondition condition, Resource resource){
 		var time = condition.t
 		if(condition.unit == TimeUnit::SEC)
 				time =  time*1000
 		return '''starttime + «time» <= System.currentTimeMillis()'''
 	}
 	
-	//TODO add tempsensor and add conditions
-	def static dispatch condition2code(TempCondition condition){ 
-		return condition.temp
-		}
 		
-	def static dispatch condition2code(True condition)
+	def static dispatch condition2code(True condition, Resource resource)
 		'''true'''
 		
-	def static dispatch condition2code(ReceiveCondition condition)
+	def static dispatch condition2code(ReceiveCondition condition, Resource resource)
 	{
 		switch (condition.message){
-				//case Message::SONAR: return ''''''
-				case Message::ALLDONE: return '''btThread.getElement() == 300''' 
-				case Message::NEWCOLOR: return '''btThread.getElement() == 400'''
-				case Message::ACTIONDONE: return '''btThread.getElement() == 500'''
+				case Message::SONAR: return '''btThread.peekElement >= 0 && btThread.peekElement() <= 255'''
+				case Message::ALLDONE: return '''btThread.peekElement() == 300''' 
+				case Message::NEWCOLOR: return '''btThread.peekElement() == 400'''
+				case Message::ACTIONDONE: return '''btThread.peekElement() == 500'''
 				default: return '''false'''	//TODO change to error statement
 			}
 	}

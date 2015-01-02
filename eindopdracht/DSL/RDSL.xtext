@@ -13,7 +13,7 @@ Automata:
 ;
 
 State: 
-	'State' name=ID 'do' actionlist += Action+	//more than one action	
+	'State' name=ID ('do' actionlist += Action*)	//more than one action	
 ;
 
 Arrow:
@@ -52,7 +52,7 @@ Conjunction:
 ;
 
 Condition: //sensorcondition
-	(LightCondition | SonarCondition | BumperCondition | ColorCondition | TempCondition | TimeCondition | ReceiveCondition | True) (', ')?
+	(LightCondition | SonarCondition | BumperCondition | ColorCondition | TimeCondition | ReceiveCondition | True) (', ')?
 ;
 
 ReceiveCondition:
@@ -69,10 +69,6 @@ LightCondition:
 
 ColorCondition:
 	'colorsensor reads' color = Color
-;
-
-TempCondition:
-	'temperaturesensor reads' temp = INT //int = graden
 ;
 
 SonarCondition:
@@ -121,7 +117,8 @@ enum Color:
 	BLUE = 'blue' |
 	BLACK = 'black'|
 	RED = 'red' |
-	GREEN = 'green'
+	GREEN = 'green' |
+	WHITE = 'white'
 ;
 
 //not finished

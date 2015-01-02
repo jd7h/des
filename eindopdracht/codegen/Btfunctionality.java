@@ -1,8 +1,8 @@
-package Robot;
+package example1;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Queue;
 
 import lejos.nxt.LCD;
@@ -64,13 +64,31 @@ class BTfunctionality extends Thread {
 		return inputList;
 	}
 	
-	public int getElement()
+	public int popElement()
 	{
 		
 		if(inputList.empty()){
 			return -1;
 		}else{
-			return 	(int) inputList.pop();	
+			return 	(int) inputList.pop();
 		}
 	}
+	
+	public int peekElement()
+	{
+		if(inputList.empty()){
+			return -1;
+		}else{
+			return 	(int) inputList.peek();
+		}
+	}
+	
+	public boolean headIsSonarElement()
+	{
+		int head = (int) inputList.peek();
+		if(head >= 0 && head <= 255)
+			return true;
+		return false;
+	}
+	
 }
