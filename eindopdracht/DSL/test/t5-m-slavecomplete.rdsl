@@ -4,19 +4,20 @@ Automaton: examplebt
 	States: 
 		State btinit 				do bt init "slavename" 
 		State wander 				do nothing
-		State sonarobstacle			do print "sonar sees something", beep
-		State colorfound			do print "new color found", beep, beep, send action done
-		State finished 				do print "all done"
+		State sonarobstacle			do consume package, print "sonar sees something", beep
+		State colorfound			do consume package, print "new color found", beep, beep, send action done
+		State finished 				do consume package, print "all done"
+		State wait				do consume package
 	Arrows: 
 		Arrow btinit -> wander			if (and true)
 
-		Arrow wander -> sonarobstacle		if (and receive sonarmessage)
+		Arrow wander -> sonarobstacle		if (and receive sonar)
 		Arrow sonarobstacle -> wander		if (and true)
 
-		Arrow wander -> colorfound		if (and receive newcolorfound)
+		Arrow wander -> colorfound		if (and receive found new color)
 		Arrow colorfound -> wait		if (and true)
 		Arrow wait -> wander			if (and receive action done)
-		Arrow wait -> wait			if (and receice ...andere pakketjes) (and timeout 10 sec)//als er een afwijkend pakketje wordt gevonden
+		Arrow wait -> wait			if (and receive found new color) (and receive all done) (and receive sonar) //als er een afwijkend pakketje wordt gevonden
 
 		Arrow wander -> finished 		if (and receive everything done)
 		

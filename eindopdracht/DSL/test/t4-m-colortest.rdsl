@@ -3,7 +3,7 @@ Automaton: examplebt
 	 States: 
 	 State s1 do init bt "rover2"
 	 State s2 do drive forwards INF speed 100
-	 State s3 do stop, drive backwards duration 1 sec speed 100, beep, turn right 180
+	 State s3 do consume package, stop, drive backwards duration 1 sec speed 100, beep, turn right 180
 	 State s4 do stop
 	 
 	 Arrows:

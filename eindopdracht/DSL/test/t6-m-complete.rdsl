@@ -6,9 +6,11 @@ Automaton: examplebt
 		State wander				do drive forwards INF speed 200
 		State problemLeft 			do stop, drive backwards 1 sec speed 100, turn right (15,90)
 		State problemRight 			do stop, drive backwards 1 sec speed 100, turn left (15,90)
-		State sonarobstacle			do stop, drive backwards 1 sec speed 50, turn left (15,180)
-		State colorfound			do stop, park, send action done
-		State finished 				do stop, print "all done"
+		State sonarobstacle			do consume package, stop, drive backwards 1 sec speed 50, turn left (15,180)
+		State colorfound			do consume package, stop, park, send action done
+		State finished 				do consume package, stop, print "all done"
+		State wait				do consume package
+		State consumethenwander			do consume package
 	Arrows: 
 		Arrow btinit -> wander			if (and true)
 		Arrow wander -> problemLeft		if (and lightsensor left reads white) (and bumper left is pressed)
@@ -18,13 +20,14 @@ Automaton: examplebt
 		Arrow problemRight -> problemRight 	if (and lightsensor right reads white) (and bumper right is pressed)
 		Arrow problemRight -> wander 		if (and lightsensor right reads black bumper right is not pressed)
 
-		Arrow wander -> sonarobstacle		if (and receive sonarmessage)
+		Arrow wander -> sonarobstacle		if (and receive sonar)
 		Arrow sonarobstacle -> wander		if (and true)
 
-		Arrow wander -> colorfound		if (and receive newcolorfound)
+		Arrow wander -> colorfound		if (and receive found new color)
 		Arrow colorfound -> wait		if (and true)
-		Arrow wait -> wander			if (and receive action done)
-		Arrow wait -> wait			if (and receice ...andere pakketjes) (and timeout 10 sec)//als er een afwijkend pakketje wordt gevonden
+		Arrow wait -> consumethenwander		if (and receive action done)
+		Arrow consumethenwander -> wander	if (and true)
+		Arrow wait -> wait			if (and receive sonar) (and receive all done) (and receive found new color) //als er een afwijkend pakketje wordt gevonden
 
 		Arrow wander -> finished 		if (and receive everything done)
 		

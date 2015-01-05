@@ -20,7 +20,7 @@ Arrow:
 	'Arrow' from=[State] '->' to=[State] 'if' disjunctionlist += Conjunction+
 ;
 
-Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction | BeepAction | PrintAction) (', ')?
+Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction | BeepAction | PrintAction | ConsumeAction) (', ')?
 ;
 DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
 ;
@@ -44,7 +44,9 @@ BeepAction:
 PrintAction:
 	'print' msg = STRING
 ;
-
+ConsumeAction:
+	{ConsumeAction} 'consume package'
+;
 
 
 Conjunction:
@@ -52,7 +54,7 @@ Conjunction:
 ;
 
 Condition: //sensorcondition
-	(LightCondition | SonarCondition | BumperCondition | ColorCondition | TimeCondition | ReceiveCondition | True) (', ')?
+	(LightCondition | SonarCondition | BumperCondition | ColorCondition | NewColorCondition | TimeCondition | ReceiveCondition | MissionCompleteCondition | True) (', ')?
 ;
 
 ReceiveCondition:
@@ -71,6 +73,10 @@ ColorCondition:
 	'colorsensor reads' color = Color
 ;
 
+NewColorCondition:
+	{UncheckedCondition} 'color is new'
+;
+
 SonarCondition:
 	'sonar detects' value = SonarValue 'at' distance = INT
 ;
@@ -81,6 +87,10 @@ BumperCondition:
 
 TimeCondition:
 	'timeout' t = INT unit = TimeUnit
+;
+
+MissionCompleteCondition:
+	{MissionCompleteCondition} 'all colors found'
 ;
 
 enum BumperValue:
