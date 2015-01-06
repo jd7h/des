@@ -28,6 +28,12 @@ import robots.tasks.rDSL.Message
 import robots.tasks.rDSL.SendAction
 import robots.tasks.rDSL.ReceiveCondition
 import robots.tasks.rDSL.ParkAction
+import robots.tasks.rDSL.ConsumeAction
+import robots.tasks.rDSL.TempAction
+import robots.tasks.rDSL.Level
+import robots.tasks.rDSL.NewColorCondition
+import robots.tasks.rDSL.UncheckedCondition
+import robots.tasks.rDSL.MissionCompleteCondition
 
 class JavaGenerator {
 	
@@ -45,11 +51,13 @@ class JavaGenerator {
 	
 	def static slaveEquipment()'''
 	//standaard equipment op Robot Slave
-	private static RCXMotor tempArm;
+	private static RCXMotor tempMotor;
 	private static NXTRegulatedMotor lamp;
 	private static ColorSensor colorsens;
-	private static UltrasonicSensor sonic;
-	private static TemperatureSensor temp;
+	private static UltrasonicSensor sonar;
+	private static RCXTemperatureSensor tempSensor;
+	
+	private static Lake lakes [];
 	'''
 	
 	def static masterInit()'''
@@ -63,11 +71,12 @@ class JavaGenerator {
 	'''
 	
 	def static slaveInit()'''
-	tempArm = new RCXMotor(MotorPort.A);
+	tempMotor = new RCXMotor(MotorPort.A);
 	lamp = Motor.C;
 	colorsens = new ColorSensor(SensorPort.S1);
-	sonic = new UltrasonicSensor(SensorPort.S2);
-	temp = new TemperatureSensor(SensorPort.S3);
+	sonar = new UltrasonicSensor(SensorPort.S2);
+	tempSensor = new RCXTemperatureSensor(SensorPort.S3);
+	lakes = new Lake[3];
 	'''
 
 	def static generateMain(Resource resource)'''
@@ -93,6 +102,7 @@ class JavaGenerator {
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.ColorSensor;
 	import lejos.nxt.TemperatureSensor;
+	import lejos.nxt.addon.RCXTemperatureSensor;
 
 	//actuators
 	import lejos.nxt.Motor;
@@ -340,7 +350,8 @@ class JavaGenerator {
 		switch (action.message){
 			case Message::SONAR: return ''' btThread.write(getLastSonarData());'''
 			case Message::ALLDONE: return '''btThread.write(300);''' 
-			case Message::NEWCOLOR: return '''btThread.write(400);'''
+			case Message::NEWCOLOR: return '''LCD.drawString("found new color", 1, 1);
+												btThread.write(400);'''
 			case Message::ACTIONDONE: return '''btThread.write(500);'''
 			default: return '''btThread.write(-1);'''	
 		}
@@ -445,8 +456,25 @@ class JavaGenerator {
 	//returns the code for print on the screen
 	def static dispatch action2code(PrintAction action)'''
 		LCD.clear();
-		LCD.drawString("«action.msg»",0,2);'''		
+		LCD.drawString("«action.msg»",0,2);'''
 		
+	//consume action
+	//removes the first package of the bt list
+	def static dispatch action2code(ConsumeAction action)'''
+		btThread.popElement();'''		
+	
+	//Temperature arm action
+	//returns the code for print on the screen
+	def static dispatch action2code(TempAction action){
+		switch (action.level){
+			case Level::UP: return   '''/* raise temp sensor */
+tempMotor.setPower(100);''' 
+			case Level::DOWN: return '''/* lower sensor by RCX motor */
+									  tempMotor.setPower(-100); 
+									  tempMotor.setPower(0);'''
+			case Level::MEASURE: return '''(int) tempSensor.getCelcius();'''
+		}
+	}
 		
 	
 	//Arrows
@@ -532,11 +560,11 @@ class JavaGenerator {
 		else{
 			switch(condition.color)
 			{
-				case Color::BLUE: return '''lejos.robotics.Colors.Color.BLUE '''
-				case Color::BLACK: return '''lejos.robotics.Colors.Color.BLACK'''
-				case Color::RED: return '''lejos.robotics.Colors.Color.RED'''
-				case Color::GREEN: return '''lejos.robotics.Colors.Color.GREEN'''
-				case Color::WHITE: return '''lejos.robotics.Colors.Color.WHITE'''
+				case Color::BLUE: return '''lejos.robotics.Color.BLUE == colorsens.getColorID()'''
+				case Color::BLACK: return '''lejos.robotics.Color.BLACK == colorsens.getColorID()'''
+				case Color::RED: return '''lejos.robotics.Color.RED == colorsens.getColorID()'''
+				case Color::GREEN: return '''lejos.robotics.Color.GREEN == colorsens.getColorID()'''
+				case Color::WHITE: return '''lejos.robotics.Color.WHITE == colorsens.getColorID()'''
 			}
 		}
 	}
@@ -563,6 +591,23 @@ class JavaGenerator {
 				default: return '''false'''	//TODO change to error statement
 			}
 	}
+	
+	
+	def static dispatch condition2code(MissionCompleteCondition condition, Resource resource)
+		'''(lakes[0].number != 0 && lakes[1].number != 0 && lakes[2].number != 0 )'''
+	
+	def static dispatch condition2code(UncheckedCondition condition, Resource resource)
+		'''(!(lakes[0].color == colorsens.getColorID()|lakes[1].color == colorsens.getColorID()|lakes[2].color == colorsens.getColorID()))
+				'''
+/*			'''for(int i = 0; i<3; i++)
+			{
+				if(!lakes[i].color == colorsens.getColorID())
+				{
+					lakes[i].color = colorsens.getColorID();
+					lakes[i].number = i+1;
+				}
+			}''' */			
+
 	
 
 }

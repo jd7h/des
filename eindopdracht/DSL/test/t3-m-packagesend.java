@@ -168,7 +168,7 @@ public static void Start()
 	//when done, wait for a trigger for a transition
 	boolean transitionTaken = false; 
 	while(!transitionTaken){	
-			if(btThread.getElement() == 300
+			if(btThread.peekElement() == 300
 			){
 				current = State.FINISHED;
 				transitionTaken = true;

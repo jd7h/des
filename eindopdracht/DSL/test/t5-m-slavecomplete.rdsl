@@ -2,12 +2,12 @@ Automaton: examplebt
 	Class: master
 
 	States: 
-		State btinit 				do bt init "slavename" 
-		State wander 				do nothing
+		State btinit 				do init bt "NXT2" 
+		State wander 				do 
 		State sonarobstacle			do consume package, print "sonar sees something", beep
 		State colorfound			do consume package, print "new color found", beep, beep, send action done
 		State finished 				do consume package, print "all done"
-		State wait				do consume package
+		State wacht				    do consume package
 	Arrows: 
 		Arrow btinit -> wander			if (and true)
 
@@ -15,11 +15,11 @@ Automaton: examplebt
 		Arrow sonarobstacle -> wander		if (and true)
 
 		Arrow wander -> colorfound		if (and receive found new color)
-		Arrow colorfound -> wait		if (and true)
-		Arrow wait -> wander			if (and receive action done)
-		Arrow wait -> wait			if (and receive found new color) (and receive all done) (and receive sonar) //als er een afwijkend pakketje wordt gevonden
+		Arrow colorfound -> wacht		if (and true)  
+		Arrow wacht -> wander			if (and receive action done)
+		Arrow wacht -> wacht				if (and receive found new color) (and receive all done) (and receive sonar) //als er een afwijkend pakketje wordt gevonden
 
-		Arrow wander -> finished 		if (and receive everything done)
+		Arrow wander -> finished 		if (and receive all done)
 		
 	
 	Start state: btinit

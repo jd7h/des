@@ -20,7 +20,7 @@ Arrow:
 	'Arrow' from=[State] '->' to=[State] 'if' disjunctionlist += Conjunction+
 ;
 
-Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction | BeepAction | PrintAction | ConsumeAction) (', ')?
+Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction | BeepAction | PrintAction | ConsumeAction | TempAction) (', ')? 
 ;
 DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
 ;
@@ -48,6 +48,9 @@ ConsumeAction:
 	{ConsumeAction} 'consume package'
 ;
 
+TempAction:
+	'temparm' level = Level
+;
 
 Conjunction:
 	'(and ' conjuctionlist += Condition+ ')'
@@ -143,4 +146,10 @@ enum Message:
 enum Type:
 	MASTER = 'master' |
 	SLAVE =  'slave'
+;
+
+enum Level:
+	UP = 'up' |
+	DOWN = 'down' |
+	MEASURE = 'measure'
 ;

@@ -1,4 +1,4 @@
-package example1;
+package Robot;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
