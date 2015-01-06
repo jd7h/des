@@ -4,14 +4,16 @@ import lejos.robotics.Color;
 
 public class Lake {
 
+	public boolean found;
 	public int color; // which color
-	public double celcius; //which temp 
-	public int number; //at which place the lake is found
+	public float celsius; //which temp 
+	//public int number; //at which place the lake is found
 	
-	public Lake() {
-		color = Color.WHITE;
-		celcius = 0.0;
-		number = 0;
+	public Lake(int color) {
+		this.color = color;
+		celsius = 0;
+		found = false;
+		//number = 0;
 	}
 
 }

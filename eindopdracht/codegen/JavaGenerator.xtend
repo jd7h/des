@@ -58,6 +58,7 @@ class JavaGenerator {
 	private static RCXTemperatureSensor tempSensor;
 	
 	private static Lake lakes [];
+	private static int nrcolors = 3;
 	'''
 	
 	def static masterInit()'''
@@ -77,6 +78,10 @@ class JavaGenerator {
 	sonar = new UltrasonicSensor(SensorPort.S2);
 	tempSensor = new RCXTemperatureSensor(SensorPort.S3);
 	lakes = new Lake[3];
+	lakes[0] = new Lake(Color.RED);
+	lakes[1] = new Lake(Color.BLUE);
+	lakes[2] = new Lake(Color.GREEN);
+	
 	'''
 
 	def static generateMain(Resource resource)'''
@@ -101,6 +106,7 @@ class JavaGenerator {
 	import lejos.nxt.UltrasonicSensor;
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.ColorSensor;
+	import lejos.robotics.Color;
 	import lejos.nxt.TemperatureSensor;
 	import lejos.nxt.addon.RCXTemperatureSensor;
 
@@ -134,9 +140,8 @@ class JavaGenerator {
 	
 	//public variables 
 	public static State current;
-	private static ListIterator<Integer> it;
 	
-	//maak een enum van de beginstates
+	//maak een enum van de states
 		public enum State {
 		«FOR s : Auxiliary.getStates(resource) SEPARATOR ','»
 			«Auxiliary.getStateItem(s)»
@@ -154,7 +159,7 @@ class JavaGenerator {
 	«slaveEquipment()»
 	«ENDIF»
 	
-	//bluetooth draadje
+	//bluetooth thread
 	private static BTfunctionality btThread;
 	
 		
@@ -184,7 +189,7 @@ class JavaGenerator {
 	}
 
 	
-	//make methods for every state seperately
+	//a method for every state
 	«FOR s : Auxiliary.getStates(resource) SEPARATOR '\n'»
 	public static void «Auxiliary.getStateMethod(s)»()
 	{
@@ -260,12 +265,6 @@ class JavaGenerator {
 	    return randomNum;
 	}
 	
-	//TODO: sonar stubfunction
-	public static int getLastSonarData()
-	{
-		return 255;
-	}
-		 
 }	
 '''
 		
@@ -348,11 +347,10 @@ class JavaGenerator {
 	//SendAction 
 	def static dispatch action2code(SendAction action){
 		switch (action.message){
-			case Message::SONAR: return ''' btThread.write(getLastSonarData());'''
-			case Message::ALLDONE: return '''btThread.write(300);''' 
-			case Message::NEWCOLOR: return '''LCD.drawString("found new color", 1, 1);
-												btThread.write(400);'''
-			case Message::ACTIONDONE: return '''btThread.write(500);'''
+			case Message::SONAR: return ''' btThread.write(sonar.getDistance()); //sends the data from the sonar '''		//todo
+			case Message::ALLDONE: return '''btThread.write(300); //sends the message 'all done' ''' 
+			case Message::NEWCOLOR: return '''btThread.write(400);  //sends the message 'new color found' '''
+			case Message::ACTIONDONE: return '''btThread.write(500);  //sends the message 'action done' '''
 			default: return '''btThread.write(-1);'''	
 		}
 	}
@@ -450,7 +448,7 @@ class JavaGenerator {
 	//beep action
 	//returns the code for a beep sound
 	def static dispatch action2code(BeepAction action)'''
-		Sound.beepSequenceUp();'''
+		Sound.beep();'''
 		
 	//print action
 	//returns the code for print on the screen
@@ -467,12 +465,24 @@ class JavaGenerator {
 	//returns the code for print on the screen
 	def static dispatch action2code(TempAction action){
 		switch (action.level){
-			case Level::UP: return   '''/* raise temp sensor */
-tempMotor.setPower(100);''' 
-			case Level::DOWN: return '''/* lower sensor by RCX motor */
-									  tempMotor.setPower(-100); 
-									  tempMotor.setPower(0);'''
-			case Level::MEASURE: return '''(int) tempSensor.getCelcius();'''
+			case Level::UP: return'''
+				//raise temp sensor
+				tempMotor.setPower(100);
+				''' 
+			case Level::DOWN: return '''
+				//lower sensor by RCX motor
+				tempMotor.setPower(-100); 
+				tempMotor.setPower(0);
+				'''
+			case Level::MEASURE: return '''
+				for(int i = 0; i < nrcolors; i++)
+				{
+					if(colorsens.getColorID() == lakes[i].color && !lakes[i].found) // kleuren komen overeen
+						lakes[i].celsius = tempSensor.getCelcius();
+						lakes[i].found = true;
+						return;
+				}
+				'''
 		}
 	}
 		
@@ -584,7 +594,7 @@ tempMotor.setPower(100);'''
 	def static dispatch condition2code(ReceiveCondition condition, Resource resource)
 	{
 		switch (condition.message){
-				case Message::SONAR: return '''btThread.peekElement >= 0 && btThread.peekElement() <= 255'''
+				case Message::SONAR: return '''btThread.peekElement() >= 0 && btThread.peekElement() <= 255'''
 				case Message::ALLDONE: return '''btThread.peekElement() == 300''' 
 				case Message::NEWCOLOR: return '''btThread.peekElement() == 400'''
 				case Message::ACTIONDONE: return '''btThread.peekElement() == 500'''
@@ -594,7 +604,7 @@ tempMotor.setPower(100);'''
 	
 	
 	def static dispatch condition2code(MissionCompleteCondition condition, Resource resource)
-		'''(lakes[0].number != 0 && lakes[1].number != 0 && lakes[2].number != 0 )'''
+		'''lakes[0].found && lakes[1].found && lakes[2].found'''
 	
 	def static dispatch condition2code(UncheckedCondition condition, Resource resource)
 		'''(!(lakes[0].color == colorsens.getColorID()|lakes[1].color == colorsens.getColorID()|lakes[2].color == colorsens.getColorID()))

@@ -19,6 +19,7 @@
 	import lejos.nxt.UltrasonicSensor;
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.ColorSensor;
+	import lejos.robotics.Color;
 	import lejos.nxt.TemperatureSensor;
 	import lejos.nxt.addon.RCXTemperatureSensor;
 
@@ -52,9 +53,8 @@
 	
 	//public variables 
 	public static State current;
-	private static ListIterator<Integer> it;
 	
-	//maak een enum van de beginstates
+	//maak een enum van de states
 		public enum State {
 		BTINIT,
 		WANDER,
@@ -77,7 +77,7 @@
 	private static TouchSensor bumperR;
 	private static NXTRegulatedMotor lamp;
 	
-	//bluetooth draadje
+	//bluetooth thread
 	private static BTfunctionality btThread;
 	
 		
@@ -108,7 +108,7 @@
 	}
 
 	
-	//make methods for every state seperately
+	//a method for every state
 	public static void Btinit()
 	{
 		//execute all actions of this state
@@ -185,7 +185,7 @@
 		//when done, wait for a trigger for a transition
 		boolean transitionTaken = false; 
 		while(!transitionTaken){	
-			if((btThread.peekElement >= 0 && btThread.peekElement() <= 255
+			if((btThread.peekElement() >= 0 && btThread.peekElement() <= 255
 			)){
 				current = State.SONAROBSTACLE;
 				transitionTaken = true;
@@ -210,7 +210,7 @@
 		btThread.popElement();
 		LCD.clear();
 		LCD.drawString("sonar sees something",0,2);
-		Sound.beepSequenceUp();
+		Sound.beep();
 		
 
 		//leg de huidige tijd vast voor alle transitions met een timeoutcondition
@@ -219,7 +219,7 @@
 		//when done, wait for a trigger for a transition
 		boolean transitionTaken = false; 
 		while(!transitionTaken){	
-			if((true
+			if((starttime + 3000 <= System.currentTimeMillis()
 			)){
 				current = State.WANDER;
 				transitionTaken = true;
@@ -234,9 +234,9 @@
 		btThread.popElement();
 		LCD.clear();
 		LCD.drawString("new color found",0,2);
-		Sound.beepSequenceUp();
-		Sound.beepSequenceUp();
-		btThread.write(500);
+		Sound.beep();
+		Sound.beep();
+		btThread.write(500);  //sends the message 'action done' 
 		
 
 		//leg de huidige tijd vast voor alle transitions met een timeoutcondition
@@ -245,7 +245,7 @@
 		//when done, wait for a trigger for a transition
 		boolean transitionTaken = false; 
 		while(!transitionTaken){	
-			if((true
+			if((starttime + 3000 <= System.currentTimeMillis()
 			)){
 				current = State.WACHT;
 				transitionTaken = true;
@@ -283,7 +283,7 @@
 			}else if(
 (btThread.peekElement() == 400
 			)||(btThread.peekElement() == 300
-			)||(btThread.peekElement >= 0 && btThread.peekElement() <= 255
+			)||(btThread.peekElement() >= 0 && btThread.peekElement() <= 255
 			)){
 				current = State.WACHT;
 				transitionTaken = true;
@@ -352,10 +352,4 @@
 	    return randomNum;
 	}
 	
-	//TODO: sonar stubfunction
-	public static int getLastSonarData()
-	{
-		return 255;
-	}
-		 
 }	

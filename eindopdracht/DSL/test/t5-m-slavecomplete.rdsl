@@ -12,10 +12,10 @@ Automaton: examplebt
 		Arrow btinit -> wander			if (and true)
 
 		Arrow wander -> sonarobstacle		if (and receive sonar)
-		Arrow sonarobstacle -> wander		if (and true)
+		Arrow sonarobstacle -> wander		if (and timeout 3 sec)
 
 		Arrow wander -> colorfound		if (and receive found new color)
-		Arrow colorfound -> wacht		if (and true)  
+		Arrow colorfound -> wacht		if (and timeout 3 sec)
 		Arrow wacht -> wander			if (and receive action done)
 		Arrow wacht -> wacht				if (and receive found new color) (and receive all done) (and receive sonar) //als er een afwijkend pakketje wordt gevonden
 

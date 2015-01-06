@@ -5,12 +5,12 @@ Automaton: examplebtslave
 	 State watch		do 
 	 State sonarflag	do beep, send sonar
 	 State colorflag	do beep, send found new color
-	 State measurement	do consume package, beep, beep, temparm down , temparm measure, temparm up, send action done
+	 State measurement	do consume package, beep, beep, temparm down, temparm measure, temparm up, send action done
 	 State finished		do beep, beep, beep, send all done
 	 
 	 Arrows:
 	 Arrow btinit -> watch		if (and true)
-	 Arrow watch -> sonarflag		if (and sonar detects something at 1)
+	 Arrow watch -> sonarflag		if (and sonar detects something at 10)
 	 Arrow watch -> colorflag		if (and colorsensor reads red) (and colorsensor reads blue) (and colorsensor reads green)
 	 Arrow sonarflag -> watch		if (and true)
 	 Arrow colorflag -> watch		if (and timeout 30 sec) //voor robuustheid?

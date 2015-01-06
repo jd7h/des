@@ -19,6 +19,7 @@
 	import lejos.nxt.UltrasonicSensor;
 	import lejos.nxt.TouchSensor;
 	import lejos.nxt.ColorSensor;
+	import lejos.robotics.Color;
 	import lejos.nxt.TemperatureSensor;
 	import lejos.nxt.addon.RCXTemperatureSensor;
 
@@ -52,9 +53,8 @@
 	
 	//public variables 
 	public static State current;
-	private static ListIterator<Integer> it;
 	
-	//maak een enum van de beginstates
+	//maak een enum van de states
 		public enum State {
 		BTINIT,
 		WATCH,
@@ -76,8 +76,9 @@
 	private static RCXTemperatureSensor tempSensor;
 	
 	private static Lake lakes [];
+	private static int nrcolors = 3;
 	
-	//bluetooth draadje
+	//bluetooth thread
 	private static BTfunctionality btThread;
 	
 		
@@ -89,6 +90,10 @@
 		sonar = new UltrasonicSensor(SensorPort.S2);
 		tempSensor = new RCXTemperatureSensor(SensorPort.S3);
 		lakes = new Lake[3];
+		lakes[0] = new Lake(Color.RED);
+		lakes[1] = new Lake(Color.BLUE);
+		lakes[2] = new Lake(Color.GREEN);
+		
 		
 		//zet de robot in de beginstate
 		current = State.BTINIT;
@@ -107,7 +112,7 @@
 	}
 
 	
-	//make methods for every state seperately
+	//a method for every state
 	public static void Btinit()
 	{
 		//execute all actions of this state
@@ -155,7 +160,7 @@
 		//when done, wait for a trigger for a transition
 		boolean transitionTaken = false; 
 		while(!transitionTaken){	
-			if((sonar.getDistance() <= 1
+			if((sonar.getDistance() <= 10
 			)){
 				current = State.SONARFLAG;
 				transitionTaken = true;
@@ -174,8 +179,8 @@
 	{
 		//execute all actions of this state
 		LCD.drawString("Sonarflag",0,3);
-		Sound.beepSequenceUp();
-		 btThread.write(getLastSonarData());
+		Sound.beep();
+		 btThread.write(sonar.getDistance()); //sends the data from the sonar 
 		
 
 		//leg de huidige tijd vast voor alle transitions met een timeoutcondition
@@ -196,9 +201,8 @@
 	{
 		//execute all actions of this state
 		LCD.drawString("Colorflag",0,3);
-		Sound.beepSequenceUp();
-		LCD.drawString("found new color", 1, 1);
-														btThread.write(400);
+		Sound.beep();
+		btThread.write(400);  //sends the message 'new color found' 
 		
 
 		//leg de huidige tijd vast voor alle transitions met een timeoutcondition
@@ -225,15 +229,21 @@
 		//execute all actions of this state
 		LCD.drawString("Measurement",0,3);
 		btThread.popElement();
-		Sound.beepSequenceUp();
-		Sound.beepSequenceUp();
-		/* lower sensor by RCX motor */
-											  tempMotor.setPower(-100); 
-											  tempMotor.setPower(0);
-		(int) tempSensor.getCelcius();
-		/* raise temp sensor */
+		Sound.beep();
+		Sound.beep();
+		//lower sensor by RCX motor
+		tempMotor.setPower(-100); 
+		tempMotor.setPower(0);
+		for(int i = 0; i < nrcolors; i++)
+		{
+			if(colorsens.getColorID() == lakes[i].color && !lakes[i].found) // kleuren komen overeen
+				lakes[i].celsius = tempSensor.getCelcius();
+				lakes[i].found = true;
+				return;
+		}
+		//raise temp sensor
 		tempMotor.setPower(100);
-		btThread.write(500);
+		btThread.write(500);  //sends the message 'action done' 
 		
 
 		//leg de huidige tijd vast voor alle transitions met een timeoutcondition
@@ -242,7 +252,7 @@
 		//when done, wait for a trigger for a transition
 		boolean transitionTaken = false; 
 		while(!transitionTaken){	
-			if(((lakes[0].number != 0 && lakes[1].number != 0 && lakes[2].number != 0 )
+			if((lakes[0].found && lakes[1].found && lakes[2].found
 			)){
 				current = State.FINISHED;
 				transitionTaken = true;
@@ -259,10 +269,10 @@
 	{
 		//execute all actions of this state
 		LCD.drawString("Finished",0,3);
-		Sound.beepSequenceUp();
-		Sound.beepSequenceUp();
-		Sound.beepSequenceUp();
-		btThread.write(300);
+		Sound.beep();
+		Sound.beep();
+		Sound.beep();
+		btThread.write(300); //sends the message 'all done' 
 		
 	}
 
@@ -327,11 +337,4 @@
 	    return randomNum;
 	}
 	
-	//TODO: sonar stubfunction
-	public static int getLastSonarData()
-	{
-		return 255;
-	}
-		 
 }	
-
