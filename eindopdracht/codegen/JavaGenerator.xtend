@@ -59,6 +59,7 @@ class JavaGenerator {
 	
 	private static Lake lakes [];
 	private static int nrcolors = 3;
+	private static boolean colorarray [];
 	'''
 	
 	def static masterInit()'''
@@ -81,6 +82,10 @@ class JavaGenerator {
 	lakes[0] = new Lake(Color.RED);
 	lakes[1] = new Lake(Color.BLUE);
 	lakes[2] = new Lake(Color.GREEN);
+	colorarray = new boolean[13];
+	for (int i = 0;i<colorarray.length;i++)
+			colorarray[i] = false;
+	
 	
 	'''
 
@@ -478,9 +483,12 @@ class JavaGenerator {
 				for(int i = 0; i < nrcolors; i++)
 				{
 					if(colorsens.getColorID() == lakes[i].color && !lakes[i].found) // kleuren komen overeen
+					{
 						lakes[i].celsius = tempSensor.getCelcius();
 						lakes[i].found = true;
+						colorarray[colorsens.getColorID()] = true;
 						return;
+					}
 				}
 				'''
 		}
@@ -607,8 +615,8 @@ class JavaGenerator {
 		'''lakes[0].found && lakes[1].found && lakes[2].found'''
 	
 	def static dispatch condition2code(UncheckedCondition condition, Resource resource)
-		'''(!(lakes[0].color == colorsens.getColorID()|lakes[1].color == colorsens.getColorID()|lakes[2].color == colorsens.getColorID()))
-				'''
+		'''!colorarray[colorsens.getColorID()]'''
+		//'''(!(lakes[0].color == colorsens.getColorID()|lakes[1].color == colorsens.getColorID()|lakes[2].color == colorsens.getColorID()))'''
 /*			'''for(int i = 0; i<3; i++)
 			{
 				if(!lakes[i].color == colorsens.getColorID())
