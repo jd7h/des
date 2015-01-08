@@ -1,0 +1,33 @@
+Automaton: examplebtslave
+	Class: slave
+	 States: 
+	 State btinit		do wait for bt
+	 State watch		do 
+	 State sonarflag	do send sonar
+	 State colorflag	do send found new color
+	 State waitfor500	do consume package
+	 State measurement	do consume package, beep, temparm down, temparm measure, temparm up
+	 State mastercontinue do send action done
+	 State finished		do beep, beep, beep, send all done
+	 
+	 Arrows:
+	 Arrow btinit -> watch		if (and true)
+	 
+	 Arrow watch -> sonarflag		if (and sonar detects something at 10)
+	 Arrow watch -> colorflag		if (and colorsensor reads red color is new) (and colorsensor reads blue color is new) (and colorsensor reads green color is new)
+	 
+	 Arrow sonarflag -> watch		if (and true)
+
+	 Arrow colorflag -> measurement 	if (and receive action done)
+	 Arrow colorflag -> waitfor500		if (and receive found new color) (and receive all done) (and receive sonar)
+	 
+	 Arrow waitfor500 -> measurement	if (and receive action done)
+	 Arrow waitfor500 -> waitfor500		if (and receive found new color) (and receive all done) (and receive sonar)
+	 
+	 Arrow measurement -> finished			if (and all colors found)
+	 Arrow measurement -> mastercontinue	if (and true)
+	 
+	 Arrow mastercontinue -> watch			if(and true)
+	
+	 Start state: btinit
+	 End state: finished

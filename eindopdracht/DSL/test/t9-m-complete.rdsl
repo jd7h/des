@@ -1,0 +1,55 @@
+Automaton: examplebt
+	Class: master
+
+	States: 
+		State calibratesens			do calibrate
+		State btinit 				do init bt "NXT2" 
+		
+		State sonarobstacle			do stop, drive backwards duration 1 sec speed 200 turn right (15,90), process sonar packages, print "sonar sees something", beep
+		State colorfound			do stop, park, consume package, print "new color found", beep, beep, send action done
+		State waitfor300500			do consume package
+		State waitfor400sonar		do consume package
+		
+		State uitparkeren			do drive backwards duration 1 sec speed 200 turn right (45,180)
+		
+		State finished 				do stop consume package, print "all done"
+		
+		State watch 				do drive forwards INF speed 200
+		State problemLeft 			do stop drive backwards duration 1 sec speed 200 turn right (15,90)
+		State problemRight 			do stop drive backwards duration 1 sec speed 200 turn left (15,90)
+		
+		
+	Arrows: 
+		Arrow calibratesens -> btinit	if (and true)
+		Arrow btinit -> watch			if (and true)
+		
+		Arrow watch -> problemLeft if (and lightsensor left reads white) (and bumper left is pressed)
+		Arrow problemLeft -> watch if (and lightsensor left reads black bumper left is not pressed)
+		Arrow problemLeft -> problemLeft if (and lightsensor left reads white) (and bumper left is pressed)
+		Arrow watch -> problemRight if (and lightsensor right reads white) (and bumper right is pressed)
+		Arrow problemRight -> problemRight if (and lightsensor right reads white) (and bumper right is pressed)
+		Arrow problemRight -> watch if (and lightsensor right reads black bumper right is not pressed)
+		
+		Arrow watch -> waitfor400sonar	if (and receive action done) (and receive all done)
+		Arrow watch -> colorfound		if (and receive found new color)
+		Arrow watch -> sonarobstacle	if (and receive sonar)
+		
+		Arrow sonarobstacle -> watch	if (and true)
+		
+		//Arrow waitfor400sonar -> waitfor400sonar if (and receive action done) (and receive all done)
+		//Arrow waitfor400sonar -> colorfound if (and receive found new color)
+		//Arrow waitfor400sonar -> sonarobstacle if (and receive sonar)
+		Arrow waitfor400sonar -> watch if (and true)
+		
+		Arrow colorfound -> finished	if (and receive all done)
+		Arrow colorfound -> waitfor300500 if (and receive sonar) (and receive found new color)
+		Arrow colorfound -> uitparkeren			if (and receive action done)
+		
+		Arrow waitfor300500 -> finished if(and receive all done)
+		Arrow waitfor300500 -> uitparkeren if (and receive action done)
+		Arrow waitfor300500 -> waitfor300500 if (and receive sonar) (and receive found new color)
+			
+		Arrow uitparkeren -> watch if(and true)
+	
+	Start state: calibratesens
+	End state: finished

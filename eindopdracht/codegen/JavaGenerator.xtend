@@ -34,6 +34,7 @@ import robots.tasks.rDSL.Level
 import robots.tasks.rDSL.NewColorCondition
 import robots.tasks.rDSL.UncheckedCondition
 import robots.tasks.rDSL.MissionCompleteCondition
+import robots.tasks.rDSL.ConsumeSonarAction
 
 class JavaGenerator {
 	
@@ -60,6 +61,7 @@ class JavaGenerator {
 	private static Lake lakes [];
 	private static int nrcolors = 3;
 	private static boolean colorarray [];
+	private static int lastcolorfound =-1;
 	'''
 	
 	def static masterInit()'''
@@ -480,6 +482,10 @@ class JavaGenerator {
 	def static dispatch action2code(ConsumeAction action)
 		'''	btThread.popElement();'''		
 	
+	def static dispatch action2code(ConsumeSonarAction action)
+		'''while(btThread.peekElement()<=255)
+			btThread.popElement();
+		'''
 	//Temperature arm action
 	//returns the code for print on the screen
 	def static dispatch action2code(TempAction action){
@@ -487,32 +493,37 @@ class JavaGenerator {
 			case Level::UP: return'''
 				//raise temp sensor
 				tempMotor.setPower(100);
-				Delay.msDelay(1000);
+				Delay.msDelay(2000);
 				tempMotor.setPower(0);
 				''' 
 			case Level::DOWN: return '''
+				lastcolorfound = colorsens.getColorID();
 				//lower temp sensor
 				tempMotor.setPower(-100); 
-				Delay.msDelay(1000);
+				Delay.msDelay(2000);
 				tempMotor.setPower(0);
 				'''
 			case Level::MEASURE: return '''
 				boolean set = false;
 				for(int i = 0; i < nrcolors; i++)
 				{
-					if(colorsens.getColorID() == lakes[i].color && !lakes[i].found) // kleuren komen overeen
+					if(lastcolorfound == lakes[i].color && !lakes[i].found) // kleuren komen overeen
 					{
 						lakes[i].celsius = tempSensor.getCelcius();
 						lakes[i].found = true;
 						colorarray[colorsens.getColorID()] = true;
 						set = true;
+						LCD.drawInt(lakes[i].celsius,0,5);
 					}
 				}
+				
 				if(!set)
-					LCD.drawString("Something went wrong with the measurement!", 0, 0);
+					Sound.buzz();
+				//	LCD.drawString("Something went wrong with the measurement!", 0, 0);
 				'''
 		}
 	}
+	
 		
 	
 	//Arrows
