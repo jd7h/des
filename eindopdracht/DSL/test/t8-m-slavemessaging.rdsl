@@ -1,0 +1,36 @@
+Automaton: examplebt
+	Class: master
+
+	States: 
+		State btinit 				do init bt "NXT2" 
+		State watch 				do 
+		State sonarobstacle			do consume package, print "sonar sees something", beep
+		State colorfound			do consume package, print "new color found", beep, beep, send action done
+		State waitfor300500			do consume package
+		State waitfor400sonar		do consume package
+		State finished 				do consume package, print "all done"
+		
+	Arrows: 
+		Arrow btinit -> watch			if (and true)
+		
+		Arrow watch -> waitfor400sonar	if (and receive action done) (and receive all done)
+		Arrow watch -> colorfound		if (and receive found new color)
+		Arrow watch -> sonarobstacle	if (and receive sonar)
+		
+		Arrow sonarobstacle -> watch	if (and true)
+		
+		Arrow waitfor400sonar -> waitfor400sonar if (and receive action done) (and receive all done)
+		Arrow waitfor400sonar -> colorfound if (and receive found new color)
+		Arrow waitfor400sonar -> sonarobstacle if (and receive sonar)
+		
+		Arrow colorfound -> finished	if (and receive all done)
+		Arrow colorfound -> waitfor300500 if (and receive sonar) (and receive found new color)
+		Arrow colorfound -> watch			if (and receive action done)
+		
+		Arrow waitfor300500 -> finished if(and receive all done)
+		Arrow waitfor300500 -> watch if (and receive action done)
+		Arrow waitfor300500 -> waitfor300500 if (and receive sonar) (and receive found new color)
+			
+	
+	Start state: btinit
+	End state: finished
