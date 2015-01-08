@@ -1,0 +1,19 @@
+Automaton: examplebt
+	Class: master
+	 States: 
+	 State btinit do init bt "rover2"
+	 State drivef do drive forwards INF speed 100
+	 State backup do consume package 400, stop, drive backwards duration 1 sec speed 100, beep, turn right 180
+	 State senddone do send action done
+	 State finished do beep
+	 
+	 Arrows:
+	 Arrow btinit -> drivef if (and true)
+	 Arrow drivef -> backup if (and receive found new color)
+	 Arrow backup -> drivef if (and true)
+	 Arrow drivef -> senddone if (and timeout 10 sec)
+	 Arrow senddone -> drivef if (and true)
+	 Arrow drivef -> finished if (and timeout 20 sec)
+
+	 Start state: btinit
+	 End state: finished

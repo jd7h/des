@@ -1,0 +1,32 @@
+Automaton: examplebt
+	Class: master
+
+	States: 
+		State btinit 				do init bt "Rover2" 
+		State waitfor300			do
+		State waitconsume300		do consume package 400 consume package 500
+		State waitfor500			do
+		State waitconsume500		do consume package 300 consume package 400
+		State write300				do consume package 300, send all done
+		State write500				do consume package 500, send action done
+		State finished				do beep beep
+		
+	Arrows: 
+		Arrow btinit -> waitfor300 if (and true)
+		
+		Arrow waitfor300 -> write300 if (and receive all done)
+		Arrow waitfor300 -> waitconsume300 if (and receive found new color) (and receive action done)
+		Arrow waitconsume300 -> waitconsume300 if (and receive found new color) (and receive action done)
+		Arrow waitconsume300 -> write300 if (and receive all done)
+		
+		Arrow write300 -> waitfor500 if (and true)
+		
+		Arrow waitfor500 -> write500 if (and receive action done)
+		Arrow waitfor500 -> waitconsume500 if (and receive all done) (and receive found new color)
+		Arrow waitconsume500 -> waitconsume500 if (and receive all done) (and receive found new color)
+		Arrow waitconsume500 -> write500 if (and receive action done)
+		
+		Arrow write500 -> finished if (and true)	
+	
+	Start state: btinit
+	End state: finished
