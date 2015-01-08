@@ -21,43 +21,34 @@ import lejos.nxt.LCD;
 class BTfunctionality extends Thread {
 
 	private DataInputStream dis;
-	private DataOutputStream dos;
-	private String threadname;
+		private String threadname;
 	private int buf;
 	public Queue<Integer> inputList;
 	
 
-	public BTfunctionality(String name, DataInputStream dis, DataOutputStream dos)
+	public BTfunctionality(String name, DataInputStream dis)
 	{
 		this.dis = dis;
-		this.dos = dos;
 		this.threadname = name;
 		inputList = new Queue<Integer>();
 		buf = -1;
 	}
 
 	public void run()
-	{
-		try {
-			buf = dis.readInt();
-			inputList.push(buf);
-		} catch (IOException e) {
-			LCD.clear();
-			LCD.drawString("Bluetooth error", 0, 1);
+	{	
+		while(true)
+		{
+			try {
+				buf = dis.readInt();
+				inputList.push(buf);
+			} catch (IOException e) {
+				LCD.clear();
+				LCD.drawString("Bluetooth error", 0, 1);
+			}
 		}
 		
 	}
 	
-	public void write(int msg) 
-	{
-		try {
-			dos.writeInt(msg);
-			dos.flush();
-		} catch (IOException e) {
-			LCD.clear();
-			LCD.drawString("Bluetooth writing Error", 0, 1);
-		}
-	}
 	
 	public Queue<Integer> getInputList()
 	{

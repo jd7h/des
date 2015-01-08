@@ -166,6 +166,7 @@ class JavaGenerator {
 	
 	//bluetooth thread
 	private static BTfunctionality btThread;
+	private static DataOutputStream dos;
 	
 		
 	public static void main(String[] args){
@@ -270,6 +271,17 @@ class JavaGenerator {
 	    return randomNum;
 	}
 	
+	public static void write(int msg) 
+	{
+		try {
+			dos.writeInt(msg);
+			dos.flush();
+		} catch (IOException e) {
+			LCD.clear();
+			LCD.drawString("Bluetooth writing Error", 0, 1);
+		}
+	}
+	
 }	
 '''
 		
@@ -352,11 +364,11 @@ class JavaGenerator {
 	//SendAction 
 	def static dispatch action2code(SendAction action){
 		switch (action.message){
-			case Message::SONAR: return ''' btThread.write(sonar.getDistance()); //sends the data from the sonar '''		//todo
-			case Message::ALLDONE: return '''btThread.write(300); //sends the message 'all done' ''' 
-			case Message::NEWCOLOR: return '''btThread.write(400);  //sends the message 'new color found' '''
-			case Message::ACTIONDONE: return '''btThread.write(500);  //sends the message 'action done' '''
-			default: return '''btThread.write(-1);'''	
+			case Message::SONAR: return ''' write(sonar.getDistance()); //sends the data from the sonar '''		//todo
+			case Message::ALLDONE: return '''write(300); //sends the message 'all done' ''' 
+			case Message::NEWCOLOR: return '''write(400);  //sends the message 'new color found' '''
+			case Message::ACTIONDONE: return '''write(500);  //sends the message 'action done' '''
+			default: return '''write(-1);'''	
 		}
 	}
 	
@@ -407,11 +419,12 @@ class JavaGenerator {
 				LCD.clear();
 				LCD.drawString("Connected", 0, 0);
 				LCD.refresh();
-				DataInputStream dis = btc.openDataInputStream();
-				DataOutputStream dos = btc.openDataOutputStream();
+				DataInputStream ldis = btc.openDataInputStream();
+				DataOutputStream ldos = btc.openDataOutputStream();
+				dos = ldos;
 				
-				//BTfunctionality btThread = new BTfunctionality("MasterReader",dis,dos);
-				btThread = new BTfunctionality("MasterReader",dis,dos);
+				//BTfunctionality btThread = new BTfunctionality("MasterReader",ldis);
+				btThread = new BTfunctionality("MasterReader",ldis);
 				//LCD.drawString("Thread initialist", 1, 4);
 				
 				btThread.start();
@@ -430,11 +443,12 @@ class JavaGenerator {
 				LCD.drawString("Connected",0,0);
 				LCD.refresh();	
 
-				DataInputStream dis = btc.openDataInputStream();
-				DataOutputStream dos = btc.openDataOutputStream();
+				DataInputStream ldis = btc.openDataInputStream();
+				DataOutputStream ldos = btc.openDataOutputStream();
+				dos = ldos;
 				
-				//BTfunctionality btThread = new BTfunctionality("SlaveReader",dis,dos);
-				btThread = new BTfunctionality("SlaveReader",dis,dos);
+				//BTfunctionality btThread = new BTfunctionality("SlaveReader",ldis);
+				btThread = new BTfunctionality("SlaveReader",ldis);
 				btThread.start();
 			'''
 		}
@@ -463,8 +477,8 @@ class JavaGenerator {
 		
 	//consume action
 	//removes the first package of the bt list
-	def static dispatch action2code(ConsumeAction action)'''
-		btThread.popElement();'''		
+	def static dispatch action2code(ConsumeAction action)
+		'''	btThread.popElement();'''		
 	
 	//Temperature arm action
 	//returns the code for print on the screen

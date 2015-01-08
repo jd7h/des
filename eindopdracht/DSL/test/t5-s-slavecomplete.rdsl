@@ -20,3 +20,27 @@ Automaton: examplebtslave
 	
 	 Start state: btinit
 	 End state: finished
+
+	 /*Automaton: examplebtslave
+	Class: slave
+	 States: 
+	 State btinit		do wait for bt
+	 State watch		do 
+	 State sonarflag	do beep, send sonar
+	 State colorflag	do beep, send found new color
+	 State measurement	do consume package, beep, beep, print "down", temparm down, print "measure", temparm measure, temparm up, send action done
+	 State finished		do beep, beep, beep, send all done
+	 
+	 Arrows:
+	 Arrow btinit -> watch		if (and true)
+	 Arrow watch -> sonarflag		if (and sonar detects something at 10)
+	 Arrow watch -> colorflag		if (and colorsensor reads red) (and colorsensor reads blue) (and colorsensor reads green)
+	 Arrow sonarflag -> watch		if (and true)
+	 Arrow colorflag -> watch		if (and timeout 30 sec) //voor robuustheid?
+	 Arrow colorflag -> measurement 	if (and receive action done)
+	 Arrow measurement -> finished	if (and all colors found)
+	 Arrow measurement -> watch		if (and true)
+	
+	 Start state: btinit
+	 End state: finished
+*/
