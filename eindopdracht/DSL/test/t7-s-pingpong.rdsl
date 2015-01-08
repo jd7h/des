@@ -4,12 +4,12 @@ Automaton: examplebtslave
 	States: 
 		State btinit 				do wait for bt
 		State waitfor300			do
-		State waitconsume300		do consume package 400, consume package 500
+		State waitconsume300		do consume package
 		State waitfor500			do
-		State waitconsume500		do consume package 300, consume package 400
+		State waitconsume500		do consume package
 		State write300				do send all done
-		State write500				do consume package 300, send action done
-		State finished				do consume package 500, beep beep
+		State write500				do consume package, send action done
+		State finished				do consume package, beep beep
 		
 	Arrows: 
 		Arrow btinit -> write300 if (and true)

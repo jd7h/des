@@ -4,11 +4,11 @@ Automaton: examplebt
 	States: 
 		State btinit 				do init bt "Rover2" 
 		State waitfor300			do
-		State waitconsume300		do consume package 400 consume package 500
+		State waitconsume300		do consume package
 		State waitfor500			do
-		State waitconsume500		do consume package 300 consume package 400
-		State write300				do consume package 300, send all done
-		State write500				do consume package 500, send action done
+		State waitconsume500		do consume package
+		State write300				do consume package, send all done
+		State write500				do consume package, send action done
 		State finished				do beep beep
 		
 	Arrows: 
