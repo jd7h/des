@@ -487,13 +487,17 @@ class JavaGenerator {
 			case Level::UP: return'''
 				//raise temp sensor
 				tempMotor.setPower(100);
+				Delay.msDelay(1000);
+				tempMotor.setPower(0);
 				''' 
 			case Level::DOWN: return '''
-				//lower sensor by RCX motor
+				//lower temp sensor
 				tempMotor.setPower(-100); 
+				Delay.msDelay(1000);
 				tempMotor.setPower(0);
 				'''
 			case Level::MEASURE: return '''
+				boolean set = false;
 				for(int i = 0; i < nrcolors; i++)
 				{
 					if(colorsens.getColorID() == lakes[i].color && !lakes[i].found) // kleuren komen overeen
@@ -501,9 +505,11 @@ class JavaGenerator {
 						lakes[i].celsius = tempSensor.getCelcius();
 						lakes[i].found = true;
 						colorarray[colorsens.getColorID()] = true;
-						return;
+						set = true;
 					}
 				}
+				if(!set)
+					LCD.drawString("Something went wrong with the measurement!", 0, 0);
 				'''
 		}
 	}

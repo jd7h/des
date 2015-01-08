@@ -38,6 +38,7 @@ class BTfunctionality extends Thread {
 	{	
 		while(true)
 		{
+			LCD.drawString(queueToString(),0,6);
 			try {
 				buf = dis.readInt();
 				inputList.push(buf);
@@ -47,6 +48,11 @@ class BTfunctionality extends Thread {
 			}
 		}
 		
+	}
+	
+	public String queueToString()
+	{
+		return inputList.toString();
 	}
 	
 	
