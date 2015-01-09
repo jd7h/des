@@ -295,6 +295,13 @@ class JavaGenerator {
 		}
 	}
 	
+	//delays for transitions, for when we want to do multiple measurements
+	public static boolean msDelay(int ms)
+	{
+		Delay.msDelay(ms);
+		return true;
+	}
+	
 }	
 '''
 		
@@ -393,9 +400,9 @@ class JavaGenerator {
 	//If lightsensor detects something else then black then the robot has to move more to this direction
 	//until both lightsensors detect something else then black
 	def static dispatch action2code(ParkAction action)'''
-	if(lightL.readNormalizedValue() >= DARK + 60) //dan staan we met de linkerlightsensor op de ring
+	if(lightL.readNormalizedValue() >= DARK + 60 && msDelay(100) && lightL.readNormalizedValue() >= DARK + 60 && msDelay(100) && lightL.readNormalizedValue() >= DARK + 60) //dan staan we met de linkerlightsensor op de ring
 			right.rotate(60);
-		else if (lightR.readNormalizedValue() >= DARK + 60) //dan staan we met de rechterlightsensor op de ring
+		else if (lightR.readNormalizedValue() >= DARK + 60 && msDelay(100) && lightR.readNormalizedValue() >= DARK + 60 && msDelay(100) && lightR.readNormalizedValue() >= DARK + 60) //dan staan we met de rechterlightsensor op de ring
 			left.rotate(60);
 		else{
 			//sluit uit: we staan al 'voorbij' het gat
@@ -408,7 +415,7 @@ class JavaGenerator {
 			{
 				time += 100;
 				Delay.msDelay(100);
-				if(lightL.readNormalizedValue() >= DARK + 60 && lightL.readNormalizedValue() >= DARK + 60 && lightL.readNormalizedValue() >= DARK + 60)
+				if(lightL.readNormalizedValue() >= DARK + 60 && msDelay(100) && lightL.readNormalizedValue() >= DARK + 60 && msDelay(100) && lightL.readNormalizedValue() >= DARK + 60)
 				{
 					left.stop(true);
 					right.stop();
@@ -416,7 +423,7 @@ class JavaGenerator {
 					//draai naar links
 					right.rotate(60);
 				}
-				else if(lightR.readNormalizedValue() >= DARK+60 && lightR.readNormalizedValue() >= DARK+60 && lightR.readNormalizedValue() >= DARK+60)
+				else if(lightR.readNormalizedValue() >= DARK+60 && msDelay(100) && lightR.readNormalizedValue() >= DARK+60 && msDelay(100) && lightR.readNormalizedValue() >= DARK+60)
 				{
 					left.stop(true);
 					right.stop();
