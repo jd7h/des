@@ -3,7 +3,7 @@ Automaton: examplebt
 
 	States: 
 		State calibratesens			do calibrate
-		State btinit 				do init bt "NXT2" 
+		State btinit 				do init bt "Rover2" 
 		
 		State sonarobstacle			do stop, drive backwards duration 1 sec speed 200 turn right (15,90), process sonar packages, print "sonar sees something", beep
 		State colorfound			do stop, park, consume package, print "new color found", beep, beep, send action done

@@ -1,0 +1,88 @@
+	
+		boolean seenL = false;
+		int degreesToRight = -1;
+		boolean seenR = false;
+		int degreesToLeft = -1;
+		int degrees = 0;
+		
+		while(degrees < 90)
+		{
+			right.rotate(15);
+			degrees += 15;
+			if(lightL.readValue() > DARK + 3)
+			{
+				seenL = true;
+				degreesToLeft = degrees;
+				break;
+			}
+			if(lightR.readValue() > DARK + 3)
+			{
+				seenR = true;
+				degreesToLeft = degrees;
+				break;
+			}		
+		}
+		if(degreesToLeft > 0)
+			right.rotate(-degreesToLeft);
+		else
+			right.rotate(-90);
+		degrees = 0;
+		while(degrees < 90)
+		{
+			left.rotate(15);
+			degrees += 15;
+			if(lightL.readValue() > DARK + 3)
+			{
+				seenL = true;
+				degreesToRight = degrees;
+				break;
+			}
+			if(lightR.readValue() > DARK + 3)
+			{
+				seenR = true;
+				degreesToRight = degrees;
+				break;
+			}		
+		}
+		if(degreesToRight> 0) 
+			left.rotate(-degreesToRight);
+		else
+			left.rotate(-90);
+		//right.backward();
+		//left.backward();
+		//Delay.msDelay(500);
+		//right.stop(true);
+		//left.stop();
+		//in theory: in original position
+		if(seenR & seenL)
+		{
+			left.rotate(degreesToRight/2);
+			right.rotate(degreesToLeft/2);
+			right.rotate(90);
+			right.backward();
+			left.backward();
+			Delay.msDelay(500);
+			right.stop(true);
+			left.stop();
+			
+			//int turn = degreesToRight - degreesToLeft;
+			//if (turn > 0)
+			//	left.rotate(turn);
+			//else
+			//	right.rotate(-1 * turn);
+		}
+		
+		/*
+		while(lightR.readValue()<=DARK+3 || lightL.readValue()<COLOR)
+		{
+			if(lightR.readValue() >= COLOR)
+				right.rotate(15);
+			else if(lightL.readValue() >= COLOR)
+				left.rotate(15);
+			else
+				right.rotate(10);
+			 	left.rotate(10);
+		}
+		*/
+		//right.rotate(-40);
+		//left.rotate(-40);

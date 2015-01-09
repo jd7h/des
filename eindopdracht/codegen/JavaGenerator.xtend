@@ -144,6 +144,10 @@ class JavaGenerator {
 	//Uncalibrated constants for the Lightsensorvalues
 	public static int BRIGHT = 40;
 	public static int DARK = 30;
+	public static int RED = 0;
+	public static int BLUE = 0;
+	public static int GREEN = 0;
+	public static int COLOR = 35;
 	
 	//public variables 
 	public static State current;
@@ -309,13 +313,17 @@ class JavaGenerator {
 				 	left.setSpeed(«s»);
 				 	right.forward();
 				 	left.forward();
-				 	Delay.msDelay(«n»);'''
+				 	Delay.msDelay(«n»);
+				 	left.stop(true);
+				 	right.stop();'''
 				 case DriveDirection::BACKWARDS: return '''
 				 	right.setSpeed(«s»);
 				 	left.setSpeed(«s»);
 				 	right.backward();
 				 	left.backward();
-				 	Delay.msDelay(«n»);'''
+				 	Delay.msDelay(«n»);
+				 	left.stop(true);
+				 	right.stop();'''
 			}	
 		}		 
 		switch(action.driveDir)
@@ -374,9 +382,24 @@ class JavaGenerator {
 		}
 	}
 	
-	//todo
 	//ParkAction
-	def static dispatch action2code(ParkAction action)''''''
+	//If lightsensor detects something else then black then the robot has to move more to this direction
+	//until both lightsensors detect something else then black
+	def static dispatch action2code(ParkAction action)'''
+	//klein stukje vooruit
+	left.forward();
+	right.forward();
+	Delay.msDelay(500);
+	left.stop(true);
+	right.stop();
+	//links v gat
+	if(lightR.readValue() > DARK + 5)
+		left.rotate(45);
+	//rechts v gat
+	else if(lightL.readValue() > DARK + 5)
+		right.rotate(45);
+		
+	'''
 	
 	//bt action
 	//assumptions: slavename is parameter of init, kind of action is in enum e
@@ -464,8 +487,21 @@ class JavaGenerator {
 		BRIGHT = lightL.readValue();
 		LCD.drawString("Left black",0,1);
 		Button.waitForAnyPress();
-		DARK = lightL.readValue();'''			
-
+		DARK = lightL.readValue();
+		/*
+		//for the colors
+		LCD.drawString("Left red",0,1);
+		Button.waitForAnyPress();
+		RED = lightL.readValue();
+		LCD.drawString("Left blue",0,1);
+		Button.waitForAnyPress();
+		BLUE = lightL.readValue();
+		LCD.drawString("Left green",0,1);
+		Button.waitForAnyPress();
+		GREEN = lightL.readValue();
+		COLOR = (RED + BLUE + GREEN) / 3;
+		*/
+		'''			
 	//beep action
 	//returns the code for a beep sound
 	def static dispatch action2code(BeepAction action)'''
@@ -513,7 +549,7 @@ class JavaGenerator {
 						lakes[i].found = true;
 						colorarray[colorsens.getColorID()] = true;
 						set = true;
-						LCD.drawInt(lakes[i].celsius,0,5);
+						LCD.drawInt((int) lakes[i].celsius,0,5);
 					}
 				}
 				
@@ -546,13 +582,13 @@ class JavaGenerator {
 			switch(condition.value)
 			{
 				case LightValue::WHITE: if(condition.side == Direction::LEFT)
-											return '''BRIGHT-10 <= lightL.readValue() && lightL.readValue() <= BRIGHT+10'''
+											return '''BRIGHT-2 <= lightL.readValue() && lightL.readValue() <= BRIGHT+3'''
 										else
-											return '''BRIGHT-10 <= lightR.readValue() && lightR.readValue() <= BRIGHT+10'''
+											return '''BRIGHT-2 <= lightR.readValue() && lightR.readValue() <= BRIGHT+3'''
 				case LightValue::BLACK: if(condition.side == Direction::LEFT)
-											return '''DARK-10 <= lightL.readValue() && lightL.readValue() <= DARK+10'''
+											return '''DARK-3 <= lightL.readValue() && lightL.readValue() <= DARK+3'''
 										else
-											return '''DARK-10 <= lightR.readValue() && lightR.readValue() <= DARK+10'''
+											return '''DARK-3 <= lightR.readValue() && lightR.readValue() <= DARK+3'''
 			}
 		}
 		else
