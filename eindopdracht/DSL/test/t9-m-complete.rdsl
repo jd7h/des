@@ -5,7 +5,7 @@ Automaton: examplebt
 		State calibratesens			do calibrate
 		State btinit 				do init bt "Rover2" 
 		
-		State sonarobstacle			do stop, drive backwards duration 1 sec speed 200 turn right (15,90), process sonar packages, print "sonar sees something", beep
+		State sonarobstacle			do stop, drive backwards duration 1 sec speed 200 turn right (50,150), print "sonar sees something", beep, process sonar packages
 		State colorfound			do stop, park, consume package, print "new color found", beep, beep, send action done
 		State waitfor300500			do consume package
 		State waitfor400sonar		do consume package
@@ -15,8 +15,8 @@ Automaton: examplebt
 		State finished 				do stop consume package, print "all done"
 		
 		State watch 				do drive forwards INF speed 200
-		State problemLeft 			do stop drive backwards duration 1 sec speed 200 turn right (15,90)
-		State problemRight 			do stop drive backwards duration 1 sec speed 200 turn left (15,90)
+		State problemLeft 			do stop drive backwards duration 1 sec speed 200 turn right (35,180)
+		State problemRight 			do stop drive backwards duration 1 sec speed 200 turn left (35,180)
 		
 		
 	Arrows: 
