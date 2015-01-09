@@ -391,9 +391,9 @@ class JavaGenerator {
 	//If lightsensor detects something else then black then the robot has to move more to this direction
 	//until both lightsensors detect something else then black
 	def static dispatch action2code(ParkAction action)'''
-	if(lightL.readNormalizedValue() >= DARK + 50) //dan staan we met de linkerlightsensor op de ring
+	if(lightL.readNormalizedValue() >= DARK + 60) //dan staan we met de linkerlightsensor op de ring
 			right.rotate(60);
-		else if (lightR.readNormalizedValue() >= DARK + 50) //dan staan we met de rechterlightsensor op de ring
+		else if (lightR.readNormalizedValue() >= DARK + 60) //dan staan we met de rechterlightsensor op de ring
 			left.rotate(60);
 		else{
 			//sluit uit: we staan al 'voorbij' het gat
@@ -406,7 +406,7 @@ class JavaGenerator {
 			{
 				time += 100;
 				Delay.msDelay(100);
-				if(lightL.readNormalizedValue() >= DARK + 50)
+				if(lightL.readNormalizedValue() >= DARK + 60 && lightL.readNormalizedValue() >= DARK + 60 && lightL.readNormalizedValue() >= DARK + 60)
 				{
 					left.stop(true);
 					right.stop();
@@ -414,7 +414,7 @@ class JavaGenerator {
 					//draai naar links
 					right.rotate(60);
 				}
-				else if(lightR.readNormalizedValue() >= DARK+50)
+				else if(lightR.readNormalizedValue() >= DARK+60 && lightR.readNormalizedValue() >= DARK+60 && lightR.readNormalizedValue() >= DARK+60)
 				{
 					left.stop(true);
 					right.stop();
@@ -575,7 +575,6 @@ class JavaGenerator {
 				tempMotor.setPower(0);
 				''' 
 			case Level::DOWN: return '''
-				lastcolorfound = colorsens.getColorID();
 				//lower temp sensor
 				tempMotor.setPower(-100); 
 				Delay.msDelay(2000);
@@ -630,9 +629,9 @@ class JavaGenerator {
 										else
 											return '''BRIGHT-10 <= lightR.readNormalizedValue() && lightR.readNormalizedValue() <= BRIGHT+30'''
 				case LightValue::BLACK: if(condition.side == Direction::LEFT)
-											return '''DARK-30 <= lightL.readNormalizedValue() && lightL.readNormalizedValue() <= DARK+30'''
+											return '''DARK-60 <= lightL.readNormalizedValue() && lightL.readNormalizedValue() <= DARK+60'''
 										else
-											return '''DARK-30 <= lightR.readNormalizedValue() && lightR.readNormalizedValue() <= DARK+30'''
+											return '''DARK-60 <= lightR.readNormalizedValue() && lightR.readNormalizedValue() <= DARK+60'''
 			}
 		}
 		else
