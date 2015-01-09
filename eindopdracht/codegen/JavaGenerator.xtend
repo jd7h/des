@@ -1,4 +1,4 @@
-﻿package robots.tasks.generator
+package robots.tasks.generator
 
 
 
@@ -86,7 +86,10 @@ class JavaGenerator {
 	lakes[2] = new Lake(Color.GREEN);
 	colorarray = new boolean[13];
 	for (int i = 0;i<colorarray.length;i++)
-			colorarray[i] = false;
+			colorarray[i] = true;
+	colorarray[Color.RED] = false;
+	colorarray[Color.BLUE] = false;
+	colorarray[Color.GREEN] = false;
 	
 	
 	'''
@@ -191,6 +194,7 @@ class JavaGenerator {
 		LCD.drawString("EndGameRobot",0,1);
 		LCD.drawString("Judith & Mirjam",0,2);
 		Button.waitForAnyPress();
+		LCD.clear();
 
 		//start de loop of doom
 		while(!inEndState())
@@ -206,6 +210,7 @@ class JavaGenerator {
 	public static void «Auxiliary.getStateMethod(s)»()
 	{
 		//execute all actions of this state
+		LCD.clear(3);
 		LCD.drawString("«Auxiliary.getStateMethod(s)»",0,3);
 		«FOR a : Auxiliary.getActionList(s)»
 			«action2code(a)»
@@ -376,7 +381,7 @@ class JavaGenerator {
 		switch (action.message){
 			case Message::SONAR: return ''' write(sonar.getDistance()); //sends the data from the sonar '''		//todo
 			case Message::ALLDONE: return '''write(300); //sends the message 'all done' ''' 
-			case Message::NEWCOLOR: return '''write(400);  //sends the message 'new color found' '''
+			case Message::NEWCOLOR: return '''lastcolorfound = colorsens.getColorID(); write(400);  //sends the message 'new color found' ''' //with fix for color saving problem
 			case Message::ACTIONDONE: return '''write(500);  //sends the message 'action done' '''
 			default: return '''write(-1);'''	
 		}
@@ -386,19 +391,47 @@ class JavaGenerator {
 	//If lightsensor detects something else then black then the robot has to move more to this direction
 	//until both lightsensors detect something else then black
 	def static dispatch action2code(ParkAction action)'''
-	//klein stukje vooruit
-	left.forward();
-	right.forward();
-	Delay.msDelay(500);
-	left.stop(true);
-	right.stop();
-	//links v gat
-	if(lightR.readValue() > DARK + 5)
-		left.rotate(45);
-	//rechts v gat
-	else if(lightL.readValue() > DARK + 5)
-		right.rotate(45);
-		
+	if(lightL.readNormalizedValue() >= DARK + 50) //dan staan we met de linkerlightsensor op de ring
+			right.rotate(60);
+		else if (lightR.readNormalizedValue() >= DARK + 50) //dan staan we met de rechterlightsensor op de ring
+			left.rotate(60);
+		else{
+			//sluit uit: we staan al 'voorbij' het gat
+			left.backward();
+			right.backward();
+			int period = 2000;
+			int time = 0;
+			boolean seen = false;
+			while(time < period)
+			{
+				time += 100;
+				Delay.msDelay(100);
+				if(lightL.readNormalizedValue() >= DARK + 50)
+				{
+					left.stop(true);
+					right.stop();
+					seen = true;
+					//draai naar links
+					right.rotate(60);
+				}
+				else if(lightR.readNormalizedValue() >= DARK+50)
+				{
+					left.stop(true);
+					right.stop();
+					seen = true;
+					//draai naar rechts
+					left.rotate(60);
+				}
+			}
+			if(!seen)
+			{
+				left.forward();
+				right.forward();
+				Delay.msDelay(period);
+				left.stop(true);
+				right.stop();				
+			}
+		}
 	'''
 	
 	//bt action
@@ -458,7 +491,8 @@ class JavaGenerator {
 		}
 		else
 		{
-			return '''				
+			return '''
+				LCD.clear(0);				
 				LCD.drawString("Waiting...",0,0);
 				LCD.refresh();
 
@@ -482,23 +516,24 @@ class JavaGenerator {
 	//calibrate action
 	//returns the code for the calibration of the sensors
 	def static dispatch action2code(CalibrateAction action)'''
+		LCD.clear();
 		LCD.drawString("Left white",0,1);
 		Button.waitForAnyPress();
-		BRIGHT = lightL.readValue();
+		BRIGHT = lightL.readNormalizedValue();
 		LCD.drawString("Left black",0,1);
 		Button.waitForAnyPress();
-		DARK = lightL.readValue();
+		DARK = lightL.readNormalizedValue();
 		/*
 		//for the colors
 		LCD.drawString("Left red",0,1);
 		Button.waitForAnyPress();
-		RED = lightL.readValue();
+		RED = lightL.readNormalizedValue();
 		LCD.drawString("Left blue",0,1);
 		Button.waitForAnyPress();
-		BLUE = lightL.readValue();
+		BLUE = lightL.readNormalizedValue();
 		LCD.drawString("Left green",0,1);
 		Button.waitForAnyPress();
-		GREEN = lightL.readValue();
+		GREEN = lightL.readNormalizedValue();
 		COLOR = (RED + BLUE + GREEN) / 3;
 		*/
 		'''			
@@ -510,7 +545,7 @@ class JavaGenerator {
 	//print action
 	//returns the code for print on the screen
 	def static dispatch action2code(PrintAction action)'''
-		LCD.clear();
+		LCD.clear(2);
 		LCD.drawString("«action.msg»",0,2);'''
 		
 	//consume action
@@ -519,8 +554,15 @@ class JavaGenerator {
 		'''	btThread.popElement();'''		
 	
 	def static dispatch action2code(ConsumeSonarAction action)
-		'''while(btThread.peekElement()<=255)
-			btThread.popElement();
+		'''for(int i = 0;i<btThread.getInputList().size();i++)
+			{
+				if(btThread.peekElement()<=255)
+				{
+					btThread.popElement();
+				}
+				else
+					break;
+			}
 		'''
 	//Temperature arm action
 	//returns the code for print on the screen
@@ -549,12 +591,14 @@ class JavaGenerator {
 						lakes[i].found = true;
 						colorarray[colorsens.getColorID()] = true;
 						set = true;
+						LCD.clear(5);
 						LCD.drawInt((int) lakes[i].celsius,0,5);
 					}
 				}
 				
 				if(!set)
 					Sound.buzz();
+					LCD.clear(0);
 				//	LCD.drawString("Something went wrong with the measurement!", 0, 0);
 				'''
 		}
@@ -582,13 +626,13 @@ class JavaGenerator {
 			switch(condition.value)
 			{
 				case LightValue::WHITE: if(condition.side == Direction::LEFT)
-											return '''BRIGHT-2 <= lightL.readValue() && lightL.readValue() <= BRIGHT+3'''
+											return '''BRIGHT-10 <= lightL.readNormalizedValue() && lightL.readNormalizedValue() <= BRIGHT+30'''
 										else
-											return '''BRIGHT-2 <= lightR.readValue() && lightR.readValue() <= BRIGHT+3'''
+											return '''BRIGHT-10 <= lightR.readNormalizedValue() && lightR.readNormalizedValue() <= BRIGHT+30'''
 				case LightValue::BLACK: if(condition.side == Direction::LEFT)
-											return '''DARK-3 <= lightL.readValue() && lightL.readValue() <= DARK+3'''
+											return '''DARK-30 <= lightL.readNormalizedValue() && lightL.readNormalizedValue() <= DARK+30'''
 										else
-											return '''DARK-3 <= lightR.readValue() && lightR.readValue() <= DARK+3'''
+											return '''DARK-30 <= lightR.readNormalizedValue() && lightR.readNormalizedValue() <= DARK+30'''
 			}
 		}
 		else
@@ -645,11 +689,11 @@ class JavaGenerator {
 		else{
 			switch(condition.color)
 			{
-				case Color::BLUE: return '''lejos.robotics.Color.BLUE == colorsens.getColorID()'''
-				case Color::BLACK: return '''lejos.robotics.Color.BLACK == colorsens.getColorID()'''
-				case Color::RED: return '''lejos.robotics.Color.RED == colorsens.getColorID()'''
-				case Color::GREEN: return '''lejos.robotics.Color.GREEN == colorsens.getColorID()'''
-				case Color::WHITE: return '''lejos.robotics.Color.WHITE == colorsens.getColorID()'''
+				case Color::BLUE: return '''lejos.robotics.Color.BLUE == colorsens.getColorID()&&lejos.robotics.Color.BLUE == colorsens.getColorID()&&lejos.robotics.Color.BLUE == colorsens.getColorID()'''
+				case Color::BLACK: return '''lejos.robotics.Color.BLACK == colorsens.getColorID()&&lejos.robotics.Color.BLACK == colorsens.getColorID()&&lejos.robotics.Color.BLACK == colorsens.getColorID()'''
+				case Color::RED: return '''lejos.robotics.Color.RED == colorsens.getColorID()&&lejos.robotics.Color.RED == colorsens.getColorID()&&lejos.robotics.Color.RED == colorsens.getColorID()'''
+				case Color::GREEN: return '''lejos.robotics.Color.GREEN == colorsens.getColorID()&&lejos.robotics.Color.GREEN == colorsens.getColorID()&&lejos.robotics.Color.GREEN == colorsens.getColorID()'''
+				case Color::WHITE: return '''lejos.robotics.Color.WHITE == colorsens.getColorID()&&lejos.robotics.Color.WHITE == colorsens.getColorID()&&lejos.robotics.Color.WHITE == colorsens.getColorID()'''
 			}
 		}
 	}
