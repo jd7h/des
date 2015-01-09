@@ -60,7 +60,7 @@ class JavaGenerator {
 	
 	private static Lake lakes [];
 	private static int nrcolors = 3;
-	private static boolean colorarray [];
+	private static boolean checkedColors [];
 	private static int lastcolorfound =-1;
 	'''
 	
@@ -84,12 +84,14 @@ class JavaGenerator {
 	lakes[0] = new Lake(Color.RED);
 	lakes[1] = new Lake(Color.BLUE);
 	lakes[2] = new Lake(Color.GREEN);
-	colorarray = new boolean[13];
-	for (int i = 0;i<colorarray.length;i++)
-			colorarray[i] = true;
-	colorarray[Color.RED] = false;
-	colorarray[Color.BLUE] = false;
-	colorarray[Color.GREEN] = false;
+	checkedColors = new boolean[13];
+	for (int i = 0;i<checkedColors.length;i++)
+			checkedColors[i] = true;
+	checkedColors[Color.RED] = false;
+	checkedColors[Color.BLUE] = false;
+	checkedColors[Color.GREEN] = false;
+	Colorfunctionality colorfunc = new Colorfunctionality(colorsens);
+	colorfunc.start();
 	
 	
 	'''
@@ -586,9 +588,10 @@ class JavaGenerator {
 				{
 					if(lastcolorfound == lakes[i].color && !lakes[i].found) // kleuren komen overeen
 					{
+						Sound.beepSequenceUp();
 						lakes[i].celsius = tempSensor.getCelcius();
 						lakes[i].found = true;
-						colorarray[colorsens.getColorID()] = true;
+						checkedColors[lastcolorfound] = true;
 						set = true;
 						LCD.clear(5);
 						LCD.drawInt((int) lakes[i].celsius,0,5);
@@ -725,7 +728,7 @@ class JavaGenerator {
 		'''lakes[0].found && lakes[1].found && lakes[2].found'''
 	
 	def static dispatch condition2code(UncheckedCondition condition, Resource resource)
-		'''!colorarray[colorsens.getColorID()]'''
+		'''!checkedColors[colorsens.getColorID()]'''
 		//'''(!(lakes[0].color == colorsens.getColorID()|lakes[1].color == colorsens.getColorID()|lakes[2].color == colorsens.getColorID()))'''
 /*			'''for(int i = 0; i<3; i++)
 			{
