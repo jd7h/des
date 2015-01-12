@@ -229,7 +229,7 @@ A complete program for the Mars Rover robot is written in two instances of the D
 We start out by giving the automaton a name and a class. In the class we specify whether it is the slave or the master brick. We need to make this distinction for the code generation phase, since the master and slave have very different actuators and sensors and thus a different set of permissible actions.
 
 \begin{verbatim}
-Automaton: examplebt
+Automaton: bumpercarexample
         Class: master
 \end{verbatim}
 
@@ -281,8 +281,48 @@ In the first arrow of our example, we have a conditional that consists of two si
 The second arrow consists of only one clause, which we can read as follows:
 \[ \texttt{ lightsensor reads black} \wedge \texttt{bumper left is not pressed} \]
 
+Finally, we need to define a starting state and a set of final states:
+\begin{verbatim}
+    Start state: start 
+    End state: finished
+\end{verbatim}
+Whenever the program is started, the start state is the state where we begin. 
+If we during execution of the program end up in a final state, we execute the actions of the final state and then stop taking transitions, ie. the program is finished.
 
+\subsection{Actions and conditions}
+We have tried to reflect the actuators/sensor division in the state machine framework. We have tried to incorporate the actuators of the robot in the actions of the DSL, and the sensor input in the conditions for the transitions.
 
+\subsubsection{Actions}
+\begin{tabular}{p{6cm}p{10cm}}
+\textbf{example syntax} & \textbf{description}\\
+drive \emph{\{forwards,backwards\}} duration \emph{\{duration,INF\}} speed \emph{speed} & Robot drives in \emph{direction} with speed \emph{speed}. Motor keeps running for \emph{duration} or indefinitely.\\
+turn (\emph{min},\emph{max}) & Robot makes a turn with random angle between \emph{min} and \emph{max}.\\
+stop & Both motors immediately stop.\\
+send \emph{message} & The robot sends package with \emph{message} to the other brick.\\
+park & The robot tries to manouver in such a way that it is aligned with a lake, as necessary for doing a temperature measurement.\\
+init bt \emph{slave}& Initalizes a bluetooth connection with \emph{slave}\\
+wait for bt & Wait for a bluetooth connection from another brick\\
+calibrate & The robot asks the user to place it on the white and black parts of the robotics area, and tries to save the sensor values of the left light sensor. Must be called in the starting state for proper functioning.\\
+beep & Robot emits a beeping sound.\\
+print \emph{string} & Robot prints \emph{string} on the screen.\\
+consume package & Robot consumes one message from the message queue, does nothing if the queue is empty.\\
+consume sonar package & Robot consumes sonar messages from the message queue until the queue is empty or the first package is not a sonar package.\\
+temparm \emph{\{up,down\}} & arm for the temperature sensor goes up/down\\
+temparm measure & Robot performs a measurement with the temperature sensor.\\
+\end{tabular}
+
+\subsubsection{Conditions}
+\begin{tabular}{p{6cm}p{10cm}}
+true & Always true, is used for transitions without condition\\
+receive \emph{message} & true if the head of the message queue contains a package with \emph{message}\\
+lightsensor \emph{\{left, right\}} reads \emph{\{black, white\}} & true if the lightsensor on the specified side reads the specified value.\\
+colorsensor reads \emph{color} & true if the colorsensor reads \emph{color}\\
+color is new & true if the color that the colorsensor found last has not been checked\\
+sonar detects \emph{\{something, nothing\}} at \emph{distance} & true if the sonar detects an object closer than \emph{distance}\\
+bumper \emph{\{left, right\}} is \emph{\{pressed, not pressed\}} & true if the bumper on the specified side is (not) pressed.\\
+timeout \emph{time} \emph{\{ms,sec\}} & true if the robot has been in this state for longer than \emph{time} \emph{unit}.\\
+all colors found & true if all lakes in the measurement array are flagged as 'found'\\
+\end{tabular}
 %What we did NOT implement, but would have done if we had more time:
 %formally restrict the actions one can do as a slave or master (ie. in the DSL).
 
