@@ -140,5 +140,9 @@ De arrows worden nu netjes afgehandeld. Welke implementatie wordt gebruik is afh
 Messages worden op het moment niet langer gedelete in de conditionals. Volgens de eerdere implementatie zouden messages zomaar weggegooid worden op het moment dat we controleren of we een transitie kunnen nemen. Dit is onhandig en dus aangepast. Er zijn nu in Btfunctinality functies voor peeking (non-destructive) en polling (destructive).
 We moeten niet vergeten dan een actie 'consume package' (oid) toe te voegen dat het bovenste package uit de queue eet, anders raakt alles verstopt. Belangrijk om rekening mee te houden bij het bouwen van instanties! 
 
+7 januari
+Probleem: soms treedt er deadlock op. 
+We vermoeden dat het komt omdat er een pakketje kwijt raakt.
+Daarom verzenden we nu elk pakketje 3x en consumen we pakketjes van een bepaalde inhoud tot we een ander pakketje tegenkomen.
 
-
+Dit hielp niet. We doen iets verkeerd in de manier waarop we met bluetooth omgaan. We hebben t4 uitgebreid naar een test waar hij tussendoor ook iets zend en dan gaat het gedrag inderdaad kapot: dus schrijven, lezen, schrijven gaat mis. Idee van Jozef was om het schrijven helemaal los van de btThread te doen. Het schrijven hoeft helemaal niet in een thread en heeft dus niets te maken met de leesThread.
