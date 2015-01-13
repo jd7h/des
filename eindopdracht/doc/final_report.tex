@@ -331,6 +331,39 @@ all colors found & true if all lakes in the measurement array are flagged as 'fo
 
 \subsection*{Main structure of the generated code}
 % Describe the main structure of the generated code.
+%- slave /Master unterschiede
+%- actions / condition use
+%- states in enum / methods created
+The Main classes for the slave and for the master are be generated of the two instances. Every main get  own equipment so that the ports and used variables can be declared and initialized. \\
+In the \emph{JavaGenerator.java} is this solved with the \emph{masterEquipment(), slaveEquipment(), masterInit(), slaveInit()} to decide which allocation should be generated in the Main classes for the slave and for the master. To handle the states from the automaton will be an enum generated which contains all states, such an enum of the mars rover looks like: 
+\begin{verbatim}
+public enum State {
+    CALIBRATESENS,
+    BTINIT,
+    SONAROBSTACLE,
+    COLORFOUND,
+    WAITFOR300500,
+    WAITFOR400SONAR,
+    UITPARKEREN,
+    FINISHED,
+    WATCH,
+    PROBLEMLEFT,
+    PROBLEMRIGHT
+}
+\end{verbatim}
+
+The public variable \emph{current} will be used to keep the current state. Every state has also his own method where all the actions of this state will be executed. After all actions are done the state waits for the next trigger which indicates the next transaction and the next state becomes the current state. 
+The method \emph{execute(State s)} connects the enum with the methods of a state. Also the start and end state are be defined in this way. \\
+The arrows of the automaton contains the conditions of an transition. These conditions are checked during the while the automaton waits for the trigger for the next state. Every condition is written as an if-statement with the next state as body. \\
+
+The most difficult part of the program was the integration of Bluetooth, we decided to created a new thread for the read part of the communication. For this the master and the slave use both the class \emph{BTfunctionality}, which contains the information for the Bluetooth part. Further is the master also the master of the Bluetooth communication and initialized also the handshake and the set up of the connection. \\
+
+The found lakes and the corresponding information are saved in the array lakes of the object Lake. So that it is in every situation possible that the slave can edit the array. \\
+
+For debugging and readability reasons we also created the thread \emph{Colorfunctionality} which shows in every situation the actual found color in the display of the slave.  
+  
+
+
 
 \section*{Realization of the Mars Rover}
 % Describe the order in which features of the Mars Rover have been implemented.
