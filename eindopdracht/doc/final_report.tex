@@ -7,6 +7,7 @@
 \usepackage{rotating}
 \usepackage{verbatim}
 \usepackage{graphicx}
+\usepackage{hyperref}
 
 \author{Judith van Stegeren and Mirjam van Nahmen}
 \title{Development of the Mars Rover robot}
@@ -347,7 +348,7 @@ The instances we have defined for the master and slave bricks are a description 
 \subsubsection{Slave}
 \includegraphics[width=16cm]{t9-s.png}
 
-\subsection*{Main structure of the generated code}
+\subsection{Main structure of the generated code}
 % Describe the main structure of the generated code.
 %- slave /Master unterschiede
 %- actions / condition use
@@ -383,28 +384,51 @@ For debugging and readability reasons we also created the thread \emph{Colorfunc
 
 
 
-\section*{Realization of the Mars Rover}
+\section{Realization of the Mars Rover}
 % Describe the order in which features of the Mars Rover have been implemented.
+\subsection{Approach}
 The first steps were to design and implement the basic structure of the DSL and the code generation. We decided to use the state diagram and designed the start/end state and the robot should be able to wander an area without falling off the table. 
 
 We built the rover by incrementally implementing the concepts we needed for the rover. Our first goal was to have a rover that could drive around freely without falling off the table. It took us more time to implement this basic functionality than normal, since we had to implement the state machine framework before we could test our instances of the DSL!
 After two weeks we had a working framework and a first stub of a DSL. 
 
 At the beginning, we have made a list of elements of the project where we anticipated problems with the implementation: 
-\begin{enumerate}
+\begin{itemize}
 \item bluetooth communication and working with threads
 \item communication protocol / packets between the two bricks
 \item usage of the RCX motor and temperature sensor
 \item code generation -- we wanted the code to be clear and modular
 \item manouvering around the lakes ("parking"), in such a way that the temperature sensor finishes in the right position.
 \item color recognition in different lighting conditions
+\end{itemize}
+
+To mitigate these potential problems, we decided to build small test instances for every problem before incorporating new functionality in the final program. Because of this incremental, modular approach, every problem could be spotted and debugged in an isolated test case, which made everything easier. The test instances can be found in the git repository (\url{https://github.com/jd7h/des/tree/master/eindopdracht/DSL/test}). 
+
+\subsection{Planning}
+Every week during the project, we would do the following:
+\begin{enumerate}
+\item Choose a problem to tackle
+\item Describe a set of automatons with the desired functionality (small test cases and a bigger test which incorporates new and old functionality)
+\item Expand the DSL until the automatons can be described in the DSL
+\item Expand the code generation files until the instances generate valid code.
+\item Test all instances, starting with the small test cases and revise the DSL and/or code generator until everything works properly. 
 \end{enumerate}
 
-To mitigate these potential problems, we decided to build small test instances for every problem before incorporating new functionality in the final program. Because of this incremental, modular approach, every problem could be spotted and debugged in an isolated test case, which made everything easier. 
+\begin{tabular}{|r|p{10cm}|}
+\hline
+week & problems tackled\\
+\hline
+december 1	& state machine framework \& wandering without falling off the table\\
+december 2	& state machine framework \& wandering without falling off the table\\
+december 3	& bluetooth, calibration of sensors, communication, basic functionality\\
+december 4	& communication between bricks\\\hline
+januari 1	& communication and package handling, colorsensor, temperature sensor\\
+januari 2	& parking, testing the mars rover as a whole\\
+\hline
+\end{tabular}
 
 
-
-\subsection*{Final result}
+%\subsection*{Final result}
 % Describe the final result: what has been implemented exactly, which requirements are satisfied, which requirements are not satisfied and explain why not. 
 
 
