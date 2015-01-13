@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper]{article}
+\documentclass[11pt,a4paper]{article}
 \usepackage[top=50pt,bottom=40pt,left=60pt,right=50pt]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -18,12 +18,12 @@
  
 % Description of the work on the Mars Rover
 %   Describe the details of the main development activities:
-\section*{Description of the work on the Mars Rover}
+\section{Introduction}
 The main goal of the robot is to find all three colored lakes and measure the temperature.
 
 % Listing of requirements with priorities.
-\subsection*{MoSCoW overview of requirements}
-\begin{tabular}{|p{5cm}|p{12cm}|} 
+\section{Requirements}
+\begin{tabular}{|p{5cm}|p{10cm}|} 
 \hline
 MoSCoW & requirement\\
 \hline
@@ -31,43 +31,43 @@ MoSCoW & requirement\\
   \textbf{Functional requirements} & The robot must be able to ...\\
 \hline
 M & find all lakes.\\
-M & find a lake and determine its color.\\
-M & navigate around lakes.\\
+%M & find a lake and determine its color.\\
+%M & navigate around lakes.\\
 M & avoid falling off the table.\\
 M & notice obstacles in the area and avoid them.\\
 M & measure the temperature of all lakes.\\
-M & see the difference between black, white, red, green and blue.\\
+%M & see the difference between black, white, red, green and blue.\\
 S & recognize bumping against an obstacles and drive around it.\\
-S & show the overview with the information of all lakes.\\
+S & when finished, show an overview of the collected data.\\
 \hline
 
   \textbf{Usability} & The robot must ...\\
 \hline
 M & be programmed by stating its behavior in a DSL and then generating code from that specification.\\
-S & not drive faster then 0,20 m/s , so that if the robot is heading for the edge of the table, the user still has time to interfere.\\
-S & provide feedback for the user about the state of the program for debugging purposes.\\
-C & provide feedback for the user about measurements it makes.\\
 M & stop when the robot is finished.\\
-M & provide feedback for the user when the robot is finished and the user press a button.\\
+S & provide feedback for the user about measurements it makes.\\
+C & not drive faster than 0,20 m/s, so that if the robot is heading for the edge of the table, the user still has time to interfere.\\
+%S & provide feedback for the user about the state of the program for debugging purposes.\\
+%M & provide feedback for the user when the robot is finished and the user press a button.\\
 C & provide feedback for the user about errors/bugs.\\
 \hline
 
   \textbf{Reliability}& \\
 \hline
-M & The robot components must be tested before it will work with the whole system.\\
-S & The robot must stop if an error/bug is detected to avoid to go off of the table. \\
+%M & The robot components must be tested before it will work with the whole system.\\
+M & The program of the robot must not consume too much memory.\\
+C & The robot must stop the motors whenever an error is detected.\\
 S & The sensors must be calibrated before the program starts.\\
-M & The robot must have enough power and memory to run the programs.\\
-C & The robot must recognize its starting position.\\
-
+%The robot must have enough power and memory to run the programs.\\
+%C & The robot must recognize its starting position.\\
 \hline
 
   \textbf{Performance}&\\
 \hline
 M & If the light sensors spot the white border, the robot must react immediately.\\
 S & If the light sensors spot the color border of a lake, the robot must react immediately.\\
-C & The robot should find all lakes in 10 minutes. \\
 S & The robot should not measure the same lake twice.\\
+C & The robot should be able to find all lakes in 10 minutes. \\
 
 \hline
    \textbf{Supportability}&\\
@@ -78,21 +78,22 @@ W & The DSL can also be used for the generation of code in another language or f
 
 \pagebreak 
 % Deployment with distribution of sensors, actuators and software components over NXT bricks; give both the own proposal and the chosen deployment, including motivation.
-\section*{Proposal deployment}
+\section{Deployment}
+\subsection{Our proposal for deployment}
 List of the actuators:
 \begin{itemize}
-\item[2] motors
-\item[1] motor for  the temperature sensor
-\item[1] lamp
+\item 2 motors
+\item 1 motor for  the temperature sensor
+\item 1 lamp
 \end{itemize}
 
 \noindent List of the sensors:
 \begin{itemize}
-\item[1] temperature sensor
-\item[2] light sensors
-\item[1] color sensor
-\item[1] ultra sonar
-\item[2] touch sensors
+\item 1 temperature sensor
+\item 2 light sensors
+\item 1 color sensor
+\item 1 ultra sonar
+\item 2 touch sensors
 \end{itemize}
 
 There can be 3 actuators and 4 sensors on 1 brick.
@@ -100,10 +101,10 @@ Since it is vital that the motor does not fall off the table, we want that the c
 
 Since the color sensor, the motor for the temperature sensor and the temperature sensor all have to do with the same functionality, it would seem logical to put these sensors and actuators on the same brick. Finally, as the measurement of the distance with the ultrasonic sensor is not crucial for the functionality of the robot, we suggest to put that sensor on the (slave) brick for the measurements as well.\\
 
-\subsubsection*{Deployment diagram}
+\textbf{Deployment diagram}\\
 \begin{tabular}{|p{3cm}|p{6cm}|p{6cm}|} 
 \hline
-brick & NXT1 (master) & NXT2 (slave)\\
+\textbf{brick} & \textbf{NXT1 (master)} & \textbf{NXT2 (slave)}\\
 \hline
 tasks & wandering, navigating, avoiding collisions & recognizing colours, spotting far-away objects, temperature sensor control, lamp\\\hline
 actuators & motor 1, motor 2 & temperature sensor motor\\\hline
@@ -111,7 +112,16 @@ sensors & light sensor 1, light sensor 2, touch sensor 1, touch sensor 2 & ultra
 \hline
 \end{tabular}
 
-\subsection*{Actual deployment diagram}
+\subsection{Use cases}
+\begin{description}
+\item[Wandering within white line] The robot drives in a straight line until it encounters a white line with one of its light sensors. If it encounters the white line, it will back up a bit, make a turn away from the white line and proceed in a straight line. For this use case, we need both motors and both the light sensors.
+\item[New lake detection and measurements] On detection of a colored lake, the robot first checks if it hasn't encountered the lake before. If not, the robot positions itself before the lake. It then lowers the temperature sensor, measures the temperature and stores it together with the color of the lake. We need the color detector, the motor for the temperature sensor and the temperature sensor itself.
+\item[Old lake detection] On detection of a colored lake, the robot checks if he encountered this lake before. If this is the case, the robot drives around the lake. For this we need the color detector and the two motors, but it doesn't matter whether the color sensor is on the same brick as both motors.
+\item[Wandering without collisions] The robot drives in a straight line. If one of the bumpers touches an object, the robot backs up, makes a turn and proceeds in a straight line. For this we need the bumpers and both motors. Since reaction time is important in this use case, it would be best if the motors and the bumpers are connected to the same brick. The ultrasonic sensor can also play a role in this use case. The reaction time of the ultrasonic sensor is less important since it can spot obstacles from further away. %The touch sensors are for the situation that the sonar missed something, so it could be an advantage to put the sonar also on the brick of the motors. The communication with the sonar does not have to be instantaneous, so we could use bluetooth, but it seems not the best thing to do.
+\item[Ready] If the robot has measured the temperature in a lake, it check if all lakes have been measured. If that is the case, it stops wandering and shows the table with the temperatures of all lakes on his display.\\
+\end{description}
+
+\subsection{Actual deployment}
 
 \begin{minipage}[t]{0.4\textwidth}
 
@@ -154,17 +164,8 @@ measurements (color of a lake, temperature and distance detection)
 	\end{tabular}
 \end{minipage}
 
-\subsection*{Use cases}
-\begin{description}
-\item[Wandering within white line] The robot drives in a straight line until it encounters a white line with one of its light sensors. If it encounters the white line, it will back up a bit, make a turn away from the white line and proceed in a straight line. For this use case, we need both motors and both the light sensors.
-\item[New lake detection and measurements] On detection of a colored lake, the robot first checks if it hasn't encountered the lake before. If not, the robot positions itself before the lake. It then lowers the temperature sensor, measures the temperature and stores it together with the color of the lake. We need the color detector, the motor for the temperature sensor and the temperature sensor itself.
-\item[Old lake detection] On detection of a colored lake, the robot checks if he encountered this lake before. If this is the case, the robot drives around the lake. For this we need the color detector and the two motors, but it doesn't matter whether the color sensor is on the same brick as both motors.
-\item[Wandering without collisions] The robot drives in a straight line. If one of the bumpers touches an object, the robot backs up, makes a turn and proceeds in a straight line. For this we need the bumpers and both motors. Since reaction time is important in this use case, it would be best if the motors and the bumpers are connected to the same brick. The ultrasonic sensor can also play a role in this use case. The reaction time of the ultrasonic sensor is less important since it can spot obstacles from further away. %The touch sensors are for the situation that the sonar missed something, so it could be an advantage to put the sonar also on the brick of the motors. The communication with the sonar does not have to be instantaneous, so we could use bluetooth, but it seems not the best thing to do.
-\item[Ready] If the robot has measured the temperature in a lake, it check if all lakes have been measured. If that is the case, it stops wandering and shows the table with the temperatures of all lakes on his display.\\
-\end{description}
-
 % Listing of the identified risks.
-\section*{Risk analysis}
+\section{Risk analysis}
 
 \begin{tabular}{|p{0.4cm}|p{1.5cm}|p{3cm}|p{0.4cm}|p{0.4cm}|p{1.3cm}|p{3.5cm}|p{3.5cm}|} 
 \hline
@@ -187,16 +188,144 @@ measurements (color of a lake, temperature and distance detection)
  \hline
 \end{tabular}
 
-\section*{DSL of the mars rover}
-We had two options for the structur of the DSL of the Mars Rover. First option was to create a DSL which is close to the behavior programming concepts of LeJOS. The advantage of this approach is the experience with during the last weeks of the class 'Design of embedded Systems' and the thread/task management is already made in form of the Arbitrator class.\\
-The second option is the implementation of the state machine approach which was the first idea for our DSL. We see the advantages here in the abstraction level which can be create. That makes it easier for us to implement such complex things like the Bluetooth communication, where we had a lot of problems with the Arbitrator. The disadvantage is the implementation itself. We do not have many experience with it, such that it will be approximately cost more time to implement the robot.\\
-The main reason why we chose for the state machine approach was the possibility to have more control over the threads and task of the robot and so a better overview what the does and why. Another reason is, that it is also more abstract and therefore also easier to make the implementation modular. That is in the future useful to use it again for comparable projects which is in the business world quite often the case.  Furthermore seems it for us more interesting to implement a state machine with all the challenges. \\
+\section{DSL}
+\subsection{Approach}
+We had two options for the structure of the DSL of the Mars Rover. 
 
-The idea behind the DSL is a state machine. In the practice it is an often used system, which uses states and arrows to describe the transitions and conditions in which the robot can be. 
-%More description of the DSL
+Our first option was to create a DSL that was close to the subsumption architecture as implemented by the LeJOS API. The advantage of this approach is that we already had experience with programming in terms of behaviors during the first weeks of the Mars Rover project. It would also mean that we didn't have to worry about implementing an Arbitrator, as it would be provided by LeJOS.
+%However, we found that the subsumption architecture was not general enough.
+% The advantage of this approach is the experience with during the last weeks of the class 'Design of embedded Systems' and the thread/task management is already made in form of the Arbitrator class.\\
 
-\subsection*{Syntax} 
+The second option is the implementation of a state machine.
+%approach which was the first idea for our DSL. 
+In this case, the advantage of a state machine implementation is the great level of abstraction that we can use for the DSL. 
+It's quite easy to design a robot by simply drawing an automata with the desired behavior.
+Since the use of an arbitrator also means that you sacrifice transparancy for convienence, we did also foresee some problems with programming and debugging: the arbitrator would be an extra layer between us and the robot. 
+%We see the advantages here in the abstraction level which can be create. 
+%That makes it easier for us to implement such complex things like the Bluetooth communication, where we had a lot of problems with the Arbitrator. 
+A disadvantage is the implementation of the state machine framework itself. 
+We would have to implement this framework ourselves, which meant that instead of having a ready-made environment for programming, we would need more startup time for the project. However, we kept this in mind when we made the planning.
+%It turned out to be no problem at all, since we could program very fast when eventually the state machine implementation was up and running.
+%We do not have many experience with it, such that it will be approximately cost more time to implement the robot.\\
+
+After some deliberation, we have chosen the state machine approach.
+Firstly, this was because of the possibility to have more control over the threads and tasks of the robot. 
+We would have a better overview about what the robot does and why. 
+Another reason is that the state machine approach is also more abstract, which suits the use of a DSL. 
+Because of the high level of abstraction it is easier to make the implementation modular. 
+From a commercial point of view, another advantage is that this way our implementation is reusable for comparable projects. 
+%That is in the future useful to use it again for comparable projects which is in the business world quite often the case.  
+And finally, it seemed to us that this approach was the most interesting to implement, with all its challenges.
+
+\subsection{Syntax} 
 %  Describe the concrete syntax of the DSL; what is the main idea, what is the meaning of the language?
+The idea behind the DSL is a finite state machine. 
+%In practice it is an often used concept from theoretical computer science.
+%which uses states and arrows to describe the transitions and conditions in which the robot can be. 
+A finite state machine, or automata, is a model of computation that can be in one of a finite number of states. It can change from one state to another by a transition or arrow.
+
+A complete program for the Mars Rover robot is written in two instances of the DSL. Since we work with two bricks, we have an automaton for each brick: one for the master and one for the slave.
+
+We start out by giving the automaton a name and a class. In the class we specify whether it is the slave or the master brick. We need to make this distinction for the code generation phase, since the master and slave have very different actuators and sensors and thus a different set of permissible actions.
+
+\begin{verbatim}
+Automaton: bumpercarexample
+        Class: master
+\end{verbatim}
+
+Then we list all states of the automaton. 
+We signify the start of this list by the keyword \texttt{States:}, and the definition of a state starts with the keyword \texttt{State}.
+Each state has a name and a (possibly empty) list of actions. 
+Whenever the robot enters in state $s$, all actions of $s$ will be executed in the specified order.
+
+\begin{verbatim}
+States: 
+        State start             do drive forwards INF speed 200
+        State problemLeft       do stop, turn right (15,90)
+        State problemRight      do stop, turn left (15,90)
+        State finished          do stop
+\end{verbatim}
+
+In this example, whenever the robot is in state \texttt{start}, it starts the motors to drive forwards. In \texttt{problemLeft} and \texttt{problemRight}, it stops the motors and makes a turn. In the state \texttt{finished} it stops the motors.
+
+Finally, we have to specify the transitions of the automaton, ie. when we can move from one state to the other. We make another list \texttt{Arrows:}, where we specify the transitions.
+
+Each arrow consists of three parts: two states (the origin and destination of the transition) and a condition. When we are in a state $s$ that has a transition to $s'$, we are only allowed to change to $s'$ if the matching condition is fulfilled. 
+
+The syntax for the specification of a transition is
+\[ \texttt{Arrow origin -> destination	if condition} \]
+where condition is a list of conditions in disjunctive normal form. 
+Disjunctive normal form means that a boolean formula consists of disjunctions of conjunctive clauses. The conjuctive clauses are placed between brackets and prefixed with the keyword \texttt{and}.
+Since every boolean formula has a disjunctive normalform, we thought it was a cool solution for more complex conditionals without having to implement boolean operators completely from scratch. 
+
+\begin{verbatim}
+Arrows: 
+    Arrow start -> problemLeft          if (and lightsensor left reads white) 
+                                           (and bumper left is pressed)
+    Arrow problemLeft -> start          if (and lightsensor left reads black 
+                                                bumper left is not pressed)
+    Arrow problemLeft -> problemLeft    if (and lightsensor left reads white) 
+                                           (and bumper left is pressed)
+    Arrow start -> problemRight         if (and lightsensor right reads white) 
+                                           (and bumper right is pressed)
+    Arrow problemRight -> problemRight  if (and lightsensor right reads white) 
+                                           (and bumper right is pressed)
+    Arrow problemRight -> start         if (and lightsensor right reads black 
+                                                bumper right is not pressed)
+    Arrow start -> finished             if (and timeout 10 sec)
+
+\end{verbatim}
+
+In the first arrow of our example, we have a conditional that consists of two single-element-clauses. This means that we can go from \texttt{start} to \texttt{problemLeft} if
+\[ \texttt{lightsensor reads white} \vee \texttt{bumper left is pressed} \]
+The second arrow consists of only one clause, which we can read as follows:
+\[ \texttt{ lightsensor reads black} \wedge \texttt{bumper left is not pressed} \]
+
+Finally, we need to define a starting state and a set of final states:
+\begin{verbatim}
+    Start state: start 
+    End state: finished
+\end{verbatim}
+Whenever the program is started, the start state is the state where we begin. 
+If we during execution of the program end up in a final state, we execute the actions of the final state and then stop taking transitions, ie. the program is finished.
+
+\subsection{Actions and conditions}
+We have tried to reflect the actuators/sensor division in the state machine framework. We have tried to incorporate the actuators of the robot in the actions of the DSL, and the sensor input in the conditions for the transitions.
+
+\subsubsection{Actions}
+\begin{tabular}{p{6cm}p{10cm}}
+\textbf{example syntax} & \textbf{description}\\
+drive \emph{\{forwards,backwards\}} duration \emph{\{duration,INF\}} speed \emph{speed} & Robot drives in \emph{direction} with speed \emph{speed}. Motor keeps running for \emph{duration} or indefinitely.\\
+turn (\emph{min},\emph{max}) & Robot makes a turn with random angle between \emph{min} and \emph{max}.\\
+stop & Both motors immediately stop.\\
+send \emph{message} & The robot sends package with \emph{message} to the other brick.\\
+park & The robot tries to manouver in such a way that it is aligned with a lake, as necessary for doing a temperature measurement.\\
+init bt \emph{slave}& Initalizes a bluetooth connection with \emph{slave}\\
+wait for bt & Wait for a bluetooth connection from another brick\\
+calibrate & The robot asks the user to place it on the white and black parts of the robotics area, and tries to save the sensor values of the left light sensor. Must be called in the starting state for proper functioning.\\
+beep & Robot emits a beeping sound.\\
+print \emph{string} & Robot prints \emph{string} on the screen.\\
+consume package & Robot consumes one message from the message queue, does nothing if the queue is empty.\\
+consume sonar package & Robot consumes sonar messages from the message queue until the queue is empty or the first package is not a sonar package.\\
+temparm \emph{\{up,down\}} & arm for the temperature sensor goes up/down\\
+temparm measure & Robot performs a measurement with the temperature sensor.\\
+\end{tabular}
+
+\subsubsection{Conditions}
+\begin{tabular}{p{6cm}p{10cm}}
+true & Always true, is used for transitions without condition\\
+receive \emph{message} & true if the head of the message queue contains a package with \emph{message}\\
+lightsensor \emph{\{left, right\}} reads \emph{\{black, white\}} & true if the lightsensor on the specified side reads the specified value.\\
+colorsensor reads \emph{color} & true if the colorsensor reads \emph{color}\\
+color is new & true if the color that the colorsensor found last has not been checked\\
+sonar detects \emph{\{something, nothing\}} at \emph{distance} & true if the sonar detects an object closer than \emph{distance}\\
+bumper \emph{\{left, right\}} is \emph{\{pressed, not pressed\}} & true if the bumper on the specified side is (not) pressed.\\
+timeout \emph{time} \emph{\{ms,sec\}} & true if the robot has been in this state for longer than \emph{time} \emph{unit}.\\
+all colors found & true if all lakes in the measurement array are flagged as 'found'\\
+\end{tabular}
+%What we did NOT implement, but would have done if we had more time:
+%formally restrict the actions one can do as a slave or master (ie. in the DSL).
+
 \subsection*{Instances for the Mars Rover}
 %  Describe the instance(s) of the DSL that are used for the Mars Rover, explain the main idea.
 
