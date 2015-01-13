@@ -20,7 +20,7 @@ Arrow:
 	'Arrow' from=[State] '->' to=[State] 'if' disjunctionlist += Conjunction+
 ;
 
-Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction | BeepAction | PrintAction | ConsumeAction | ConsumeSonarAction | TempAction) (', ')? 
+Action: (DriveAction | TurnAction | StopAction | SendAction | ParkAction | BTAction | CalibrateAction | BeepAction | PrintAction | ConsumeAction | ConsumeSonarAction | TempAction | FinishPrint) (', ')? 
 ;
 DriveAction: 'drive' driveDir = DriveDirection ('duration' dl = INT unit = TimeUnit | 'INF' ) 'speed' speed = INT//voor een bepaalde tijd of loopen en snellheid
 ;
@@ -54,6 +54,10 @@ ConsumeSonarAction:
 
 TempAction:
 	'temparm' level = Level
+;
+
+FinishPrint:
+	{FinishPrint} 'show found results'
 ;
 
 Conjunction:

@@ -35,6 +35,7 @@ import robots.tasks.rDSL.NewColorCondition
 import robots.tasks.rDSL.UncheckedCondition
 import robots.tasks.rDSL.MissionCompleteCondition
 import robots.tasks.rDSL.ConsumeSonarAction
+import robots.tasks.rDSL.FinishPrint
 
 class JavaGenerator {
 	
@@ -62,6 +63,9 @@ class JavaGenerator {
 	private static int nrcolors = 3;
 	private static boolean checkedColors [];
 	private static int lastcolorfound =-1;
+	private static String colorlist[] = {"None", "Red", "Green", "Blue", "Yellow",
+		"Megenta", "Orange", "White", "Black", "Pink",
+		"Grey", "Light Grey", "Dark Grey", "Cyan"}; 
 	'''
 	
 	def static masterInit()'''
@@ -408,7 +412,7 @@ class JavaGenerator {
 			//sluit uit: we staan al 'voorbij' het gat
 			left.backward();
 			right.backward();
-			int period = 2000;
+			int period = 1500;
 			int time = 0;
 			boolean seen = false;
 			while(time < period)
@@ -436,7 +440,7 @@ class JavaGenerator {
 			{
 				left.forward();
 				right.forward();
-				Delay.msDelay(period);
+				Delay.msDelay(period+500);
 				left.stop(true);
 				right.stop();				
 			}
@@ -612,6 +616,21 @@ class JavaGenerator {
 				'''
 		}
 	}
+	
+	//prints the found lakes and their temperature
+	def static dispatch action2code(FinishPrint action)
+		'''
+		LCD.clear();
+		for(int i = 0; i < nrcolors; i++)
+		{
+			LCD.drawString("Results:",0,0);
+			if(lakes[i].found)
+			{
+				LCD.drawString("Lake " + colorlist[lakes[i].color+1] + " " + lakes[i].celsius + "°C" , 0, i+1);
+			}			
+		}
+		'''
+		
 	
 		
 	

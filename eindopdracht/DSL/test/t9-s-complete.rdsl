@@ -8,7 +8,7 @@ Automaton: examplebtslave
 	 State waitfor500	do consume package
 	 State measurement	do consume package, beep, temparm down, temparm measure, temparm up
 	 State mastercontinue do send action done
-	 State finished		do beep, beep, beep, send all done
+	 State finished		do beep, beep, beep, send all done, show found results
 	 
 	 Arrows:
 	 Arrow btinit -> watch		if (and true)
