@@ -1,0 +1,28 @@
+digraph finite_state_machine {	
+	
+	node [nodesep=5.0, fontsize=11];
+
+	graph [overlap = false,splines=true,overlap=scalexy];
+
+	
+	start				[style=invisible];
+	start -> btinit	
+	btinit -> watch 		[label="true"];
+		 
+	watch -> sonarflag		[label="sonar detects something\n at 10"];
+	watch -> colorflag		[label="colorsensor red AND red new OR\n colorsensor green AND green new OR\n colorsensor blue AND blue new"];
+		 
+	sonarflag -> watch		[label="true"];
+
+	colorflag -> measurement	[label="receive action done"];
+	colorflag -> waitfor500		[label="receive found new color OR\n receive all done OR\n receive sonar"];
+		 
+	waitfor500 -> measurement	[label="receive action done"];
+	waitfor500 -> waitfor500	[label="receive found new color OR\n receive all done OR\n receive sonar"];
+		 
+	measurement -> finished		[label="all colors found"];
+	measurement -> mastercontinue	[label="true"];
+		 
+	mastercontinue -> watch		[label="true"];
+
+}

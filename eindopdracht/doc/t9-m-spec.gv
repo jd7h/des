@@ -1,0 +1,52 @@
+digraph finite_state_machine {
+
+
+	node [nodesep=5.0, fontsize=11];
+
+	graph [overlap = false,rankdir=LR,splines=true,overlap=scalexy];
+
+	subgraph cluster_a {
+    style=invisible;
+    problemLeft; problemRight; sonarobstacle; waitfor400sonar;
+  	}
+
+	subgraph cluster_b {
+    style=invisible;
+    colorfound;waitfor300500;uitparkeren;finished;
+  	}
+
+	start						[style=invisible];
+
+	
+
+
+	start -> calibratesens		
+
+	calibratesens -> btinit [label = "true"];
+	btinit -> watch			[ label = "true"];
+			
+	watch -> problemLeft		[ label = "lightsensorL reads white OR\n bumperL is pressed"];
+	problemLeft -> watch		[ label = "lightsensorL reads black AND\n bumperL is not pressed"];
+	problemLeft -> problemLeft	[ label = "lightrensorL reads white OR\n bumperL is pressed"];
+	watch -> problemRight		[ label = "lightsensorR reads white OR\n bumperR is pressed"];
+	problemRight -> problemRight	[ label = "lightsensorR reads white OR\n bumperR is pressed"];
+	problemRight -> watch		[ label = "lightsensorR reads black AND\n bumperR is not pressed"];
+			
+	watch -> waitfor400sonar	[ label = "receive action done OR\n receive all done"];
+	watch -> colorfound		[ label = "receive found new color"];
+	watch -> sonarobstacle		[ label = "receive sonar"];
+			
+	sonarobstacle -> watch		[ label = "true"];
+			
+	waitfor400sonar -> watch	[ label = "true"];
+			
+	colorfound -> finished    	[ label = "receive all done"];
+	colorfound -> waitfor300500 	[ label = "receive sonar OR\n receive found new color"];
+	colorfound -> uitparkeren       [ label = "receive action done"];
+			
+	waitfor300500 -> finished	[ label = "receive all done"];
+	waitfor300500 -> uitparkeren 	[ label = "receive action done"];
+	waitfor300500 -> waitfor300500	[ label = "receive sonar OR\n receive found new color"];
+				
+	uitparkeren -> watch 		[ label = "true"];
+}
