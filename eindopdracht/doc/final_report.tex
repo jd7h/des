@@ -431,5 +431,50 @@ januari 2	& parking, testing the mars rover as a whole\\
 %\subsection*{Final result}
 % Describe the final result: what has been implemented exactly, which requirements are satisfied, which requirements are not satisfied and explain why not. 
 
+%Second Part:
+ % Evaluation of the work on the Mars Rover
+ % Evaluate the work done and mention own observations. 
+  % A list of relevant questions:
+	% • What were the most important steps during the development; what was difficult, what
+	%was easy, was the order of the steps suitable?
+	% • How often did you change the DSL, is there a large difference with the DSL for the
+	%small Lego NXT Rover, what where the reasons for changes?
+	% • Looking back at your DSL and code generation; what would you do differently, what
+	%could be improved (e.g., if you would have more time)?
+	% • How flexible and extendable is your solution? For instance, how easy is it to add
+	%sensors, actuators, to move them to another NXT brick, or to add new functionality?
+	% • Evaluate the development process. Especially, discuss the use of a DSL for modeling
+	%and code generation. What are advantages and disadvantages, what was difficult, what was easy?
+	% • What are the observations about the technology used, such as Eclipse, LeJOS, Xtext,and Xtend?
+	% • What are general lessons learned? 
+
+\section{Evaluation of the work on the Mars Rover}
+The most important steps of our Mars Rover project were  in the beginning the decision to create a DSL in form of a state machine. With this decision we solved some problems we encountered during the project of the small Rover. For example the problem of the unclear working with the Arbitrator and the bluetooth communication using a Thread. The coding was for us now more open and we knew in every state exactly what the robot does, that made the programming and working with the robot more easy. But the decision created also some problems. We had to begin from scratch and couldn't use much code from the small Rover, we had to built the framework which was a challenge for us, because we had not much experience with LeJos and NXT. 
+%Something about DSL of the small rover???
+
+\subsection{Planning}
+We tried to work every week one day together, but we had of course some problems, because we had not on the same day time to work together, but we managed to create a good task allocation and we could also work on different days. We also discussed every week a goal which should been reached, such that we could show a result to Jozef. As an effect of this is that we didn't stay to long on one complex problem and to find sometimes a solution which is more convenient and for that moment useful, but not really nice. \\
+
+To get the project more structured we made a list with subject which can be problematic and which need more time to find a good solution. This helped because we got early an impression how big th project becomes and we had in the beginning time to get in the subjects. A second advantage of this approach was  that we could build our DSL around the difficult subjects and we didn't had to change the DSL so much. \\
+During the hole programming phase we build small tests which are successive such that we could very nicely test every component separately. Further could we built the test that go more and more to a complete solution for the Mars Rover.\\
+
+\subsection{Our solution}
+The case that we use a state machine is useful in different ways, it makes it easy to create a model of the state machines. To change the modules of the robot only the code generator has to be changed, that is positive, because the old instances of the robot could be used further. \\
+For our robot is it also very easy to add some new functions and modules. Our DSL is very structured and it is easy to add a new arrow with constraints and a new state with new actions in the instances. Also to add some new code is our code very good structured which makes it easy to add new functionality. \\
+The bluetooth connection is also extendable, we worked with a number code to identify the different messages. The numbers are integers and it is easy to add new messages in the DSL with the corresponding numbers. \\
+The state machine approach was useful to structure the coding process, because we had to split every step of the robot in conditions for the arrow and actions which should be done when the conditions match. This made it also easy to split our tasks in basic stuff, condition stuff and action stuff. Also the way to solve a complex problem was in the way of thinking in which conditions are there and what should the robot do to reach the state we want. In the beginning we thought to big and to complex, but after the first few tests, we learned the advantages and it was easier to split the big problems in smaller ones which made it easier to solve it. \\
+
+
+
+\subsection{Future work}
+If had more time, we had changed  and extended some different things. The Bluetooth works not perfectly with the ultra sonic sensor. The sensor sends non stop the distance to the master until he don't sees something, then he sends one time 500. But this blocks the other functions of the robot and it is possible that the robot goes always back until the sensor stops with sending. \\
+A second thing is the calibration of the sensors, the robot is very addicted to the ambient light, a solution is to calibrate every light and color sensor before every start. At this moment the robot only calibrates the light values, this can be improved. 
+
+\subsection{Eclipse, LeJOS, Xtext,and Xtend}
+Working with Java and NXT was new for us, but it worked very good. LeJOS, Xtext and Xtend are very well documented and also often used, so that there are many forums and blogs which answered to many of our questions we had during coding. Especially the API description is very good and explains many functions.\\
+The only problem we had, is that the Java which is used for LeJOS does not support every basic functionality of Java. But to find this, we used a lot of try and error tests. 
+
+\subsection{General lessons}
+Working with hardware is not always deterministic because of the many influences outside of the system. It is also almost impossible to consider every possible situation what can be happen with the system. 
 
 \end{document}
