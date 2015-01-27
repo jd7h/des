@@ -462,27 +462,30 @@ During the whole programming phase we build small tests which are successive suc
 \textbf{Looking back at your DSL and code generation; what would you do differently, what could be improved (e.g., if you would have more time)?}\\
 Because of the limited time of the project and the very narrow goal of the DSL -- the DSL is for only one mission and for only one robot (in our case, two robots, master and slave) -- the DSL is a bit less abstract than we would have liked. To complete the project in time, we had to focus on implemented the functionality that was most useful for the final demo. For this reason, we hardly have any code or grammar-specifications of things that we did not use heavily, such as the lamp and the sonar. 
 We could also have spent less time on the bluetooth implementation. We have a few problems with getting the bluetooth communication to work during development, but since we did not exactly know the cause of the problem we spent a lot of time debugging. A tip from Jozef during the demo solved the issue, luckily, but it turned out to be a very minor thing and it should've taken less time.\\
+If we had more time, we had changed and extended some different things. The Bluetooth works not perfectly with the ultra sonic sensor. The sensor sends non stop the distance to the master until he don't sees something, then he sends one time 500. But this blocks the other functions of the robot and it is possible that the robot goes always back until the sensor stops with sending. \\
+A second thing is the calibration of the sensors, the robot is very addicted to the ambient light, a solution is to calibrate every light and color sensor before every start. At this moment the robot only calibrates the light values, this can be improved.\\
 
 \textbf{How often did you change the DSL, is there a large difference with the DSL for the small Lego NXT Rover, what where the reasons for changes?}\\
 Because of our test-driven approach, we extended the DSL weekly with new functionality. Since the DSL for the small rover was very limited, there is a big difference between the DSL for the small rover and the DSL for the mars rover. The small rover had no distinction between the master and the slave, there was only a limited set of actions and since we were still working with the subsumption architecture, we had to incorporate priorities in the DSL.\\
 
-%\subsection{Our solution}
-\textbf{How flexible and extendable is your solution? For instance, how easy is it to add sensors, actuators, to move them to another NXT brick, or to add new functionality?}
-The case that we use a state machine is useful in different ways, it makes it easy to create a model of the state machines. To change the modules of the robot only the code generator has to be changed, that is positive, because the old instances of the robot could be used further. \\
+\textbf{How flexible and extendable is your solution? For instance, how easy is it to add sensors, actuators, to move them to another NXT brick, or to add new functionality?}\\
+The fact that we use a state machine is useful in different ways. It makes it easy to create a model of the state machines. To change the modules of the robot only the code generator has to be changed, that is positive, because the old instances of the robot could be used further. \\
 For our robot is it also very easy to add some new functions and modules. Our DSL is very structured and it is easy to add a new arrow with constraints and a new state with new actions in the instances. Also to add some new code is our code very good structured which makes it easy to add new functionality. \\
-The bluetooth connection is also extendable, we worked with a number code to identify the different messages. The numbers are integers and it is easy to add new messages in the DSL with the corresponding numbers. \\
+The bluetooth 'protocol' we made is also extendable. We worked with a integers to identify the different messages, so it is easy to add new messages in the DSL. \\
 The state machine approach was useful to structure the coding process, because we had to split every step of the robot in conditions for the arrow and actions which should be done when the conditions match. This made it also easy to split our tasks in basic stuff, condition stuff and action stuff. Also the way to solve a complex problem was in the way of thinking in which conditions are there and what should the robot do to reach the state we want. In the beginning we thought to big and to complex, but after the first few tests, we learned the advantages and it was easier to split the big problems in smaller ones which made it easier to solve it. \\
 
-\subsection{Future work}
-If had more time, we had changed  and extended some different things. The Bluetooth works not perfectly with the ultra sonic sensor. The sensor sends non stop the distance to the master until he don't sees something, then he sends one time 500. But this blocks the other functions of the robot and it is possible that the robot goes always back until the sensor stops with sending. \\
-A second thing is the calibration of the sensors, the robot is very addicted to the ambient light, a solution is to calibrate every light and color sensor before every start. At this moment the robot only calibrates the light values, this can be improved. 
+\textbf{Evaluate the development process. Especially, discuss the use of a DSL for modeling and code generation. What are advantages and disadvantages, what was difficult, what was easy?}\\
+DSLs can have quite some advantages: the code from the codegenerator can be reused over and over, as it's easier to create new instances than to write an entire new program. It's nice and abstract and tailored to the problem at the same time, which means that people who are not programmers will have less trouble using a (well-designed) DSL than a programming language. 
+We think the usage of a DSL to solve a set of problems is only useful if the developer is already familiar with the way a this particular set of problems has to be solved. Since the DSL has such a big impact in the code you can ultimately generate, the developer has to have a solution in his head before he can design the DSL. 
+The design of the DSL is of course the hardest part, since this part completely determines everything you can do with it later on. We tackled this problem by looking directly at the (new) things we needed in the project. This way we were never 'stuck' and we never had to complete rewrite the DSL. The downside of this approach is that the DSL is a bit too specific for the mars rover mission.
+The best way to design a DSL is trying to make the DSL as modular as possible, or at least design it in such a way that the codegenerator can work from the DSL in a modular way. It also allows you to extend or adapt the DSL in case the problem or the solution changes.\\
 
-\subsection{Eclipse, LeJOS, Xtext,and Xtend}
-% • What are the observations about the technology used, such as Eclipse, LeJOS, Xtext,and Xtend?
+%\subsection{Eclipse, LeJOS, Xtext,and Xtend}
+\textbf{What are the observations about the technology used, such as Eclipse, LeJOS, Xtext,and Xtend?}\\
 Working with Java and NXT was new for us, but it worked very good. LeJOS, Xtext and Xtend are very well documented and also often used, so that there are many forums and blogs which answered to many of our questions we had during coding. Especially the API description is very good and explains many functions.\\
-The only problem we had, is that the Java which is used for LeJOS does not support every basic functionality of Java. But to find this, we used a lot of try and error tests. 
+The only problem we had, is that the Java which is used for LeJOS does not support every basic functionality of Java. But to find this, we used a lot of try and error tests. \\
 
-\subsection{General lessons}
+\textbf{What are general lessons learned?}\\
 Working with hardware is not always deterministic because of the many influences outside of the system. It is also almost impossible to consider every possible situation what can be happen with the system. 
 
 \end{document}
