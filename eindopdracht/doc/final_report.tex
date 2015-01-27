@@ -99,7 +99,7 @@ List of the actuators:
 \end{itemize}
 
 There can be 3 actuators and 4 sensors on 1 brick.
-Since it is vital that the motor does not fall off the table, we want that the communication between the light sensors and the motors happens without bluetooth. Since collision with other objects is an important issue, it would seem logical to connect the touch sensors directly with the master brick as well.\\ 
+Since it is vital that the motor does not fall off the table, we want that the communication between the light sensors and the motors happens without Bluetooth. Since collision with other objects is an important issue, it would seem logical to connect the touch sensors directly with the master brick as well.\\ 
 
 Since the color sensor, the motor for the temperature sensor and the temperature sensor all have to do with the same functionality, it would seem logical to put these sensors and actuators on the same brick. Finally, as the measurement of the distance with the ultrasonic sensor is not crucial for the functionality of the robot, we suggest to put that sensor on the (slave) brick for the measurements as well.\\
 
@@ -108,7 +108,7 @@ Since the color sensor, the motor for the temperature sensor and the temperature
 \hline
 \textbf{brick} & \textbf{NXT1 (master)} & \textbf{NXT2 (slave)}\\
 \hline
-tasks & wandering, navigating, avoiding collisions & recognizing colours, spotting far-away objects, temperature sensor control, lamp\\\hline
+tasks & wandering, navigating, avoiding collisions & recognizing colors, spotting far-away objects, temperature sensor control, lamp\\\hline
 actuators & motor 1, motor 2 & temperature sensor motor\\\hline
 sensors & light sensor 1, light sensor 2, touch sensor 1, touch sensor 2 & ultra sonic sensor, temperature sensor, color sensor\\
 \hline
@@ -119,7 +119,7 @@ sensors & light sensor 1, light sensor 2, touch sensor 1, touch sensor 2 & ultra
 \item[Wandering within white line] The robot drives in a straight line until it encounters a white line with one of its light sensors. If it encounters the white line, it will back up a bit, make a turn away from the white line and proceed in a straight line. For this use case, we need both motors and both the light sensors.
 \item[New lake detection and measurements] On detection of a colored lake, the robot first checks if it hasn't encountered the lake before. If not, the robot positions itself before the lake. It then lowers the temperature sensor, measures the temperature and stores it together with the color of the lake. We need the color detector, the motor for the temperature sensor and the temperature sensor itself.
 \item[Old lake detection] On detection of a colored lake, the robot checks if he encountered this lake before. If this is the case, the robot drives around the lake. For this we need the color detector and the two motors, but it doesn't matter whether the color sensor is on the same brick as both motors.
-\item[Wandering without collisions] The robot drives in a straight line. If one of the bumpers touches an object, the robot backs up, makes a turn and proceeds in a straight line. For this we need the bumpers and both motors. Since reaction time is important in this use case, it would be best if the motors and the bumpers are connected to the same brick. The ultrasonic sensor can also play a role in this use case. The reaction time of the ultrasonic sensor is less important since it can spot obstacles from further away. %The touch sensors are for the situation that the sonar missed something, so it could be an advantage to put the sonar also on the brick of the motors. The communication with the sonar does not have to be instantaneous, so we could use bluetooth, but it seems not the best thing to do.
+\item[Wandering without collisions] The robot drives in a straight line. If one of the bumpers touches an object, the robot backs up, makes a turn and proceeds in a straight line. For this we need the bumpers and both motors. Since reaction time is important in this use case, it would be best if the motors and the bumpers are connected to the same brick. The ultrasonic sensor can also play a role in this use case. The reaction time of the ultrasonic sensor is less important since it can spot obstacles from further away. %The touch sensors are for the situation that the sonar missed something, so it could be an advantage to put the sonar also on the brick of the motors. The communication with the sonar does not have to be instantaneous, so we could use Bluetooth, but it seems not the best thing to do.
 \item[Ready] If the robot has measured the temperature in a lake, it check if all lakes have been measured. If that is the case, it stops wandering and shows the table with the temperatures of all lakes on his display.\\
 \end{description}
 
@@ -176,7 +176,7 @@ measurements (color of a lake, temperature and distance detection)
 \hline
  1 & Technical risk & The computer with the installed software breaks down and we lose access to our work. & 3 & 4 & High & Push all work to the repository, regularly. & Find a replacement for the broken laptop or use one of the lab computers.\\
 \hline
- 2 & Organiza- tional risk & The robot is not available for testing. & 3 & 4 & High & Regulary test small pieces of code, so that debugging is not a lot of work. & Postpone testing until later or wait until the robot is free. Use the lab when when we know there won't be other students around (early morning).\\
+ 2 & Organiza- tional risk & The robot is not available for testing. & 3 & 4 & High & Regularly test small pieces of code, so that debugging is not a lot of work. & Postpone testing until later or wait until the robot is free. Use the lab when when we know there won't be other students around (early morning).\\
 \hline
  3  & Technical risk & The DSL does not fit with the implementation. & 3 & 2 & Medium & Change the DSL to a lower level of abstraction. & \\
 \hline
@@ -184,7 +184,7 @@ measurements (color of a lake, temperature and distance detection)
 \hline
  5 & Require- ments risk & The requirements contains ideas which are not compatible with the idea of the DSL. & 2 & 2 & Medium &  & Change requirements until it is possible to implement.\\
 \hline
- 6 & Technical risk & Problems with the bluetooth communication between the two bricks & 5 & 3 & Medium & Test bluetooth functionality as soon as possible. & Ask for help from the teacher or other students.\\
+ 6 & Technical risk & Problems with the Bluetooth communication between the two bricks & 5 & 3 & Medium & Test Bluetooth functionality as soon as possible. & Ask for help from the teacher or other students.\\
 \hline
  7 & Organiza- tional risk & Lab partners have different schedules which makes it hard to find time to work together & 5 & 3 & Medium & The lab partners don't plan anything on Wednesday afternoon, so that there is at least one moment in the week when they are both free to work on the project & Reschedule work or work together during the weekends.\\
  \hline
@@ -196,22 +196,22 @@ We had two options for the structure of the DSL of the Mars Rover.
 
 Our first option was to create a DSL that was close to the subsumption architecture as implemented by the LeJOS API. The advantage of this approach is that we already had experience with programming in terms of behaviors during the first weeks of the Mars Rover project. It would also mean that we didn't have to worry about implementing an Arbitrator, as it would be provided by LeJOS.
 %However, we found that the subsumption architecture was not general enough.
-% The advantage of this approach is the experience with during the last weeks of the class 'Design of embedded Systems' and the thread/task management is already made in form of the Arbitrator class.\\
+% The advantage of this approach is the experience with during the last weeks of the class 'Design of embedded Systems' and the Thread/task management is already made in form of the Arbitrator class.\\
 
 The second option is the implementation of a state machine.
 %approach which was the first idea for our DSL. 
 In this case, the advantage of a state machine implementation is the great level of abstraction that we can use for the DSL. 
 It's quite easy to design a robot by simply drawing an automata with the desired behavior.
-Since the use of an arbitrator also means that you sacrifice transparancy for convienence, we did also foresee some problems with programming and debugging: the arbitrator would be an extra layer between us and the robot. 
+Since the use of an arbitrator also means that you sacrifice transparency for convenience, we did also foresee some problems with programming and debugging: the arbitrator would be an extra layer between us and the robot. 
 %We see the advantages here in the abstraction level which can be create. 
 %That makes it easier for us to implement such complex things like the Bluetooth communication, where we had a lot of problems with the Arbitrator. 
 A disadvantage is the implementation of the state machine framework itself. 
-We would have to implement this framework ourselves, which meant that instead of having a ready-made environment for programming, we would need more startup time for the project. However, we kept this in mind when we made the planning.
+We would have to implement this framework ourselves, which meant that instead of having a ready-made environment for programming, we would need more start up time for the project. However, we kept this in mind when we made the planning.
 %It turned out to be no problem at all, since we could program very fast when eventually the state machine implementation was up and running.
 %We do not have many experience with it, such that it will be approximately cost more time to implement the robot.\\
 
 After some deliberation, we have chosen the state machine approach.
-Firstly, this was because of the possibility to have more control over the threads and tasks of the robot. 
+Firstly, this was because of the possibility to have more control over the Threads and tasks of the robot. 
 We would have a better overview about what the robot does and why. 
 Another reason is that the state machine approach is also more abstract, which suits the use of a DSL. 
 Because of the high level of abstraction it is easier to make the implementation modular. 
@@ -258,8 +258,8 @@ Each arrow consists of three parts: two states (the origin and destination of th
 The syntax for the specification of a transition is
 \[ \texttt{Arrow origin -> destination	if condition} \]
 where condition is a list of conditions in disjunctive normal form. 
-Disjunctive normal form means that a boolean formula consists of disjunctions of conjunctive clauses. The conjuctive clauses are placed between brackets and prefixed with the keyword \texttt{and}.
-Since every boolean formula has a disjunctive normalform, we thought it was a cool solution for more complex conditionals without having to implement boolean operators completely from scratch. 
+Disjunctive normal form means that a boolean formula consists of disjunctions of conjunctive clauses. The conjunctive clauses are placed between brackets and prefixed with the keyword \texttt{and}.
+Since every boolean formula has a disjunctive normal form, we thought it was a cool solution for more complex conditionals without having to implement boolean operators completely from scratch. 
 
 \begin{verbatim}
 Arrows: 
@@ -302,9 +302,9 @@ drive \emph{\{forwards,backwards\}} duration \emph{\{duration,INF\}} speed \emph
 turn (\emph{min},\emph{max}) & Robot makes a turn with random angle between \emph{min} and \emph{max}.\\
 stop & Both motors immediately stop.\\
 send \emph{message} & The robot sends package with \emph{message} to the other brick.\\
-park & The robot tries to manouver in such a way that it is aligned with a lake, as necessary for doing a temperature measurement.\\
-init bt \emph{slave}& Initalizes a bluetooth connection with \emph{slave}\\
-wait for bt & Wait for a bluetooth connection from another brick\\
+park & The robot tries to maneuver in such a way that it is aligned with a lake, as necessary for doing a temperature measurement.\\
+init bt \emph{slave}& Initalizes a Bluetooth connection with \emph{slave}\\
+wait for bt & Wait for a Bluetooth connection from another brick\\
 calibrate & The robot asks the user to place it on the white and black parts of the robotics area, and tries to save the sensor values of the left light sensor. Must be called in the starting state for proper functioning.\\
 beep & Robot emits a beeping sound.\\
 print \emph{string} & Robot prints \emph{string} on the screen.\\
@@ -375,11 +375,11 @@ The public variable \emph{current} will be used to keep the current state. Every
 The method \emph{execute(State s)} connects the enum with the methods of a state. Also the start and end state are be defined in this way. \\
 The arrows of the automaton contains the conditions of an transition. These conditions are checked during the while the automaton waits for the trigger for the next state. Every condition is written as an if-statement with the next state as body. \\
 
-The most difficult part of the program was the integration of Bluetooth, we decided to created a new thread for the read part of the communication. For this the master and the slave use both the class \emph{BTfunctionality}, which contains the information for the Bluetooth part. Further is the master also the master of the Bluetooth communication and initialized also the handshake and the set up of the connection. \\
+The most difficult part of the program was the integration of Bluetooth, we decided to created a new Thread for the read part of the communication. For this the master and the slave use both the class \emph{BTfunctionality}, which contains the information for the Bluetooth part. Further is the master also the master of the Bluetooth communication and initialized also the handshake and the set up of the connection. \\
 
 The found lakes and the corresponding information are saved in the array lakes of the object Lake. So that it is in every situation possible that the slave can edit the array. \\
 
-For debugging and readability reasons we also created the thread \emph{Colorfunctionality} which shows in every situation the actual found color in the display of the slave.  
+For debugging and readability reasons we also created the Thread \emph{Colorfunctionality} which shows in every situation the actual found color in the display of the slave.  
   
 
 
@@ -394,11 +394,11 @@ After two weeks we had a working framework and a first stub of a DSL.
 
 At the beginning, we have made a list of elements of the project where we anticipated problems with the implementation: 
 \begin{itemize}
-\item bluetooth communication and working with threads
+\item Bluetooth communication and working with Threads
 \item communication protocol / packets between the two bricks
 \item usage of the RCX motor and temperature sensor
 \item code generation -- we wanted the code to be clear and modular
-\item manouvering around the lakes ("parking"), in such a way that the temperature sensor finishes in the right position.
+\item maneuvering around the lakes ("parking"), in such a way that the temperature sensor finishes in the right position.
 \item color recognition in different lighting conditions
 \end{itemize}
 
@@ -418,12 +418,12 @@ Every week during the project, we would do the following:
 \hline
 week & problems tackled\\
 \hline
-december 1	& state machine framework \& wandering without falling off the table\\
-december 2	& state machine framework \& wandering without falling off the table\\
-december 3	& bluetooth, calibration of sensors, communication, basic functionality\\
-december 4	& communication between bricks\\\hline
-januari 1	& communication and package handling, colorsensor, temperature sensor\\
-januari 2	& parking, testing the mars rover as a whole\\
+December 1	& state machine framework \& wandering without falling off the table\\
+December 2	& state machine framework \& wandering without falling off the table\\
+December 3	& Bluetooth, calibration of sensors, communication, basic functionality\\
+December 4	& communication between bricks\\\hline
+January 1	& communication and package handling, colorsensor, temperature sensor\\
+January 2	& parking, testing the mars rover as a whole\\
 \hline
 \end{tabular}
 
@@ -450,7 +450,7 @@ januari 2	& parking, testing the mars rover as a whole\\
 
 \section{Evaluation of the work on the Mars Rover}
 \textbf{What were the most important steps during the development; what was difficult, what was easy, was the order of the steps suitable?}\\
-The most important steps of our Mars Rover project were in the beginning the decision to create a DSL in form of a state machine. With this decision we solved some problems we encountered during the project of the small Rover. For example the problem of the untransparent workings of the Arbitrator and the bluetooth communication using a Thread. Because we used a deterministic automata approach, we knew in every state exactly what the robot does. The behaviour of the robot was for us now more transparent, and this made the programming and working with the robot more easy. 
+The most important steps of our Mars Rover project were in the beginning the decision to create a DSL in form of a state machine. With this decision we solved some problems we encountered during the project of the small Rover. For example the problem of the untransparent workings of the Arbitrator and the Bluetooth communication using a Thread. Because we used a deterministic automata approach, we knew in every state exactly what the robot does. The behavior of the robot was for us now more transparent, and this made the programming and working with the robot more easy. 
 The decision created also some problems. We had to begin with building the framework from scratch and couldn't use much code from the small Rover. This was a challenge for us, because we had not much experience with LeJos and NXT without the subsumption architecture.
 
 %\subsection{Planning}
@@ -461,7 +461,7 @@ During the whole programming phase we build small tests which are successive suc
 
 \textbf{Looking back at your DSL and code generation; what would you do differently, what could be improved (e.g., if you would have more time)?}\\
 Because of the limited time of the project and the very narrow goal of the DSL -- the DSL is for only one mission and for only one robot (in our case, two robots, master and slave) -- the DSL is a bit less abstract than we would have liked. To complete the project in time, we had to focus on implemented the functionality that was most useful for the final demo. For this reason, we hardly have any code or grammar-specifications of things that we did not use heavily, such as the lamp and the sonar. 
-We could also have spent less time on the bluetooth implementation. We have a few problems with getting the bluetooth communication to work during development, but since we did not exactly know the cause of the problem we spent a lot of time debugging. A tip from Jozef during the demo solved the issue, luckily, but it turned out to be a very minor thing and it should've taken less time.\\
+We could also have spent less time on the Bluetooth implementation. We have a few problems with getting the Bluetooth communication to work during development, but since we did not exactly know the cause of the problem we spent a lot of time debugging. A tip from Jozef during the demo solved the issue, luckily, but it turned out to be a very minor thing and it should've taken less time.\\
 If we had more time, we had changed and extended some different things. The Bluetooth works not perfectly with the ultra sonic sensor. The sensor sends non stop the distance to the master until he don't sees something, then he sends one time 500. But this blocks the other functions of the robot and it is possible that the robot goes always back until the sensor stops with sending. \\
 A second thing is the calibration of the sensors, the robot is very addicted to the ambient light, a solution is to calibrate every light and color sensor before every start. At this moment the robot only calibrates the light values, this can be improved.\\
 
@@ -471,7 +471,7 @@ Because of our test-driven approach, we extended the DSL weekly with new functio
 \textbf{How flexible and extendable is your solution? For instance, how easy is it to add sensors, actuators, to move them to another NXT brick, or to add new functionality?}\\
 The fact that we use a state machine is useful in different ways. It makes it easy to create a model of the state machines. To change the modules of the robot only the code generator has to be changed, that is positive, because the old instances of the robot could be used further. \\
 For our robot is it also very easy to add some new functions and modules. Our DSL is very structured and it is easy to add a new arrow with constraints and a new state with new actions in the instances. Also to add some new code is our code very good structured which makes it easy to add new functionality. \\
-The bluetooth 'protocol' we made is also extendable. We worked with a integers to identify the different messages, so it is easy to add new messages in the DSL. \\
+The Bluetooth 'protocol' we made is also extendable. We worked with a integers to identify the different messages, so it is easy to add new messages in the DSL. \\
 The state machine approach was useful to structure the coding process, because we had to split every step of the robot in conditions for the arrow and actions which should be done when the conditions match. This made it also easy to split our tasks in basic stuff, condition stuff and action stuff. Also the way to solve a complex problem was in the way of thinking in which conditions are there and what should the robot do to reach the state we want. In the beginning we thought to big and to complex, but after the first few tests, we learned the advantages and it was easier to split the big problems in smaller ones which made it easier to solve it. \\
 
 \textbf{Evaluate the development process. Especially, discuss the use of a DSL for modeling and code generation. What are advantages and disadvantages, what was difficult, what was easy?}\\
