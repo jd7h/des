@@ -21,7 +21,7 @@
 % Description of the work on the Mars Rover
 %   Describe the details of the main development activities:
 \section{Introduction}
-The main goal of the robot is to find all three colored lakes and measure the temperature.
+The main goal of this project is to build a Mars Rover robot that can autonomously find all lakes in the vicinity and measure the temperature in each of them.
 
 % Listing of requirements with priorities.
 \section{Requirements}
@@ -194,7 +194,8 @@ measurements (color of a lake, temperature and distance detection)
 \subsection{Approach}
 We had two options for the structure of the DSL of the Mars Rover. 
 
-Our first option was to create a DSL that was close to the subsumption architecture as implemented by the LeJOS API. The advantage of this approach is that we already had experience with programming in terms of behaviors during the first weeks of the Mars Rover project. It would also mean that we didn't have to worry about implementing an Arbitrator, as it would be provided by LeJOS.
+Our first option was to create a DSL that was close to the subsumption architecture as implemented by the LeJOS API. The advantage of this approach is that we already had experience with programming in terms of behaviors during the first weeks of the Mars Rover project. It would also mean that we didn't have to worry about implementing an Arbitrator, as it would be provided by LeJOS. 
+However, since the use of an arbitrator means that you sacrifice transparency for convenience, we did also foresee some problems with programming and debugging: the arbitrator would be an extra layer between us and the robot. 
 %However, we found that the subsumption architecture was not general enough.
 % The advantage of this approach is the experience with during the last weeks of the class 'Design of embedded Systems' and the Thread/task management is already made in form of the Arbitrator class.\\
 
@@ -202,10 +203,10 @@ The second option is the implementation of a state machine.
 %approach which was the first idea for our DSL. 
 In this case, the advantage of a state machine implementation is the great level of abstraction that we can use for the DSL. 
 It's quite easy to design a robot by simply drawing an automata with the desired behavior.
-Since the use of an arbitrator also means that you sacrifice transparency for convenience, we did also foresee some problems with programming and debugging: the arbitrator would be an extra layer between us and the robot. 
+
 %We see the advantages here in the abstraction level which can be create. 
 %That makes it easier for us to implement such complex things like the Bluetooth communication, where we had a lot of problems with the Arbitrator. 
-A disadvantage is the implementation of the state machine framework itself. 
+A disadvantage is the implementation of the state machine framework. 
 We would have to implement this framework ourselves, which meant that instead of having a ready-made environment for programming, we would need more start up time for the project. However, we kept this in mind when we made the planning.
 %It turned out to be no problem at all, since we could program very fast when eventually the state machine implementation was up and running.
 %We do not have many experience with it, such that it will be approximately cost more time to implement the robot.\\
@@ -251,7 +252,7 @@ States:
 
 In this example, whenever the robot is in state \texttt{start}, it starts the motors to drive forwards. In \texttt{problemLeft} and \texttt{problemRight}, it stops the motors and makes a turn. In the state \texttt{finished} it stops the motors.
 
-Finally, we have to specify the transitions of the automaton, ie. when we can move from one state to the other. We make another list \texttt{Arrows:}, where we specify the transitions.
+Finally, we have to specify the transitions of the automaton, ie. when we can move from one state to the other. We make another list \texttt{Arrows:}, where we specify the transitions. Note that the order in which we define the transitions from $a \rightarrow b$ is relevant for the order in which we check the possible transitions in the method for state $a$.
 
 Each arrow consists of three parts: two states (the origin and destination of the transition) and a condition. When we are in a state $s$ that has a transition to $s'$, we are only allowed to change to $s'$ if the matching condition is fulfilled. 
 
@@ -259,7 +260,7 @@ The syntax for the specification of a transition is
 \[ \texttt{Arrow origin -> destination	if condition} \]
 where condition is a list of conditions in disjunctive normal form. 
 Disjunctive normal form means that a boolean formula consists of disjunctions of conjunctive clauses. The conjunctive clauses are placed between brackets and prefixed with the keyword \texttt{and}.
-Since every boolean formula has a disjunctive normal form, we thought it was a cool solution for more complex conditionals without having to implement boolean operators completely from scratch. 
+Since every boolean formula has a disjunctive normal form, we thought it was a cool solution for more complex conditionals without having to implement boolean operators completely from scratch. In practice we hardly used complex conditionals, so in the end it also meant more typing work for the programmers.
 
 \begin{verbatim}
 Arrows: 
@@ -337,7 +338,7 @@ We use one instance for every brick.
 Since we use a state machine, we wanted the following assumptions to hold when designing the automatons:
 \begin{enumerate}
 \item every state is a black box without weird side effects, ie. when the current state is not s1, no part of s1 will be executed.
-\item the outgoing arrows of every state should together cover all possible situations. If not, we get stuck in one of the states.
+\item the outgoing arrows of every state should together cover all possible situations. If not, we can get stuck in one of the states.
 \end{enumerate}
 
 The instances we have defined for the master and slave bricks are a description of the following automatons:
