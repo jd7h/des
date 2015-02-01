@@ -354,8 +354,10 @@ The instances we have defined for the master and slave bricks are a description 
 %- slave /Master unterschiede
 %- actions / condition use
 %- states in enum / methods created
-The Main classes for the slave and for the master are be generated of the two instances. Every main get  own equipment so that the ports and used variables can be declared and initialized. \\
-In the \emph{JavaGenerator.java} is this solved with the \emph{masterEquipment(), slaveEquipment(), masterInit(), slaveInit()} to decide which allocation should be generated in the Main classes for the slave and for the master. To handle the states from the automaton will be an enum generated which contains all states, such an enum of the mars rover looks like: 
+The Main classes for the slave and for the master are generated of two instances. Every main get its own equipment so that the right ports and variables are declared and initialized. \\
+In \emph{JavaGenerator.java} is this solved with the \emph{masterEquipment(), slaveEquipment(), masterInit(), slaveInit()} methods to decide which configuration should be generated in the Main classes for the slave and for the master. 
+
+We define all states from the automaton in an enum which contains all states. Such an enum of the mars rover looks like: 
 \begin{verbatim}
 public enum State {
     CALIBRATESENS,
@@ -372,11 +374,14 @@ public enum State {
 }
 \end{verbatim}
 
-The public variable \emph{current} will be used to keep the current state. Every state has also his own method where all the actions of this state will be executed. After all actions are done the state waits for the next trigger which indicates the next transaction and the next state becomes the current state. 
-The method \emph{execute(State s)} connects the enum with the methods of a state. Also the start and end state are be defined in this way. \\
-The arrows of the automaton contains the conditions of an transition. These conditions are checked during the while the automaton waits for the trigger for the next state. Every condition is written as an if-statement with the next state as body. \\
+The public variable \emph{current} will be used to keep the current state. 
 
-The most difficult part of the program was the integration of Bluetooth, we decided to created a new Thread for the read part of the communication. For this the master and the slave use both the class \emph{BTfunctionality}, which contains the information for the Bluetooth part. Further is the master also the master of the Bluetooth communication and initialized also the handshake and the set up of the connection. \\
+Every state has his own method where all the actions of this state will be executed in order. After all actions are executed the state waits for a trigger which indicates the next transaction and the next state becomes the current state. 
+The method \emph{execute(State s)} connects the enum with the methods of a state. The start and end state are be defined in this way. \\
+
+The arrows of the automaton contains the conditions of an transition. These conditions are checked in order when the automaton waits for a trigger for the next state. Every condition is written as an if-statement with the next state as body. \\
+
+The most difficult part of the program was the integration of bluetooth, we decided to created a new Thread for the read part of the communication. For this the master and the slave use both the class \emph{BTfunctionality}, which contains the information for the Bluetooth part. The master is the initiator of the Bluetooth communication as it initializes the handshake and sets up a connection. \\
 
 The found lakes and the corresponding information are saved in the array lakes of the object Lake. So that it is in every situation possible that the slave can edit the array. \\
 
@@ -457,13 +462,13 @@ The decision created also some problems. We had to begin with building the frame
 %\subsection{Planning}
 We tried to work every week one day together in the DES-lab, but we had of course some problems. Because we both had very different schedules, it was hard to find time to work together. We managed to create a good task allocation and we could also work on different days. We also discussed every week a goal which should been reached, so that we could show a result to Jozef. As an effect of this is that we didn't stay to long on one complex problem and to find sometimes a solution which is more convenient and for that moment useful, but not really nice. %example?\\
 
-To get the project more structured we made a list with subject which can be problematic and which need more time to find a good solution. This helped because we got early an impression how big the project becomes and we had in the beginning time to get in the subjects. A second advantage of this approach was that we could build our DSL around the difficult subjects and we didn't had to change the DSL so much. \\
-During the whole programming phase we build small tests which are successive such that we could very nicely test every component separately. Further could we built the test that go more and more to a complete solution for the Mars Rover.\\
+To get the project more structured we made a list with subjects which can be problematic and which need more time to find a good solution. This helped because we got early an impression how big the project would be and we had in the beginning time to get in the subjects. A second advantage of this approach was that we could build our DSL around the difficult subjects and we didn't had to change the DSL so much. \\
+During the whole programming phase we built small tests which are successive such that we could very nicely test every component separately. Further could we build the test that go more and more to a complete solution for the Mars Rover.\\
 
 \textbf{Looking back at your DSL and code generation; what would you do differently, what could be improved (e.g., if you would have more time)?}\\
-Because of the limited time of the project and the very narrow goal of the DSL -- the DSL is for only one mission and for only one robot (in our case, two robots, master and slave) -- the DSL is a bit less abstract than we would have liked. To complete the project in time, we had to focus on implemented the functionality that was most useful for the final demo. For this reason, we hardly have any code or grammar-specifications of things that we did not use heavily, such as the lamp and the sonar. 
+Because of the limited time of the project and the very narrow goal of the DSL -- the DSL is for only one mission and for only one robot (in our case, two robots, master and slave) -- the DSL is a bit less abstract than we would have liked. To complete the project in time, we had to focus on implementing the functionality that was most useful for the final demo. For this reason, we hardly have any code or grammar-specifications of things that we did not use heavily, such as the lamp and the sonar. 
 We could also have spent less time on the Bluetooth implementation. We have a few problems with getting the Bluetooth communication to work during development, but since we did not exactly know the cause of the problem we spent a lot of time debugging. A tip from Jozef during the demo solved the issue, luckily, but it turned out to be a very minor thing and it should've taken less time.\\
-If we had more time, we had changed and extended some different things. The Bluetooth works not perfectly with the ultra sonic sensor. The sensor sends non stop the distance to the master until he don't sees something, then he sends one time 500. But this blocks the other functions of the robot and it is possible that the robot goes always back until the sensor stops with sending. \\
+If we had more time, we had changed and extended some different things. The Bluetooth works not perfectly with the ultra sonic sensor. The sensor sends nonstop the distance to the master until he doesn't see something, then he sends one time 500. But this blocks the other functions of the robot and it is possible that the robot goes always back until the sensor stops with sending. In other words, we could have spent more time designing the communication 'protocol' the master and slave use to communicate with each other. \\
 A second thing is the calibration of the sensors, the robot is very addicted to the ambient light, a solution is to calibrate every light and color sensor before every start. At this moment the robot only calibrates the light values, this can be improved.\\
 
 \textbf{How often did you change the DSL, is there a large difference with the DSL for the small Lego NXT Rover, what where the reasons for changes?}\\
